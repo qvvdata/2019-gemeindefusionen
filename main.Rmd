@@ -1,8 +1,8 @@
 ---
-title: "Hier muss ein Titel rein"
-subtitle: "Und ein Untertitel"
-author: "tbd"
-date: "MM-YYYY"
+title: "Analyse der Gemeinstrukturreform und Verwaltungsausgaben in Österreichs Gemeinden seit 2010"
+subtitle: "Das wird ein Spaß"
+author: "Gerald Gartner, Markus Hametner, Gabriel Hellmann"
+date: "11-2018"
 output:
   html_document:
     code_folding: show
@@ -17,8 +17,8 @@ output:
 # CONFIG
 user_name <- "qvvdata" # your Git username (only needed if
 # you want to deploy to GH pages)
-project_name <- "PROJECT_NAME" # adapt!
-package_date <- "2017-09-01" # date of the CRAN snapshot that
+project_name <- "2019-gemeindefusionen" # adapt!
+package_date <- "2018-10-10" # date of the CRAN snapshot that
 # the checkpoint package uses
 ```
 
@@ -87,7 +87,9 @@ library(scales) # scales for ggplot2
 library(jsonlite) # json
 library(forcats) # easier factor handling,
 library(lintr) # code linting
+library(rmapshaper) # simplify 
 library(xlsx) #Excel
+library(sf) # Maps
 library(googlesheets) # googlesheets (replace with googlesheets4 asap)",
 file = "manifest.R")
 ```
