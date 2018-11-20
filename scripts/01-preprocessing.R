@@ -1,10 +1,24 @@
+# braucht mehr Leistung
+options(java.parameters = "- Xmx1024m")
+
+#mapping laden
+ansatz_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="ansaetze")
+posten_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="posten")
+haushalt_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="haushalt")
+
+
 # Laden der Finanzgebarung nach Ansatz
-ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", fileEncoding="UTF-8") %>%
+needs(xlsx)
+ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", sheet ="fileref") %>%
+  mutate(gkz = as.numeric(gkz), 
+         fj = as.numeric(fj))
+
+ansatz2 <- read.delim2("input/bessereheader/gemeindennachansatz.txt") %>%
   mutate(gkz = as.numeric(gkz), 
          fj = as.numeric(fj))
 
 # Laden der Finanzgebarung nach Posten
-posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx") %>%
+posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx", sheet="fileref") %>%
   mutate(gkz = as.numeric(gkz), 
          fj = as.numeric(fj))
 
