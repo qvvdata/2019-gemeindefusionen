@@ -1,6 +1,8 @@
 suppressPackageStartupMessages(library("dplyr"))
 library(tidyr)
 
+
+borderman_fusionen_cache <- NULL
 propagate_fusions <- function(df, fusionen) {
   # Takes two dataframes
   # One containing the columns gkz (Gemeindekennziffer) and name (Gemeindename), and any number of columns containing number values
@@ -57,10 +59,12 @@ borderman <- function(df) {
   # Call example: borderman(bev) or borderman(arbeitslose)
 
   library("googlesheets")
-  data <- gs_key('13vfbtcOrA95sw4McFjT1znVgzgdrMQjYtmOZ9w5oVIQ')
-  fusionen <- gs_read_listfeed(data, ws = 'gemeindefusionen', col_names = TRUE)
+  if(is.null(borderman_fusionen_cache)) {
+    data <- gs_key('13vfbtcOrA95sw4McFjT1znVgzgdrMQjYtmOZ9w5oVIQ')
+    borderman_fusionen_cache <<- gs_read_listfeed(data, ws = 'gemeindefusionen', col_names = TRUE)
+  }
 
-  propagate_fusions(df, fusionen)
+  propagate_fusions(df, borderman_fusionen_cache)
 }
 
 remove_teilungen <- function(df) {

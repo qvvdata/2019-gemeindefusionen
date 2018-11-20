@@ -1,3 +1,22 @@
+
+library(tidyverse)
+library(readxl)
+library(sf)
+library(rmapshaper)
+source('./scripts/borderman.R')
+
+# Laden der Finanzgebarung nach Ansatz
+ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
+  mutate(gkz = as.numeric(gkz), 
+         fj = as.numeric(fj))
+
+ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(borderman(.[,c('gkz','soll')]))
+
+# Laden der Finanzgebarung nach Posten
+posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx", sheet="fileref") %>%
+  mutate(gkz = as.numeric(gkz), 
+         fj = as.numeric(fj))
+
 # braucht mehr Leistung
 options(java.parameters = "- Xmx1024m")
 
@@ -13,14 +32,7 @@ ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", sheet ="fil
   mutate(gkz = as.numeric(gkz), 
          fj = as.numeric(fj))
 
-ansatz2 <- read.delim2("input/bessereheader/gemeindennachansatz.txt") %>%
-  mutate(gkz = as.numeric(gkz), 
-         fj = as.numeric(fj))
-
-# Laden der Finanzgebarung nach Posten
-posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx", sheet="fileref") %>%
-  mutate(gkz = as.numeric(gkz), 
-         fj = as.numeric(fj))
+ansatz2 <- read.delim2("input/bessereheader/gemeindennachansatz.txt")
 
 # Laden der Bevölkerungsdaten
 gemeinden_vz <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", sheet="bev_volkszaehlung")%>%
