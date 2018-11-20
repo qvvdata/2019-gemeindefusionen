@@ -1,7 +1,15 @@
+library(tidyverse)
+library(readxl)
+library(sf)
+library(rmapshaper)
+source('./scripts/borderman.R')
+
 # Laden der Finanzgebarung nach Ansatz
-ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", fileEncoding="UTF-8") %>%
+ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
   mutate(gkz = as.numeric(gkz), 
          fj = as.numeric(fj))
+
+ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(borderman(.[,c('gkz','soll')]))
 
 # Laden der Finanzgebarung nach Posten
 posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx") %>%
