@@ -1,0 +1,3 @@
+### Methodik 
+Bei der Gemeindestrukturreform gab nicht nur Zusammenlegungen von Gemeinden. Manche Gemeinden haben auch Teile einer anderen Gemeinde dazubekommen, beispielsweise Oberstorcha oder Kohlberg. Diese neun Gemeinden werden in unserer Analyse vollständig ausgeblendet, weil wir die Kostenstellen nicht proportional ihren neuen Gemeinden zuweisen können. Bei fusionierten Gemeinden wie Straß in Steiermark, Obervogau, Spielfeld und Vogau zur Gemeinde Spielfeld-Straß haben wir die Ausgaben der vier vormaligen Gemeinden summiert und sie mit den Ausgaben der einzelnen, zusammengelegten Gemeinde verglichen. 
+

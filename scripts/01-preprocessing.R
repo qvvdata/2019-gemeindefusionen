@@ -1,4 +1,3 @@
-
 library(tidyverse)
 library(readxl)
 library(sf)
@@ -6,35 +5,114 @@ library(rmapshaper)
 source('./scripts/borderman.R')
 
 # Laden der Finanzgebarung nach Ansatz
-ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
-  mutate(gkz = as.numeric(gkz), 
-         fj = as.numeric(fj))
+# ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
+#   mutate(gkz = as.numeric(gkz), 
+#          fj = as.numeric(fj))
+# 
+# ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(remove_teilungen(borderman(.[,c('gkz','soll')])))
+# 
 
-ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(borderman(.[,c('gkz','soll')]))
 
-# Laden der Finanzgebarung nach Posten
-posten <- read_excel("input/bessereheader/gemeindennachposten.xlsx", sheet="fileref") %>%
-  mutate(gkz = as.numeric(gkz), 
-         fj = as.numeric(fj))
+# fj10 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2010.xlsx")
+# fj11 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2011.xlsx")
+# fj12 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2012.xlsx")
+# fj13 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2013.xlsx")
+# fj14 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2014.xlsx")
+# fj15 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2015.xlsx")
+# fj16 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2016.xlsx")
+# fj17 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2all_2017.xlsx")
+# 
+# data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
+#   mutate(gkz = as.numeric(gem), 
+#          FJ = as.numeric(FJ))
+# 
+# data_bordermanned <- data %>% 
+#   group_by(FJ,HH, ans2, post3) %>%
+#   do(remove_teilungen(borderman(.[,c('gkz','SOLL')])))
+
+#save(data, "output/ignore/data.rda")
+#save(data_bordermanned, "output/ignore/data_bordermanned.rda")
+
+# Reinladen des bereinigten Haushaltsfiles
+data_bordermanned <- readRDS("output/ignore/data_bordermanned.RDS")
+
+# Der Borderman macht ein Gather und Spread auf Werte mit 0, deshalb sind im File dann zu viele Werte bei Ansätzen, die es eigenltich nicht gibt --> entfernen
+data <- data_bordermanned %>%
+filter(SOLL !=0)%>%
+  filter(SOLL >0)%>% # Überträge aus dem Vorjahr weg
+  mutate(fj = as.numeric(FJ), 
+         gkz_neu = as.numeric(gkz_neu), 
+         hh = HH, 
+         soll = SOLL)%>%
+  ungroup() %>%
+  select(fj, hh, ans2, post3, gkz_neu, soll)
+
+#gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
+#gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(remove_teilungen(borderman(.[,c('gkz','test')]))) %>% select(-test)
+#saveRDS(gsr15, "output/ignore/gsr15.rds")
+
+gsr15 <- readRDS("output/ignore/gsr15.rds")
+
+# Reinladen des bereinigten Haushaltsfiles
+data_bordermanned <- readRDS("output/ignore/data_bordermanned.RDS")
 
 # braucht mehr Leistung
 options(java.parameters = "- Xmx1024m")
 
 #mapping laden
-ansatz_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="ansaetze")
-posten_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="posten")
-haushalt_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="haushalt")
+ansatz_bez <- read_excel("input/bessereheader/ansaetze.xlsx", sheet ="Ansätze") # %>% mutate(ans2 = as.numeric())
+ansatz3_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="ansaetze", trim_ws=TRUE) 
+posten_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="posten", trim_ws=TRUE)
+haushalt_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="haushalt", trim_ws=TRUE)
+
+# 0. Borderman auf alles
+# 1. Merge der Bezeichnungen ✅
+# 2. Erstellen der Gruppen ✅
+# 3. Merge der Bevölkerungszahlen ✅
+# 4. Merge der Bezirke und Urban-Rural-Typologie ✅
+# 5. Von der Gemeindestrukturreform betroffen mergen ✅
+# 6. Kosten pro Kopf für die Verwaltung im Verlauf berechnen✅
+# Werte unter 0 raushauen ✅
+
+#Laden der Finanzgebarung nach Ansatz
+ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", sheet ="fileref",  trim_ws = TRUE) %>%
+   mutate(gkz = as.numeric(gkz),
+          fj = as.numeric(fj)) %>%
+   select(-c(haushalt, bez))
+
+ansatz2017 <- read_excel("input/bessereheader/Ansatz2017.xlsx", trim_ws = TRUE) %>%
+   mutate(gkz = as.numeric(gem),
+          fj = as.numeric(FJ))%>%
+   rename(hh = HH,
+          soll = SOLL) %>%
+   select(-c(FJ, gem))
+
+ansaetze_data <- bind_rows(ansatz2017, ansatz)
+
+ ansaetze_data_bordermanned <- ansaetze_data %>% 
+    group_by(fj,hh,ans3) %>%
+    do(remove_teilungen(borderman(.[,c('gkz','soll')]))) 
+ 
+ ansaetze_data <- ansaetze_data_bordermanned %>%
+   filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
+
+# saveRDS(ansaetze_data, "output/ignore/ansaetze_data.rds")
+
+ansaetze_data <- readRDS("output/ignore/ansaetze_data.rds") %>%
+  mutate(gkz_neu = as.numeric(gkz_neu))
+ 
+
+# Gefunden im Analyse-Schritt: gkz 62248, 62227, 62336 --> dürften nicht da sein
 
 
-# Laden der Finanzgebarung nach Ansatz
-needs(xlsx)
-ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", sheet ="fileref") %>%
-  mutate(gkz = as.numeric(gkz), 
-         fj = as.numeric(fj))
-
-ansatz2 <- read.delim2("input/bessereheader/gemeindennachansatz.txt")
-
+ 
 # Laden der Bevölkerungsdaten
+
+mylabels <- c("Bis 500","501- 1.000","1.001- 1.500","1.501- 2.000","2.001- 2.500","2.501- 3.000" ,  
+              "3.001- 5.000","5.001- 10.000","10.001- 20.000","20.001- 30.000","30.001- 50.000","50.001-100.000","100.001-200.000",
+               "200.001-500.000","Über 1 000.000", "über 1 000.000")
+my_breaks <- c(0, 500, 1000, 1500,2000,2500,3000,5000,10000,20000,30000,50000,100000,200000,500000,1000000,5000000)
+
 gemeinden_vz <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", sheet="bev_volkszaehlung")%>%
   gather(jahr, wert, `1910`:`2011`) %>%
   filter(jahr!="2011")%>%
@@ -45,7 +123,10 @@ gemeinden_reg <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", 
   select(-`gem.y`) %>%
   gather(jahr, ew, `2002`:`2001`) %>%
   arrange(jahr) %>%
-  rename("name" = "gem.x")
+  rename("name" = "gem.x")%>%
+  mutate(jahr=as.numeric(jahr)) %>%
+  filter(jahr>=2010 & jahr<=2017) %>%
+  mutate(gemgrklas = cut(ew, breaks=my_breaks, labels=mylabels))
 
 #needs(rmapshaper)
 # Laden der Geodaten
@@ -61,43 +142,74 @@ bundeslaendergrenzen <- gde_18 %>% group_by(BL) %>% summarise()
 bezirksgrenzen <- gde_18 %>% group_by(BEZ) %>% summarise()
 
 # Laden der Urban-Rural-Typologie
-urbanrural <- read_excel("input/originalfiles/urbanrural.xlsx", sheet="data") %>%
+urbanrural <- read_excel("input/bessereheader/urbanrural.xlsx", sheet="data") %>%
   mutate(gkz = as.numeric(gkz)
   ) %>%
   select(-name)
 
-bezirke <-  read_excel("input/bessere_header/polbezirke2018.xls") %>%
+bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
   mutate(blkz = as.numeric(blkz),
          bezcode = as.numeric(bezcode),
          polbezcode = as.numeric(polbezcode))
 
-gsr <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste")
+# Zusammenführen der Datensätze
+ data_tt <- data %>%
+   filter(ans2!="72" & ans2!="19") %>% # Das sind 5 Zeilen, die Buchungsfehler sind
+   left_join(gemeinden_reg, by=c("gkz_neu"="gkz", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
+   left_join(ansatz_bez, by=c("ans2"="ansatz")) %>% # Namen der Ansätze
+   left_join(posten_bez, by=c("post3"="posten")) %>%  # Namen der Posten
+   left_join(urbanrural, by = c("gkz_neu"="gkz")) %>% # Typologie hinzufügen
+   left_join(gsr15, by=c("gkz_neu" = "gkz")) %>% # von Gemeindestrukturreform betroffen?
+   rename(posten_bez = `bezeichnung.y`, 
+          ansatz_bez = `bezeichnung.x`)
 
-#GRUPPEN EINRICHTEN
+#   needs(openxlsx)
+#  write.xlsx(data_tt, "output/ignore/data_tt.xls")
+ 
+ #GRUPPEN EINRICHTEN
+ personal <- c("Geldbezüge von Beamten der Verwaltung", "Geldbezüge der Beamten in handwerklicher Verwendung", 
+               "Geldbezüge der Vertragsbediensteten der Verwaltung", "Geldbezüge der Vertragsbediensteten in handwerklicher Verwendung", 
+               "Geldbezüge der ganzjährig beschäftigten Angestellten", "sonstige Aufwandsentschädigungen", "Mehrleistungsvergütungen", "Sonstige Nebengebühren")
+ 
+ energie <- c("Strom", "Gas", "Wasser", "Wärme")
+ 
+ gemeindereferate <- c("Standesamt", "Bauamt", "Amt für Raumordnung und Raumplanung", "Sozialamt", "Zentralamt")
+ 
+ # Alles zusammen heißt Abteilungen/Fachreferate: 
+ # Amt- für Raumordnung Raum-Management -
+ # Bauamt -
+ # Sozialamt
+ # STandesamt - 
+ # Zentralamt
+ 
+
+ posten_data <- data_tt %>%
+   mutate(gruppe1 = ifelse(posten_bez %in% personal, "Personal", 
+                           ifelse(posten_bez %in% energie, "Energie", "nope")), 
+          gruppe = ifelse(gruppe1=="nope", posten_bez, gruppe1), 
+          gkz_neu = as.numeric(gkz_neu)) %>%
+   select(-gruppe1)
 
 
+ # Ansätze-Daten zusammenführen
+ ansaetze_data_tt <- ansaetze_data %>%
+   #filter(ans2!="72" & ans3!="19") %>% # Das sind 5 Zeilen, die Buchungsfehler sind
+   left_join(gemeinden_reg, by=c("gkz_neu"="gkz", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
+   left_join(ansatz3_bez, by=c("ans3"="ansaetze")) %>% # Namen der Ansätze
+   left_join(urbanrural, by = c("gkz_neu"="gkz")) %>% # Typologie hinzufügen
+   left_join(gsr15, by=c("gkz_neu" = "gkz")) %>% # von Gemeindestrukturreform betroffen?
+     mutate(gruppe1 = ifelse(bezeichnung %in% gemeindereferate, "gemeindereferate", "nope"), 
+        gruppe = ifelse(gruppe1=="nope", bezeichnung, gruppe1), 
+        gkz_neu = as.numeric(gkz_neu)) %>%
+   select(-gruppe1)
+ 
 
+ 
+ansaetze_data <- ansaetze_data_tt
 
-#Personal: 
-# "Geldbezüge von Beamten der Verwaltung"                           
-# "Geldbezüge der Beamten in handwerklicher Verwendung"             
-# "Geldbezüge der Vertragsbediensteten der Verwaltung"              
-# "Geldbezüge der Vertragsbediensteten in handwerklicher Verwendung"
-# "Geldbezüge der ganzjährig beschäftigten Angestellten"     
-#"sonstige Aufwandsentschädigungen"                                
-#"Mehrleistungsvergütungen"     
-
-#Energie: 
-# "Strom"                                                           
-# "Gas"                                                             
-# "Wasser"                                                          
-# "Wärme"  
-
-#Amtsausstattung: Ein neues Gemeindeamt und das verschönert nach dem Zusammenzuzuziehen? 
-# Durchschnittliche Steierungsrate der Energie / Personalkosten in allen sieben Bundesländern?
-#Gewählte Gemeindeorgane: Aufwandsentschädigung je nach Größe der Gemeinde
-#Fuhrpark: eiegener Bagger doer das Teilen von Rasenmähern?
-
-
-# Steigerung der Aufwendungen pro Kopf und insgesamt?
+ 
+#Bevölkerung und Zahl der Gemeinden 1961 bis 2011 nach der Gemeindegröße und Bundesländern (Gebietsstand: jeweiliger Erhebungsstichtag)
+gemstruktur <- read_excel("input/bessereheader/gemeindegroessenklassenbundesländer1961bis2018.xlsx")%>%
+gather(type,value, österreich_bev:wien_gemzahl)%>%
+separate(type, into=c("bl", "typ"), sep="_")
 

@@ -83,7 +83,6 @@ library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
 library(magrittr) # pipes
 library(stringr) # string manipulation
 library(readxl) # excel
-library(scales) # scales for ggplot2
 library(jsonlite) # json
 library(forcats) # easier factor handling,
 library(lintr) # code linting
@@ -150,13 +149,63 @@ options(scipen=999)
 ```
 
 
+# Amtsausstattung: Ein neues Gemeindeamt und das verschönert nach dem Zusammenzuzuziehen? 
+# Durchschnittliche Steierungsrate der Energie / Personalkosten in allen sieben Bundesländern?
+# Gewählte Gemeindeorgane: Aufwandsentschädigung je nach Größe der Gemeinde
+# Fuhrpark: eiegener Bagger doer das Teilen von Rasenmähern?
+
+# Steigerung der Aufwendungen pro Kopf und insgesamt?
+
+# Ansätze --> Kostenstellen
+# Alle Aufwendungen für Effekte, im Verwaltungsbereich, da sind auch Handelswaren Büroeinrichtung dabei, 
+
+# Posten --> Kostenart, Wofür wurde Geld ausgegeben, bei denen wissen 
+# - Ist der Personalaufwand gestiegen oder gefallen, über alle 
 
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
+needs(directlabels)
+#Wie hat sich die durchschnittliche Gemeindegröße je Bundesland verändert?
+gemgr <- gemstruktur %>%
+  filter(gemeindegrößenklasse=="Insgesamt" & bl!="wien")%>%
+  spread(typ, value)%>%
+  mutate(avggem = bev/gemzahl)
 
-#Analyse
+needs(directlabels)
+plot_gemgr <- ggplot(gemgr, aes(jahr, avggem, color = bl)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = bl), method="angled.boxes")
+
+plot_gemgr
+
+#Wie hat sich die Gemeindezahl je Bundesland verändert?
+gemzahl <- gemstruktur %>%
+  filter(gemeindegrößenklasse=="Insgesamt" & bl!="wien" & bl!="österreich")%>%
+  spread(typ, value)%>%
+  mutate(avggem = bev/gemzahl)
+
+plot_gemzahl <- ggplot(gemzahl, aes(jahr, gemzahl, color = bl)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = bl), method="angled.boxes")+
+  expand_limits(y = 0)
+
+# Veränderung durchschnittlicher Zahl
+gemstrukturdiff <- gemgr %>%
+  #filter(jahr=="1961" | jahr =="2018") %>%
+  select(bl, jahr, avggem)%>%
+  spread(jahr, avggem)%>%
+  mutate(diff6118 = (`2018`/`1961`-1)*100, 
+         diff6181 = (`1981`/`1961`-1)*100, 
+         diff1118 = (`2018`/`2011`-1)*100)
 
 ```
+
+#Erkenntnisse durchschnittliche Gemeindegröße
+Die Gemeindestrukturreform in den 70er-Jahren hat in Niederösterreich zur Verdreifachung der durchschnittlichen Gemeindegröße geführt. In der Steiermark selbst hat sich diese Zahl verdoppelt. Allerdings war  das Niveau ein anderes. Mit einer durchschnittlichen Einwohnerzahl von 850 war Niederösterreich 1961 sehr kleinstrukturiert. In der Steiermark war die durchschnittliche Größe 2011 vor der Reformpartnerschaft mit 2230 Bürgern pro Gemeinde zwar vorletzter im Österreich-Vergleich, aber schon drei Mal so groß wie in Niederösterreich. 
 
 ```{r}
 #Visualisierungen
@@ -170,6 +219,385 @@ options(scipen=999)
 
 #Exportieren für Illustrator funktioniert nicht über ggsave (Schriften), sondern besser über Export des Plot-Viewers
 ```
+
+Wie haben sich die Personalausgaben pro Kopf je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
+
+```{r}
+personalkostenprokopf <- posten_data %>%
+  filter(gruppe=="Personal") %>%
+  filter (hh=="1" | hh=="5") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(personalausgaben = sum(soll)) %>%
+  mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
+    ungroup() %>%
+  select(fj, gkz_neu, name, personalausgabenprokopf, gsrbetr) %>%
+  spread(fj, personalausgabenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+personalkostenprokopf_fus <- personalkostenprokopf %>%
+  filter(gsrbetr=="Ja")
+
+personalkostenprokopf_nfus <- personalkostenprokopf %>%
+  filter(gsrbetr=="Nein")
+
+personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkostenprokopf_nfus)
+
+# Ansätze nicht zusammenwerfen für Dechantskirchen, also wo sind die Personalkosten warum gestiegen 
+personalkostenprokopf_mitansaetzen <- posten_data %>%
+  filter(gruppe=="Personal") %>%
+  filter (hh=="1" | hh=="5") %>%# auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew, ans2, ansatz_bez) %>%
+  summarise(personalausgaben = sum(soll)) %>%
+    ungroup() %>%
+  mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
+  select(fj, gkz_neu, name, personalausgabenprokopf, gsrbetr, ans2, ansatz_bez) %>%
+  spread(fj, personalausgabenprokopf) %>%
+  ungroup() %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+personalkostenprokopf_fus <- personalkostenprokopf %>%
+  filter(gsrbetr=="Ja")
+
+personalkostenprokopf_nfus <- personalkostenprokopf %>%
+  filter(gsrbetr=="Nein")
+  
+
+```
+
+In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten pro Kopf gesunken. In der anderen 95 Prozent der Gemeinden sind die Personalkosten pro Kopf gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten pro Kopf in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen. 
+
+#Wie haben sich die Personalausgaben absolut je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
+```{r}
+personalausgaben_absolut <- posten_data %>%
+  filter(gruppe=="Personal") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(personalausgaben = sum(soll)) %>%
+  #mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
+  select(fj, gkz_neu, name, personalausgaben, gsrbetr) %>%
+  #ungroup() %>%
+  spread(fj, personalausgaben) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+# Filter auf steirische Gemeinden, die von GSR betroffen waren 
+personalausgaben_absolut_fus <- personalausgaben_absolut %>%
+  filter(gsrbetr=="Ja")
+
+# Filter auf steirische Gemeinden, die von GSR nicht betroffen waren 
+personalausgaben_absolut_nfus <- personalausgaben_absolut %>%
+  filter(gsrbetr=="Nein")
+```
+
+In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten absolut gesunken. In der anderen 95 Prozent der Gemeinden sind die Personalkosten absolut tendenziell gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten absolut in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen.
+
+
+
+```{r}
+# Map der Personalkostensteigerung pro Kopf
+# map dat mit Daten für die Visualisierung mergen
+map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
+
+#heimkehrer zeichnen
+plot_1 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = map_data, aes(fill=avg_diff), color="white", size=0.001) +
+  geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  scale_fill_gradient(low = "#ffffff", high = "#132B43",
+                       space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  labs(x = NULL, y = NULL, title = "personalkostenprokopferhöhung", caption = "Quelle: Statistik Austria, BEV.") +
+  guides(fill=guide_legend(nrow=6,byrow=TRUE)) 
+
+plot(plot_1)
+#add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'rueckkehrer')
+
+
+```
+
+# Alles zusammen heißt gemeindereferate: 
+# Amt- für Raumordnung Raum-Management
+# Bauamt
+# Sozialamt
+# STandesamt
+# Zentralamt
+
+# Amtsgebäude
+# Freiwillige Feuerwehren
+# Fuhrpark
+# Wirtschaftshöfe
+# Gewählte GEmeindeorgane
+
+
+
+```{r}
+#Energiekosten pro Kopf
+energiekostenprokopf <- posten_data %>%
+  filter(gruppe=="Energie") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(energieausgaben = sum(soll))%>%
+  mutate(energieausgabenprokopf = round(energieausgaben/ew,2)) %>%
+  select(fj, gkz_neu, name, energieausgabenprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, energieausgabenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+energiekostenprokopf_fus <- energiekostenprokopf %>%
+  filter(gsrbetr=="Ja")
+
+energiekostenprokopf_nfus <- energiekostenprokopf %>%
+  filter(gsrbetr=="Nein")
+  
+
+```
+
+58/128 von gsrbetr Gemeinden gesunken 45 %
+102/159 von nicht_gsrbetr Gemeinden gesunken 64 %
+
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Gemeindereferate ("Standesamt", "Bauamt", "Amt für Raumordnung und Raumplanung", "Sozialamt", "Zentralamt")
+```{r}
+referateprokopf <- ansaetze_data %>%
+  filter(gruppe=="gemeindereferate") %>% 
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(referateausgaben = sum(soll)) %>%
+  mutate(referateausgabenprokopf = round(referateausgaben/ew,2)) %>%
+  select(fj, gkz_neu, name, referateausgabenprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, referateausgabenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+referateprokopf_fus <- referateprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+referateprokopf_nfus <- personalkostenprokopf %>%
+  filter(gsrbetr=="Nein")  
+
+
+```
+42/128 gesunkene Kosten für Referate pro Kopf (40 %) bei fusionierten
+23/159 gesunkene Kosten für Referate pro Kopf (15 %) bei nicht fusionierten
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Feuerwehren
+
+```{r}
+feuerwehrenprokopf <- ansaetze_data %>%
+  filter(gruppe=="Freiwillige Feuerwehren") %>%
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(feuerwehren = sum(soll)) %>%
+  mutate(feuerwehrenprokopf = round(feuerwehren/ew,2)) %>%
+  select(fj, gkz_neu, name, feuerwehrenprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, feuerwehrenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+feuerwehrenprokopf_fus <- feuerwehrenprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+feuerwehrenprokopf_nfus <- feuerwehrenprokopf %>%
+  filter(gsrbetr=="Nein")  
+```
+
+65/128 (50 %) gesunkene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
+78/159 (49 %) gesunkene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
+
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für gewählte Gemeindeorgane
+```{r}
+gemeindeorganeprokopf <- ansaetze_data %>%
+  filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(gemeindeorgane = sum(soll)) %>%
+  mutate(gemeindeorganeprokopf = round(gemeindeorgane/ew,2)) %>%
+  select(fj, gkz_neu, name, gemeindeorganeprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, gemeindeorganeprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+gemeindeorganeprokopf_fus <- gemeindeorganeprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
+  filter(gsrbetr=="Nein")  
+```
+106/128 (84 %) gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
+0/159 gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Amtsgebäude
+```{r}
+amtsgebaeudeprokopf <- ansaetze_data %>%
+  filter(gruppe=="Amtsgebaeude") %>% 
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(amtsgebaeude = sum(soll)) %>%
+  mutate(amtsgebaeudeprokopf = round(amtsgebaeude/ew,2)) %>%
+  select(fj, gkz_neu, name, amtsgebaeudeprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, amtsgebaeudeprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+amtsgebaeudeprokopf_fus <- amtsgebaeudeprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+amtsgebaeudeprokopf_nfus <- amtsgebaeudeprokopf %>%
+  filter(gsrbetr=="Nein")  
+```
+Keine umfassende Betrachtung möglich, weil Daten fehlen von vielen Gemeinden. 
+
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Wirtschaftshoefe (Bauhof)
+
+```{r}
+bauhofprokopf <- ansaetze_data %>%
+  filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% 
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(bauhof = sum(soll)) %>%
+  mutate(bauhofprokopf = round(bauhof/ew,2)) %>%
+  select(fj, gkz_neu, name, bauhofprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, bauhofprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+bauhofprokopf_fus <- bauhofprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+bauhofprokopf_nfus <- bauhofprokopf %>%
+  filter(gsrbetr=="Nein")  
+```
+
+18/71 (25 %) gesunkene Kosten pro Kopf bei Bauhöfen in fusionierten Gemeinden
+22/57 (38 %) gesunkene Kosten pro Kopf bei Bauhöfen in nicht fusionierten Gemeinden
+
+#Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Fuhrpark
+
+```{r}
+fuhrparkprokopf <- ansaetze_data %>%
+  filter(gruppe=="Fuhrpark") %>% 
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(fuhrpark = sum(soll)) %>%
+  mutate(fuhrparkprokopf = round(fuhrpark/ew,2)) %>%
+  select(fj, gkz_neu, name, fuhrparkprokopf, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, fuhrparkprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+fuhrparkprokopf_fus <- fuhrparkprokopf %>%
+  filter(gsrbetr=="Ja")
+
+fuhrparkprokopf_nfus <- fuhrparkprokopf %>%
+  filter(gsrbetr=="Nein")  
+```
+26/71  (37 %) gesunkene Kosten pro Kopf bei Fuhrpark in fusionierten Gemeinden
+31/65  (48 %) gesunkene Kosten pro Kopf bei Fuhrpark in nicht fusionierten Gemeinden
+
+```{r}
+# Wie hoch sind die Förderungen je Gemeinde für politische Parteien?
+foerderungen_parteien_gem <- posten_data %>%
+  filter(ans2=="00" & post3=="757" & fj =="2017") %>%
+  filter (hh=="1" | hh=="5") 
+
+test <- foerderungen_parteien_gem %>%
+  group_by(gkz_neu) %>%
+  summarise(n_distinct(gkz_neu))
+
+foerderungen_parteien_gem <- posten_data %>%
+  filter(ans2=="00" & post3=="757")  %>%
+  filter (hh=="1" | hh=="5") %>%
+  mutate(blcode = substr(gkz_neu, 1,1)) %>%
+  group_by(fj, ans2, post3, blcode) %>%
+  summarise(sum = sum(soll))
+
+options(scipen=999)
+p <- ggplot(foerderungen_parteien_gem, aes(fj, sum, group=blcode, color=blcode)) +
+  geom_line() 
+print(p)
+
+# Welche GEmeinden geben pro Kopf 2017 am meisten für ihre Parteien aus?
+foerderungen_parteien_gem_avg <- posten_data %>%
+  filter(ans2=="00" & post3=="757" & fj =="2017")  %>%
+  filter (hh=="1" | hh=="5") %>%
+  mutate(sollproew = round(soll/ew, 1))%>%
+  arrange(-sollproew)%>%
+  ungroup() %>%
+  select(gkz_neu, name, soll, ew, sollproew, urbantyp) %>%
+  arrange(-sollproew) %>%
+  top_n(20, sollproew)
+  
+
+write.xlsx(foerderungen_parteien_gem_avg, "output/ignore/foerderungen_parteien_gem_avg.xlsx")
+
+# Waren die Top-20-Gemeinden auch in den Vorjahren führend/überdurchschnittlich?
+foerderungen_parteien_gem_avg_allyears <- posten_data %>%
+  filter(ans2=="00" & post3=="757" & gkz_neu %in% foerderungen_parteien_gem_avg$gkz_neu)  %>%
+  filter (hh=="1" | hh=="5") %>%
+  mutate(sollproew = round(soll/ew, 1)) %>%
+  ungroup() %>%
+  select(gkz_neu, name, fj, sollproew, urbantyp) 
+
+foerderungen_parteien_gem_avg_allyears_spreaded <- foerderungen_parteien_gem_avg_allyears%>%
+  spread(fj, sollproew)
+
+foerderungen_parteien_gem_avg_allyears_top <- ggplot(foerderungen_parteien_gem_avg_allyears, aes(fj, sollproew, color = name)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = name), method="angled.boxes")
+
+foerderungen_parteien_gem_avg_allyears_top
+  
+
+```
+
+# Herausrechnen von Außerordentlichen Einnahmen und Ausgaben. Je Tabellenblatt ein Ansatz. Wenn es da Auffälligkeiten gibt, sollten wir bei einer qualitativen Analyse sehen, wo ein Amtsgebäude verkauft wurde, ein neues Feuerwehrauto gekauft wurde etc. 
+
+# 5 ao Ausgaben, 6 ao. Einnahmen, 1 ordentliche ausgaben, 2 ordentliche Einnahmen
+```{r}
+aoa_stmk_ansaetze <- ansaetze_data %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000 & hh=="5") %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(soll = sum(soll)) %>%
+  select(fj, gkz_neu, name, soll, gruppe, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, soll) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+  
+```
+
+
 
 ## Linting
 
