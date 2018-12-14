@@ -4,37 +4,35 @@ library(sf)
 library(rmapshaper)
 source('./scripts/borderman.R')
 
-# Laden der Finanzgebarung nach Ansatz
-# ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
-#   mutate(gkz = as.numeric(gkz), 
-#          fj = as.numeric(fj))
-# 
-# ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(remove_teilungen(borderman(.[,c('gkz','soll')])))
-# 
+#Laden der Finanzgebarung nach Ansatz
+ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
+  mutate(gkz = as.numeric(gkz),
+         fj = as.numeric(fj))
+ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(borderman(.[,c('gkz','soll')]))
 
+# Posten Daten reinladen 
+fj10 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2010.xlsx")
+fj11 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2011.xlsx")
+fj12 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2012.xlsx")
+fj13 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2013.xlsx")
+fj14 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2014.xlsx")
+fj15 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2015.xlsx")
+fj16 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2016.xlsx")
+fj17 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2all_2017.xlsx")
 
-# fj10 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2010.xlsx")
-# fj11 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2011.xlsx")
-# fj12 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2012.xlsx")
-# fj13 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2013.xlsx")
-# fj14 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2014.xlsx")
-# fj15 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2015.xlsx")
-# fj16 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2_2016.xlsx")
-# fj17 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2all_2017.xlsx")
-# 
-# data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
-#   mutate(gkz = as.numeric(gem), 
-#          FJ = as.numeric(FJ))
-# 
-# data_bordermanned <- data %>% 
-#   group_by(FJ,HH, ans2, post3) %>%
-#   do(remove_teilungen(borderman(.[,c('gkz','SOLL')])))
+data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
+  mutate(gkz = as.numeric(gem),
+         FJ = as.numeric(FJ))
+
+data_bordermanned <- data %>%
+  group_by(FJ,HH, ans2, post3) %>%
+  do((borderman(.[,c('gkz','SOLL')])))
 
 #save(data, "output/ignore/data.rda")
 #save(data_bordermanned, "output/ignore/data_bordermanned.rda")
 
 # Reinladen des bereinigten Haushaltsfiles
-data_bordermanned <- readRDS("output/ignore/data_bordermanned.RDS")
+#data_bordermanned <- readRDS("output/ignore/data_bordermanned.RDS")
 
 # Der Borderman macht ein Gather und Spread auf Werte mit 0, deshalb sind im File dann zu viele Werte bei Ansätzen, die es eigenltich nicht gibt --> entfernen
 data <- data_bordermanned %>%
@@ -47,14 +45,12 @@ filter(SOLL !=0)%>%
   ungroup() %>%
   select(fj, hh, ans2, post3, gkz_neu, soll)
 
-#gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
-#gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(remove_teilungen(borderman(.[,c('gkz','test')]))) %>% select(-test)
+gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
+gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
 #saveRDS(gsr15, "output/ignore/gsr15.rds")
 
-gsr15 <- readRDS("output/ignore/gsr15.rds")
+#gsr15 <- readRDS("output/ignore/gsr15.rds")
 
-# Reinladen des bereinigten Haushaltsfiles
-data_bordermanned <- readRDS("output/ignore/data_bordermanned.RDS")
 
 # braucht mehr Leistung
 options(java.parameters = "- Xmx1024m")
@@ -91,15 +87,15 @@ ansaetze_data <- bind_rows(ansatz2017, ansatz)
 
  ansaetze_data_bordermanned <- ansaetze_data %>% 
     group_by(fj,hh,ans3) %>%
-    do(remove_teilungen(borderman(.[,c('gkz','soll')]))) 
+    do(borderman(.[,c('gkz','soll')])) 
  
  ansaetze_data <- ansaetze_data_bordermanned %>%
    filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
 
 # saveRDS(ansaetze_data, "output/ignore/ansaetze_data.rds")
 
-ansaetze_data <- readRDS("output/ignore/ansaetze_data.rds") %>%
-  mutate(gkz_neu = as.numeric(gkz_neu))
+#ansaetze_data <- readRDS("output/ignore/ansaetze_data.rds") %>%
+#  mutate(gkz_neu = as.numeric(gkz_neu))
  
 
 # Gefunden im Analyse-Schritt: gkz 62248, 62227, 62336 --> dürften nicht da sein
@@ -175,6 +171,8 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
  
  gemeindereferate <- c("Standesamt", "Bauamt", "Amt für Raumordnung und Raumplanung", "Sozialamt", "Zentralamt")
  
+
+ 
  # Alles zusammen heißt Abteilungen/Fachreferate: 
  # Amt- für Raumordnung Raum-Management -
  # Bauamt -
@@ -203,7 +201,6 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
         gkz_neu = as.numeric(gkz_neu)) %>%
    select(-gruppe1)
  
-
  
 ansaetze_data <- ansaetze_data_tt
 

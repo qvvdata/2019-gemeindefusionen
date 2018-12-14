@@ -235,14 +235,91 @@ personalkostenprokopf <- posten_data %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
+
+# Wie verläuft der Kostentrend zwischen 2015 und 2017? Ist ein Abwärtstrend erkennbar?
+needs(forecast)
+personalkostenprokopf$trend <- NA
+personalkostenprokopf$pvalue <- NA
+for (i in 1:nrow(personalkostenprokopf)){
+  
+  werte <- as.ts(as.vector(t(personalkostenprokopf[i,][9:11])))
+  fit <- tslm(werte~trend)
+  trend <- fit$coefficients[2]
+  pvalue <- summary(fit)$coefficients[2,4]
+  
+  personalkostenprokopf$trend[i] <- trend
+  personalkostenprokopf$pvalue[i] <- pvalue
+  
+  cat(trend)
+  cat(pvalue)
+  
+  
+}
+
+personalkostenprokopf$sig <- NA  
+personalkostenprokopf$sig[personalkostenprokopf$pvalue<=0.10] <- "Signifikant 5%"
+personalkostenprokopf$sig[personalkostenprokopf$pvalue> 0.10] <- "Insignifikant 5%"
+personalkostenprokopf$posneg[personalkostenprokopf$trend >= 0] <- "positiv"
+personalkostenprokopf$posneg[personalkostenprokopf$trend <= 0] <- "negativ"
   
 personalkostenprokopf_fus <- personalkostenprokopf %>%
   filter(gsrbetr=="Ja")
 
+klz_personalkostenprokopf_fus <-  personalkostenprokopf_fus %>%
+  arrange(-avg_diff) %>%
+  top_n(20, avg_diff)
+
 personalkostenprokopf_nfus <- personalkostenprokopf %>%
   filter(gsrbetr=="Nein")
 
-personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkostenprokopf_nfus)
+personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkostenprokopf_nfus) %>% select(-c(trend, pvalue, sig, posneg))
+  
+write.xlsx(personalkostenprokopf_map, "output/ignore/klz_personalkostenprokopf.xlsx", sheetName = "Personalkosten pro Kopf")
+
+
+#Visualisierung der Personalkosten pro Kopf mit Quantilen für die Kleine Zeitung
+q <- ecdf(personalkostenprokopf_map$avg15_17)
+
+p <- ggplot() +
+  geom_sf(
+    data= (personalkostenprokopf_map %>%
+             mutate(
+               gkz=as.character(gkz_neu),
+               q=round(q(avg15_17)*3)+1) %>%
+             left_join(gde_18, by = c("gkz" = "GKZ"))),
+    aes(fill=q), color="white", size=0.01) +
+  coord_sf(datum=sf::st_crs(4326))
+print(p)
+
+quantile(personalkostenprokopf_map$avg15_17, probs = seq(0, 1, by = 0.10))
+
+# Maximum für höchsten Decil setzen in der Visualisierung
+personalkostenprokopf_map$avg15_17[personalkostenprokopf_map$avg15_17 >= 464] <- 464
+
+#Personalkosten pro Kopf zeichnen zeichnen
+map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
+map_data <- gde_18 %>% 
+  mutate(gkz_neu=as.numeric(GKZ)) %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu")) 
+
+
+plot_1 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = map_data, aes(fill=avg15_17), color="white", size=0.001) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  scale_fill_gradient(low = "#E1A9A9", high = "#571F1E", 
+                       space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  labs(x = NULL, y = NULL, title = "personalkostenprokopf", caption = "Quelle: Statistik Austria, BEV.") +
+  guides(fill=guide_legend(nrow=6,byrow=TRUE))+
+  theme_addendum()
+print(plot_1)
+
+add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'personalkostenprokopf')
+
 
 # Ansätze nicht zusammenwerfen für Dechantskirchen, also wo sind die Personalkosten warum gestiegen 
 personalkostenprokopf_mitansaetzen <- posten_data %>%
@@ -258,17 +335,62 @@ personalkostenprokopf_mitansaetzen <- posten_data %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
-  
-personalkostenprokopf_fus <- personalkostenprokopf %>%
-  filter(gsrbetr=="Ja")
 
-personalkostenprokopf_nfus <- personalkostenprokopf %>%
-  filter(gsrbetr=="Nein")
-  
+# Ohne Zuweisung der Gemeinden - Wie haben sich die Ausgaben gesamt entwickelt?
+personalkostenprokopfstmkggesamt <- posten_data %>%
+  filter(gruppe=="Personal") %>%
+  filter (hh=="1" | hh=="5") %>% 
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  group_by(fj,gsrbetr, gruppe) %>%
+  summarise(personalausgaben = sum(soll), 
+            bevsumme = sum(ew)) %>%
+  mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
+    ungroup() %>%
+  select(fj, gsrbetr, personalausgabenprokopf) %>%
+  spread(fj, personalausgabenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100, 
+         avg_diff17 = (`2017`/`2016`-1)*100)
+
+# Gesamtentwicklung absolut
+personalkostenprokopfstmkggesamtabs <- posten_data %>%
+  filter(gruppe=="Personal") %>%
+  filter (hh=="1" | hh=="5") %>% 
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  group_by(fj,gsrbetr, gruppe) %>%
+  summarise(personalausgaben = sum(soll), 
+            bevsumme = sum(ew)) %>%
+    ungroup() %>%
+  select(fj, gsrbetr, personalausgaben) %>%
+  spread(fj, personalausgaben) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100, 
+         avg_diff17 = (`2017`/`2016`-1)*100)
+
+
+# Nach Gemeindegröße die Entwicklung der Personalkosten von fusionierten und nicht-fusionierten ansehen
+personalkostenprokopfstmkgemgr <- posten_data %>%
+  filter(gruppe=="Personal") %>%
+  filter (hh=="1" | hh=="5") %>% 
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  group_by(fj,gsrbetr, gruppe, gemgrklas) %>%
+  summarise(personalausgaben = sum(soll), 
+            bevsumme = sum(ew)) %>%
+  mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
+    ungroup()
+
+p <- ggplot(personalkostenprokopfstmkgemgr, aes(x = fj, y = personalausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
+    geom_line(lwd=0.9) +
+    facet_wrap(~gemgrklas)
+
+print(p)
+ggsave("output/ignore/p.pdf", width = 20, height = 20, units = "cm")
 
 ```
 
-In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten pro Kopf gesunken. In der anderen 95 Prozent der Gemeinden sind die Personalkosten pro Kopf gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten pro Kopf in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen. 
+In sieben von 119 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten pro Kopf gesunken. In der anderen 96 Prozent der Gemeinden sind die Personalkosten pro Kopf gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten pro Kopf in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen. 
 
 #Wie haben sich die Personalausgaben absolut je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
 ```{r}
@@ -294,7 +416,7 @@ personalausgaben_absolut_nfus <- personalausgaben_absolut %>%
   filter(gsrbetr=="Nein")
 ```
 
-In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten absolut gesunken. In der anderen 95 Prozent der Gemeinden sind die Personalkosten absolut tendenziell gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten absolut in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen.
+In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten absolut gesunken. In der anderen 96 Prozent der Gemeinden sind die Personalkosten absolut tendenziell gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten absolut in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen.
 
 
 
@@ -303,15 +425,15 @@ In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die 
 # map dat mit Daten für die Visualisierung mergen
 map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
 
-#heimkehrer zeichnen
+#Personalkosten pro Kopf Erhöhung zeichnen zeichnen
 plot_1 <- ggplot() +
   # municipality polygons & outline
   geom_sf(data = map_data, aes(fill=avg_diff), color="white", size=0.001) +
-  geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
   coord_sf() +
   #coord_map(projection = "mercator") +
   # coord_sf did not work here
-  scale_fill_gradient(low = "#ffffff", high = "#132B43",
+  scale_fill_gradient(low = "#bf4342", high = "#519872", 
                        space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
   labs(x = NULL, y = NULL, title = "personalkostenprokopferhöhung", caption = "Quelle: Statistik Austria, BEV.") +
   guides(fill=guide_legend(nrow=6,byrow=TRUE)) 
@@ -532,7 +654,7 @@ test <- foerderungen_parteien_gem %>%
   group_by(gkz_neu) %>%
   summarise(n_distinct(gkz_neu))
 
-foerderungen_parteien_gem <- posten_data %>%
+foerderungen_parteien_gem_bl <- posten_data %>%
   filter(ans2=="00" & post3=="757")  %>%
   filter (hh=="1" | hh=="5") %>%
   mutate(blcode = substr(gkz_neu, 1,1)) %>%
@@ -576,27 +698,131 @@ foerderungen_parteien_gem_avg_allyears_top <- ggplot(foerderungen_parteien_gem_a
   geom_dl(aes(label = name), method="angled.boxes")
 
 foerderungen_parteien_gem_avg_allyears_top
+
+# Gemeindeförderungen je Partei Export Datawrapper
+foerderungen_parteien_gem_avg_allyears_dw <- posten_data %>%
+  filter(ans2=="00" & post3=="757" & fh=="2017") %>%
+  filter (hh=="1" | hh=="5") %>%
+  mutate(sollproew = round(soll/ew, 1)) %>%
+  ungroup()
   
+#Wie hoch ist der durchschnitt in allen Gemeinden 2017?
+foerderungen_parteien_gem_avg_allyears_dw_all <- posten_data %>%
+  filter(ans2=="00" & post3=="757") %>%
+  filter (hh=="1" | hh=="5") %>%
+  group_by(ans2, fj) %>%
+  summarise(sumew = sum(ew), 
+            sumsoll = sum(soll)) %>%
+  mutate(sollproew = round(sumsoll/sumew, 2), 
+         name = "Österreich") 
+
+gkz_tv <- c("31042", "31513")
+
+# Hürm und Seefeeld Kadolz
+foerderungen_parteien_gem_avg_allyears_dw_tv <- posten_data %>%
+  filter(ans2=="00" & post3=="757" & gkz_neu %in% gkz_tv) %>%
+  filter (hh=="1" | hh=="5") %>%
+  group_by(ans2, fj, name) %>%
+  summarise(sumew = sum(ew), 
+            sumsoll = sum(soll)) %>%
+  mutate(sollproew = round(sumsoll/sumew, 2))
+
+# 
+foerderungen_parteien_gem_avg_allyears_dw_combined <- bind_rows(foerderungen_parteien_gem_avg_allyears_dw_tv,                 foerderungen_parteien_gem_avg_allyears_dw_all) %>%
+  gather( typ, wert,sumew:sollproew) %>%
+  filter(typ=="sollproew") %>%
+  spread(fj, wert)%>% 
+  ungroup() %>%
+  select(-c(typ, ans2))
+
+foerderungen_parteien_gem_avg_allyears_dw_combined <- as.data.frame(foerderungen_parteien_gem_avg_allyears_dw_combined) 
+    
+needs(xlsx)
+
+write.xlsx(foerderungen_parteien_gem_avg_allyears_dw_combined, "output/ignore/foerderungen_parteien_gem_avg_allyears_dw_combined.xlsx", row.names=FALSE)
+
+
+# Export für die Karte oder die Tabelle
+foerderungen_parteien_map <- foerderungen_parteien_gem %>%
+  mutate(sollprokopf = round((soll/ew), 2), 
+         soll = round(soll,0)) %>%
+  select(gkz_neu, name, soll, sollprokopf) 
+
+gemeinden_reg18 <- gemeinden_reg %>% 
+  left_join(foerderungen_parteien_map, by=c("gkz"="gkz_neu"))%>% 
+  filter(jahr==2017) %>%
+  rename(jahr2 = jahr)
+
+gemeinden_reg18_t <- borderman_propagate_fusions(gemeinden_reg18) %>%
+  select(gkz, `name.x`, soll, sollprokopf) %>%
+  mutate(soll = replace_na(soll, 0), 
+         sollprokopf = replace_na(sollprokopf, 0))%>%
+  rename(name = `name.x`)
+
+write.xlsx(gemeinden_reg18_t, "output/ignore/gemeinden_reg18_t.xlsx")
+
+
+
+
 
 ```
+
+# Tooltip
+In <name> gingen <soll> Euro aus der Gemeindekasse an Parteien. Das sind X.Y Euro pro Gemeindebürger. Das ist <durchschnittlich/unter/über> viel.
 
 # Herausrechnen von Außerordentlichen Einnahmen und Ausgaben. Je Tabellenblatt ein Ansatz. Wenn es da Auffälligkeiten gibt, sollten wir bei einer qualitativen Analyse sehen, wo ein Amtsgebäude verkauft wurde, ein neues Feuerwehrauto gekauft wurde etc. 
 
 # 5 ao Ausgaben, 6 ao. Einnahmen, 1 ordentliche ausgaben, 2 ordentliche Einnahmen
 ```{r}
+# Außerordentliche Ausgaben
 aoa_stmk_ansaetze <- ansaetze_data %>%
   filter(gkz_neu >60000 & gkz_neu < 70000 & hh=="5") %>%
-  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  group_by(fj, hh, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(soll = sum(soll)) %>%
-  select(fj, gkz_neu, name, soll, gruppe, gsrbetr) %>%
+  select(fj, hh, gkz_neu, name, soll, gruppe, gsrbetr) %>%
   ungroup() %>%
-  spread(fj, soll) %>%
-  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-         avg15_17 = (`2015`+`2016`+`2017`)/3, 
-         avg_diff = (avg15_17/avg12_14-1)*100)
+  spread(fj, soll) 
+
+aoa_stmk_ansaetze %>% filter(gruppe=="Gewaehlte Gemeindeorgane") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "Gemeindeorgane")
+aoa_stmk_ansaetze %>% filter(gruppe=="gemeindereferate") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "gemeindereferate", append = TRUE)
+aoa_stmk_ansaetze %>% filter(gruppe=="Amtsgebaeude") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "Amtsgebaeude", append = TRUE)
+aoa_stmk_ansaetze %>% filter(gruppe=="Freiwillige Feuerwehren") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "Freiwillige Feuerwehren", append = TRUE)
+aoa_stmk_ansaetze %>% filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "Wirtschaftshoefe (Bauhof)", append = TRUE)
+aoa_stmk_ansaetze %>% filter(gruppe=="Fuhrpark") %>% write.xlsx("output/ignore/aoa.xlsx", sheetName = "Fuhrpark", append = TRUE)
+
+# Außerordentliche Einnahmen
+aoe_stmk_ansaetze <- ansaetze_data %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000 & hh=="6") %>%
+  group_by(fj, hh, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(soll = sum(soll)) %>%
+  select(fj, gkz_neu, hh, name, soll, gruppe, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, soll) 
+
+aoe_stmk_ansaetze %>% filter(gruppe=="Gewaehlte Gemeindeorgane") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Gemeindeorgane")
+aoe_stmk_ansaetze %>% filter(gruppe=="gemeindereferate") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "gemeindereferate", append = TRUE)
+aoe_stmk_ansaetze %>% filter(gruppe=="Amtsgebaeude") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Amtsgebaeude", append = TRUE)
+aoe_stmk_ansaetze %>% filter(gruppe=="Freiwillige Feuerwehren") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Freiwillige Feuerwehren", append = TRUE)
+aoe_stmk_ansaetze %>% filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Wirtschaftshoefe (Bauhof)", append = TRUE)
+aoe_stmk_ansaetze %>% filter(gruppe=="Fuhrpark") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Fuhrpark", append = TRUE)
   
 ```
 
+```{r}
+# Gibt es Cluster in denen viele kleine Gemeinden aneinandergrenzen?
+# Voraus als Vorzeigegemeinde
+# Pöllau als Blockadebeispiel
+
+# Hartberg mit seinen Umgebungsgemeinden (ergäbe mehr als 10.000 Einwohner) oder von Friedberg und Pinggau nicht angegangen
+# Gleisdorf gab es einst Außenstellen, die wurden bald geschlossen
+
+# Hat die politische Partizipation in den Wahlen nach der Fusion abgenommen?
+# Hat die politische Repräsentation abgenommen? Wie viele Gemeinderäte kommen nun auf die Bürger? Studie: Hat die Kleine zeitung darüber berichtet? Sollen wir das ein Jahr davor machen: Nach der Reform, vor der Wahl: Ihr Stimme ist so wenig wert wie nie
+# Können wir den Common-Pool-Effekt ( Noch schnell was großes anschaffen, damit wir es auf die große Gemeinde abwälzen können, nachweisen mit den außerordentlichen ausgaben?)
+
+
+
+```
 
 
 ## Linting
