@@ -1,0 +1,70 @@
+# Simple Babel Webpack Template
+
+You can see the output / a demo here:  
+[https://paulkogel.github.io/simple-babel-webpack-template](https://paulkogel.github.io/simple-babel-webpack-template)
+
+Includes only essentials to:
++ compile ES6 to ES5 (with Babel)
++ use ES6 modules (with Webpack)
++ React is entirely optional and isn't actually used. It's included only to demonstrate how to load external libraries.
++ uses static CSS (**not** processed/loaded via Webpack).
+
+This setup has been adapted from the following German tutorial by [Nils Hartmann](https://twitter.com/nilshartmann):  
+[http://reactjs.de/posts/react-anwendungen-mit-webpack-entwickeln](http://reactjs.de/posts/react-anwendungen-mit-webpack-entwickeln)
+
+### Recommended Node version
++ Node 5.0.0 (best install via nvm)
++ npm 3.3.6
+
+Both are set in `package.json` - feel free to remove the version numbers there should your setup require it.
+
+### Setup
+
+    npm install
+    npm run devserver
+
+You can now rename "Peter Parker" in `application.js`, reload the page, and you should see the new name :)
+
+### Production build & deploy
+
+1. To transpile the JavaScript run:
+
+    npm run build
+
+Check `dist/js` for output:
++ `application.js` (transpiled source code)
++ `application.js.map` (source map)
+
+2. Commit changes to git (dist must be checked in):
+
+    git add dist && git commit -m 'Your commit message'
+
+3. Then push just the `/dist` folder to the `gh-pages` branch like so:
+
+    git subtree push --prefix dist origin gh-pages
+
+### Only for reference: setup was done with these commands
+
+No need to do this anymore. The following list is only kept as a reference to see how this repository was created from scratch.
+
+    mkdir simple-babel-webpack-template
+    cd simple-babel-webpack-template
+    npm init .
+
+    npm install --save babel
+    npm install --save-dev webpack
+    npm install --save-dev babel-preset-es2015
+    npm install --save-dev webpack-dev-server
+
+Optional: add React (only for demonstration purposes, could be any other npm package as well)
+
+    npm install --save react react-dom
+    npm install --save-dev babel-preset-react
+
+Required npm module to merge Webpack configs (allows us to use `webpack/base.config.js`):
+
+    npm install --save-dev webpack-merge
+
+### Good to know
++ the Webpack dev server's port can be changed in package JSON's `devserver` script (`--port` option). Make sure you don't forget to set the same port in `/webpack/development.config.js` - otherwise hot module replacement won't work and you'll get lots of connection errors in your browser's JS console.
++ Webpack dev server's base directory (`/dist` for this repository) is set in package.json's `devserver` script with `content-base`.
