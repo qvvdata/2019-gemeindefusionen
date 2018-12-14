@@ -9,7 +9,7 @@ maps['parteienfoerderungen_gemeinden_2017'] = {
   datakey: 'Gemeindename',
   scale: 'category-multi',
   search: true,
-  colorschemes: [['#f1f1f1', '#bf4342', '#e1bb80','#545a71']],
+  colorschemes: [['#f1f1f1', '#62a87c', '#9B9B9B','#af3b6e']],
   categories: ['keine', 'unterdurchschnittlich', 'durchschnittlich', 'überdurchschnittlich'],
   value: (d) => (isNaN(d.sollprokopf) || d.sollprokopf == 0) ? ['keine'] : [(d.sollprokopf<1.3 ? 'unterdurchschnittlich' : (d.sollprokopf < 2.81 ? 'durchschnittlich' : 'überdurchschnittlich' ))],
   tooltip: function(d,p,pctfmt,numfmt) {
@@ -17,7 +17,7 @@ maps['parteienfoerderungen_gemeinden_2017'] = {
          return `In ${d.name} wurde keine Parteienförderung im Haushalt verbucht.`
     }
     console.log(d.soll);
-    return `In ${name} gingen ${numfmt(d.soll)} Euro aus der Gemeindekasse an Parteien. <br />
+    return `In ${d.name} gingen ${numfmt(d.soll)} Euro aus der Gemeindekasse an Parteien. <br />
             Das sind ${pctfmt(d.sollprokopf)} Euro pro Gemeindebürger.
             Das ist im bundesweiten Vergleich ${(d.sollprokopf<1.3 ? 'unterdurchschnittlich' : (d.sollprokopf < 2.81 ? 'durchschnittlich' : 'überdurchschnittlich' ))} viel.`;
   },
