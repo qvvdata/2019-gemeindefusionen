@@ -50,7 +50,7 @@ gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(borderman(.[
 #saveRDS(gsr15, "output/ignore/gsr15.rds")
 
 #gsr15 <- readRDS("output/ignore/gsr15.rds")
-
+vfgh <- read_excel("input/bessereheader/2015gsr.xls", sheet="vfgh") %>% rename(gkz = gkz_neu) 
 
 # braucht mehr Leistung
 options(java.parameters = "- Xmx1024m")
@@ -186,7 +186,9 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
                            ifelse(posten_bez %in% energie, "Energie", "nope")), 
           gruppe = ifelse(gruppe1=="nope", posten_bez, gruppe1), 
           gkz_neu = as.numeric(gkz_neu)) %>%
-   select(-gruppe1)
+   select(-gruppe1) %>%
+   mutate(bezcode =  as.numeric(substr(gkz_neu, 0,3))) %>%
+   left_join(bezirke, by=c("bezcode"="bezcode"))
 
 
  # Ansätze-Daten zusammenführen
@@ -209,4 +211,7 @@ ansaetze_data <- ansaetze_data_tt
 gemstruktur <- read_excel("input/bessereheader/gemeindegroessenklassenbundesländer1961bis2018.xlsx")%>%
 gather(type,value, österreich_bev:wien_gemzahl)%>%
 separate(type, into=c("bl", "typ"), sep="_")
+
+# Zuweisung der REgionalausgaben zu Bezirken 
+
 

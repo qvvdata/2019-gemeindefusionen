@@ -80,6 +80,7 @@ if ( is.null(path_to_wd) | !dir.exists(path_to_wd)) {
 # tidyverse: see https://blog.rstudio.org/2016/09/15/tidyverse-1-0-0/
 cat("
 library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rlang)
 library(magrittr) # pipes
 library(stringr) # string manipulation
 library(readxl) # excel
@@ -136,7 +137,7 @@ sessionInfo()
 
 ### Load additional scripts
 
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # if you want to outsource logic to other script files, see README for 
 # further information
 knitr::read_chunk("scripts/theme_addendum.R")
@@ -206,19 +207,6 @@ gemstrukturdiff <- gemgr %>%
 
 #Erkenntnisse durchschnittliche Gemeindegröße
 Die Gemeindestrukturreform in den 70er-Jahren hat in Niederösterreich zur Verdreifachung der durchschnittlichen Gemeindegröße geführt. In der Steiermark selbst hat sich diese Zahl verdoppelt. Allerdings war  das Niveau ein anderes. Mit einer durchschnittlichen Einwohnerzahl von 850 war Niederösterreich 1961 sehr kleinstrukturiert. In der Steiermark war die durchschnittliche Größe 2011 vor der Reformpartnerschaft mit 2230 Bürgern pro Gemeinde zwar vorletzter im Österreich-Vergleich, aber schon drei Mal so groß wie in Niederösterreich. 
-
-```{r}
-#Visualisierungen
-
-  # labs(title = "Schlagzeile", 
-  #      x = "Vertikale Achse", 
-  #      y = "horizontale Achse",
-  #      #subtitle ="Funktioniert aus unerklärlichen Gründen noch nicht", 
-  #      caption = "Quelle")+
-  # theme_addendum()
-
-#Exportieren für Illustrator funktioniert nicht über ggsave (Schriften), sondern besser über Export des Plot-Viewers
-```
 
 Wie haben sich die Personalausgaben pro Kopf je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
 
@@ -336,57 +324,57 @@ personalkostenprokopf_mitansaetzen <- posten_data %>%
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
 
-# Ohne Zuweisung der Gemeinden - Wie haben sich die Ausgaben gesamt entwickelt?
-personalkostenprokopfstmkggesamt <- posten_data %>%
-  filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>% 
-  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-  group_by(fj,gsrbetr, gruppe) %>%
-  summarise(personalausgaben = sum(soll), 
-            bevsumme = sum(ew)) %>%
-  mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
-    ungroup() %>%
-  select(fj, gsrbetr, personalausgabenprokopf) %>%
-  spread(fj, personalausgabenprokopf) %>%
-  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-         avg15_17 = (`2015`+`2016`+`2017`)/3, 
-         avg_diff = (avg15_17/avg12_14-1)*100, 
-         avg_diff17 = (`2017`/`2016`-1)*100)
+# # Ohne Zuweisung der Gemeinden - Wie haben sich die Ausgaben gesamt entwickelt? --> Falsch, weil bevsumm!
+# personalkostenprokopfstmkggesamt <- posten_data %>%
+#   filter(gruppe=="Personal") %>%
+#   filter (hh=="1" | hh=="5") %>% 
+#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+#   group_by(fj,gsrbetr, gruppe) %>%
+#   summarise(personalausgaben = sum(soll), 
+#             bevsumme = sum(ew)) %>%
+#   mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
+#     ungroup() %>%
+#   select(fj, gsrbetr, personalausgabenprokopf) %>%
+#   spread(fj, personalausgabenprokopf) %>%
+#   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+#          avg15_17 = (`2015`+`2016`+`2017`)/3, 
+#          avg_diff = (avg15_17/avg12_14-1)*100, 
+#          avg_diff17 = (`2017`/`2016`-1)*100)
 
-# Gesamtentwicklung absolut
-personalkostenprokopfstmkggesamtabs <- posten_data %>%
-  filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>% 
-  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-  group_by(fj,gsrbetr, gruppe) %>%
-  summarise(personalausgaben = sum(soll), 
-            bevsumme = sum(ew)) %>%
-    ungroup() %>%
-  select(fj, gsrbetr, personalausgaben) %>%
-  spread(fj, personalausgaben) %>%
-  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-         avg15_17 = (`2015`+`2016`+`2017`)/3, 
-         avg_diff = (avg15_17/avg12_14-1)*100, 
-         avg_diff17 = (`2017`/`2016`-1)*100)
+# Gesamtentwicklung absolut --> falsch weil bevsum
+# personalkostenprokopfstmkggesamtabs <- posten_data %>%
+#   filter(gruppe=="Personal") %>%
+#   filter (hh=="1" | hh=="5") %>% 
+#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+#   group_by(fj,gsrbetr, gruppe) %>%
+#   summarise(personalausgaben = sum(soll), 
+#             bevsumme = sum(ew)) %>%
+#     ungroup() %>%
+#   select(fj, gsrbetr, personalausgaben) %>%
+#   spread(fj, personalausgaben) %>%
+#   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+#          avg15_17 = (`2015`+`2016`+`2017`)/3, 
+#          avg_diff = (avg15_17/avg12_14-1)*100, 
+#          avg_diff17 = (`2017`/`2016`-1)*100)
 
 
-# Nach Gemeindegröße die Entwicklung der Personalkosten von fusionierten und nicht-fusionierten ansehen
-personalkostenprokopfstmkgemgr <- posten_data %>%
-  filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>% 
-  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-  group_by(fj,gsrbetr, gruppe, gemgrklas) %>%
-  summarise(personalausgaben = sum(soll), 
-            bevsumme = sum(ew)) %>%
-  mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
-    ungroup()
-
-p <- ggplot(personalkostenprokopfstmkgemgr, aes(x = fj, y = personalausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
-    geom_line(lwd=0.9) +
-    facet_wrap(~gemgrklas)
-
-print(p)
-ggsave("output/ignore/p.pdf", width = 20, height = 20, units = "cm")
+# Nach Gemeindegröße die Entwicklung der Personalkosten von fusionierten und nicht-fusionierten ansehen --> Falsch weil bevsum
+# personalkostenprokopfstmkgemgr <- posten_data %>%
+#   filter(gruppe=="Personal") %>%
+#   filter (hh=="1" | hh=="5") %>% 
+#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+#   group_by(fj,gsrbetr, gruppe, gemgrklas) %>%
+#   summarise(personalausgaben = sum(soll), 
+#             bevsumme = sum(ew)) %>%
+#   mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
+#     ungroup()
+# 
+# p <- ggplot(personalkostenprokopfstmkgemgr, aes(x = fj, y = personalausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
+#     geom_line(lwd=0.9) +
+#     facet_wrap(~gemgrklas)
+# 
+# print(p)
+# ggsave("output/ignore/p.pdf", width = 20, height = 20, units = "cm")
 
 ```
 
@@ -662,9 +650,6 @@ foerderungen_parteien_gem_bl <- posten_data %>%
   summarise(sum = sum(soll))
 
 options(scipen=999)
-p <- ggplot(foerderungen_parteien_gem, aes(fj, sum, group=blcode, color=blcode)) +
-  geom_line() 
-print(p)
 
 # Welche GEmeinden geben pro Kopf 2017 am meisten für ihre Parteien aus?
 foerderungen_parteien_gem_avg <- posten_data %>%
@@ -701,7 +686,7 @@ foerderungen_parteien_gem_avg_allyears_top
 
 # Gemeindeförderungen je Partei Export Datawrapper
 foerderungen_parteien_gem_avg_allyears_dw <- posten_data %>%
-  filter(ans2=="00" & post3=="757" & fh=="2017") %>%
+  filter(ans2=="00" & post3=="757" & fj=="2017") %>%
   filter (hh=="1" | hh=="5") %>%
   mutate(sollproew = round(soll/ew, 1)) %>%
   ungroup()
@@ -805,6 +790,24 @@ aoe_stmk_ansaetze %>% filter(gruppe=="Amtsgebaeude") %>% write.xlsx("output/igno
 aoe_stmk_ansaetze %>% filter(gruppe=="Freiwillige Feuerwehren") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Freiwillige Feuerwehren", append = TRUE)
 aoe_stmk_ansaetze %>% filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Wirtschaftshoefe (Bauhof)", append = TRUE)
 aoe_stmk_ansaetze %>% filter(gruppe=="Fuhrpark") %>% write.xlsx("output/ignore/aoe.xlsx", sheetName = "Fuhrpark", append = TRUE)
+
+# Mieteinnahmen in der Steiermark ordentlich für Gabriel
+mieteinnahmen_stmk_ansaetze <- ansaetze_data %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000 & hh=="2" & ans3=="029") %>%
+  group_by(fj, hh, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(soll = sum(soll)) %>%
+  select(fj, gkz_neu, hh, name, soll, gruppe, gsrbetr) %>%
+  ungroup() %>%
+  spread(fj, soll) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+
+mieteinnahmen_stmk_ansaetze %>% write.xlsx("output/ignore/mieteinnahmen_stmk.xlsx", sheetName = "Mieteinnahmen")
+
+# Kannst du eine Auswertung für den Ansatz 029 Amtsgebäude machen (Haushalt 2 – ordentliche Einnahmen). Würde mich interessieren, ob sich da bei den Fusionsgemeinden durch die Fusion etwas getan hat und ob sie auffällig im Vergleich zu den Nichtfusionsgemeinden sind.
+# Sprich Veränderung absolut im Schnitt im pro Kopf im Schnitt.
+# Könnten wir auch als Thema zum KDZ mitnehmen, weil wenn keine Gemeinde Teile der fusionsbedingt nicht mehr benötigten Amtsgebäude vermietet, wäre das eine Notiz wert.
   
 ```
 
@@ -821,6 +824,384 @@ aoe_stmk_ansaetze %>% filter(gruppe=="Fuhrpark") %>% write.xlsx("output/ignore/a
 # Können wir den Common-Pool-Effekt ( Noch schnell was großes anschaffen, damit wir es auf die große Gemeinde abwälzen können, nachweisen mit den außerordentlichen ausgaben?)
 
 
+#Verwaltung testen
+verwaltungsausgaben <- posten_data %>%
+  mutate(post1 = substr(post3,1,1), 
+         ans1 = substr(ans2, 1,1)) %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+   filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
+  filter(ans2 == "00" & post3 == "010" |
+         ans2 == '00' &post3 == '040' |
+          ans2 == '00' &post3 == '042'|
+          ans2 == '00' &post1 == '6'|
+          ans2 == '01' |
+          ans2 == '02' |
+          ans2 == '03' |
+          ans2 == '05' &post3 == '010'|
+          ans2 == '05' &post3 == '040'|
+          ans2 == '05' &post3 == '042'|
+          ans2 == '05' &post1 == '5'|
+          ans2 == '05' &post1 == '6'|
+          ans2 == '05' &post3 == '700'|
+          ans2 == '05' &post3 == '723'|
+          ans2 == '05' &post3 == '728'|
+          ans2 == '05' &post3 == '729'|
+          ans2 == '06' &post3 == '010'|
+          ans2 == '06' &post3 == '040'|
+          ans2 == '06' &post3 == '042'|
+          ans2 == '06' &post1 == '5'|
+          ans2 == '06' &post1 == '6'|
+          ans2 == '06' &post3 == '700'|
+          ans2 == '06' &post3 == '723'|
+          ans2 == '06' &post3 == '728'|
+          ans2 == '06' &post3 == '729'|
+          ans2 == '07' &post3 == '010'|
+          ans2 == '07' &post3 == '040'|
+          ans2 == '07' &post3 == '042'|
+          ans2 == '07' &post1 == '5'|
+          ans2 == '07' &post1 == '6'|
+          ans2 == '07' &post3 == '700'|
+          ans2 == '07' &post3 == '723'|
+          ans2 == '07' &post3 == '728'|
+          ans2 == '07' &post3 == '729'|
+          ans2 == '08' &post3 == '010'|
+          ans2 == '08' &post3 == '040'|
+          ans2 == '08' &post3 == '042'|
+          ans2 == '08' &post1 == '5'|
+          ans2 == '08' &post1 == '6'|
+          ans2 == '08' &post3 == '700'|
+          ans2 == '08' &post3 == '723'|
+          ans2 == '08' &post3 == '728'|
+          ans2 == '08' &post3 == '729'|
+          ans2 == '09' |
+          ans2 == '10' |
+          ans2 == '13' |
+          ans1 == '1' &post3 == '500'|
+          ans1 == '1' &post3 == '501'|
+          ans1 == '1' &post3 == '510'|
+          ans1 == '1' &post3 == '511'|
+          ans1 == '1' &post3 == '6'|
+          ans1 == '1' &post3 == '723'|
+          ans2 == '20' |
+          ans1 == '2' &post3 == '040'|
+          ans1 == '2' &post3 == '500'|
+          ans1 == '2' &post3 == '501'|
+          ans1 == '2' &post3 == '510'|
+          ans1 == '2' &post3 == '511'|
+          ans1 == '2' &post3 == '617'|
+          ans1 == '2' &post3 == '723'|
+          ans2 == '30' |
+          ans1 == '3' &post3 == '010'|
+          ans1 == '3' &post3 == '040'|
+          ans1 == '3' &post3 == '042'|
+          ans1 == '3' &post1 == '5'|
+          ans1 == '3' &post1 == '6'|
+          ans1 == '3' &post3 == '700'|
+          ans1 == '3' &post3 == '723'|
+          ans2 == '40' |
+          ans1 == '4' &post3 == '040'|
+          ans1 == '4' &post3 == '500'|
+          ans1 == '4' &post3 == '501'|
+          ans1 == '4' &post3 == '510'|
+          ans1 == '4' &post3 == '511'|
+          ans1 == '4' &post3 == '617'|
+          ans1 == '4' &post3 == '723'|
+          ans2 == '50' |
+          ans1 == '5' &post3 == '040'|
+          ans1 == '5' &post3 == '500'|
+          ans1 == '5' &post3 == '501'|
+          ans1 == '5' &post3 == '510'|
+          ans1 == '5' &post3 == '511'|
+          ans1 == '5' &post1 == '6'|
+          ans1 == '5' &post3 == '723'|
+          ans2 == '60' |
+          ans1 == '6' &post3 == '040'|
+          ans1 == '6' &post3 == '042'|
+          ans1 == '6' &post1 == '5'|
+          ans1 == '6' &post1 == '6'|
+          ans1 == '6' &post3 == '700'|
+          ans1 == '6' &post3 == '723'|
+          ans2 == '70' |
+          ans1 == '7' &post3 == '040'|
+          ans1 == '7' &post3 == '042'|
+          ans1 == '7' &post1 == '5'|
+          ans1 == '7' &post1 == '6'|
+          ans1 == '7' &post3 == '700'|
+          ans1 == '7' &post3 == '723'|
+          ans2 == '80' |
+          ans1 == '8' &post3 == '040'|
+          ans1 == '8' &post3 == '042'|
+          ans1 == '8' &post3 == '500'|
+          ans1 == '8' &post3 == '501'|
+          ans1 == '8' &post3 == '510'|
+          ans1 == '8' &post3 == '511'|
+          ans1 == '8' &post1 == '6'|
+          ans1 == '8' &post3 == '700'|
+          ans1 == '8' &post3 == '723'|
+          ans2 == '90' |
+          ans1 == '9' &post3 == '010'|
+          ans1 == '9' &post3 == '040'|
+          ans1 == '9' &post3 == '042'|
+          ans1 == '9' &post1 == '5'|
+          ans1 == '9' &post1== '6'|
+          ans1 == '9' &post3 == '700'|
+          ans1 == '9' &post3 == '723'|
+          ans1 == '9' &post3 == '728'|
+          ans1 == '9' &post3 == '729') 
+
+verwaltungsausgabenprokopf <- verwaltungsausgaben %>%
+  group_by(fj, gkz_neu, name, gsrbetr, ew) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ew,2)) %>%
+    ungroup() %>%
+  select(fj, gkz_neu, name, vwausgabenprokopf, gsrbetr) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+
+vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%
+  filter(gsrbetr=="Ja")
+
+
+vwkostenprokopf_nfus <- verwaltungsausgabenprokopf %>%
+  filter(gsrbetr=="Nein")
+
+verwaltungsausgaben_aggregat <-verwaltungsausgaben %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr) #%>%
+ # spread(fj, vwausgaben) %>%
+  #mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+  #       avg15_17 = (`2015`+`2016`+`2017`)/3, 
+  #       avg_diff = (avg15_17/avg12_14-1)*100)
+
+needs(directlabels)
+plot1 <- ggplot(verwaltungsausgaben_aggregat, aes(fj, vwausgaben, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 400000000)
+
+print(plot1)
+
+verwaltungsausgabenprokopf <-verwaltungsausgaben %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr) 
+
+# Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
+gsrbetr_bev <- gemeinden_reg %>%
+  filter(gkz >60000 & gkz < 70000) %>%
+  select(gkz, jahr,ew) %>%
+  group_by(gkz, jahr) %>%
+  do(borderman(.[,c('gkz','ew')])) %>%
+  left_join(gsr15)
+
+gsrbetr_bev_t <- gsrbetr_bev %>%
+  group_by(gsrbetr, jahr) %>%
+  summarise(ew = sum(ew)) 
+
+# Join der Bevölkerung mit den Verwaltungsausgaben
+
+verwaltungsausgabenprokopf_t <- verwaltungsausgabenprokopf %>%
+  left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
+  mutate(vwausgabenprokopf = vwausgaben/ew)
+
+plot2 <- ggplot(verwaltungsausgabenprokopf_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 700)
+plot(plot2)
+  
+
+# Personenzahl nach Gemeindegrößenklasse und gsr-betr
+gsrbetr_bev_gemgr <- verwaltungsausgaben %>%
+  distinct(fj, gkz_neu, gemgrklas, ew, gsrbetr) %>%
+  group_by(fj, gemgrklas, gsrbetr) %>%
+  summarise(ew = sum(ew)) 
+
+# Verwaltungsausgaben pro Kopf nach Gemeindegrößenklasse
+verwaltungsausgabenprokopf_gemgrklas <-verwaltungsausgaben %>%
+  group_by(fj, gsrbetr, gemgrklas) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gemgrklas, gsrbetr) %>%
+  left_join(gsrbetr_bev_gemgr, by=c("fj"="fj", "gemgrklas"="gemgrklas", "gsrbetr"="gsrbetr")) %>%
+  group_by(fj, gemgrklas, gsrbetr) %>%
+  summarise(vwausgaben = sum(vwausgaben), 
+            ew = sum(ew)) %>%
+  mutate(vwausgabenprokopf = vwausgaben/ew)
+
+p <- ggplot(verwaltungsausgabenprokopf_gemgrklas, aes(x = fj, y = vwausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
+    geom_line(lwd=0.9) +
+    facet_wrap(~gemgrklas)
+plot(p)
+
+
+
+```
+
+```{r message=FALSE, warning=FALSE}
+verwaltungsausgaben_bev_vfgh <- verwaltungsausgaben %>%
+  distinct(fj, gkz_neu, ew) %>%
+  filter(gkz_neu %in% vfgh$gkz) %>%
+  group_by(fj) %>%
+  summarise(ew = sum(ew)) 
+ 
+verwaltungsausgabenprokopf_vfgh <- verwaltungsausgaben %>%
+  filter(gkz_neu %in% vfgh$gkz) %>%
+  group_by(fj) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  left_join(verwaltungsausgaben_bev_vfgh, by = c("fj"="fj")) %>%
+  mutate(vwausgabenprokopf = vwausgaben/ew, 
+         gsrbetr = "Ja, VFGH")
+ 
+test <- rbind(verwaltungsausgabenprokopf_t, verwaltungsausgabenprokopf_vfgh)
+plot7 <- ggplot(test, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 700)
+plot(plot7)
+
+```
+
+```{r}
+# Gibt es die U-Kurve bei Verwaltungsausgaben in Österreich?
+verwaltungsausgaben_at <- posten_data %>%
+  mutate(post1 = substr(post3,1,1), 
+         ans1 = substr(ans2, 1,1)) %>%
+   filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
+  filter(ans2 == "00" & post3 == "010" |
+         ans2 == '00' &post3 == '040' |
+          ans2 == '00' &post3 == '042'|
+          ans2 == '00' &post1 == '6'|
+          ans2 == '01' |
+          ans2 == '02' |
+          ans2 == '03' |
+          ans2 == '05' &post3 == '010'|
+          ans2 == '05' &post3 == '040'|
+          ans2 == '05' &post3 == '042'|
+          ans2 == '05' &post1 == '5'|
+          ans2 == '05' &post1 == '6'|
+          ans2 == '05' &post3 == '700'|
+          ans2 == '05' &post3 == '723'|
+          ans2 == '05' &post3 == '728'|
+          ans2 == '05' &post3 == '729'|
+          ans2 == '06' &post3 == '010'|
+          ans2 == '06' &post3 == '040'|
+          ans2 == '06' &post3 == '042'|
+          ans2 == '06' &post1 == '5'|
+          ans2 == '06' &post1 == '6'|
+          ans2 == '06' &post3 == '700'|
+          ans2 == '06' &post3 == '723'|
+          ans2 == '06' &post3 == '728'|
+          ans2 == '06' &post3 == '729'|
+          ans2 == '07' &post3 == '010'|
+          ans2 == '07' &post3 == '040'|
+          ans2 == '07' &post3 == '042'|
+          ans2 == '07' &post1 == '5'|
+          ans2 == '07' &post1 == '6'|
+          ans2 == '07' &post3 == '700'|
+          ans2 == '07' &post3 == '723'|
+          ans2 == '07' &post3 == '728'|
+          ans2 == '07' &post3 == '729'|
+          ans2 == '08' &post3 == '010'|
+          ans2 == '08' &post3 == '040'|
+          ans2 == '08' &post3 == '042'|
+          ans2 == '08' &post1 == '5'|
+          ans2 == '08' &post1 == '6'|
+          ans2 == '08' &post3 == '700'|
+          ans2 == '08' &post3 == '723'|
+          ans2 == '08' &post3 == '728'|
+          ans2 == '08' &post3 == '729'|
+          ans2 == '09' |
+          ans2 == '10' |
+          ans2 == '13' |
+          ans1 == '1' &post3 == '500'|
+          ans1 == '1' &post3 == '501'|
+          ans1 == '1' &post3 == '510'|
+          ans1 == '1' &post3 == '511'|
+          ans1 == '1' &post3 == '6'|
+          ans1 == '1' &post3 == '723'|
+          ans2 == '20' |
+          ans1 == '2' &post3 == '040'|
+          ans1 == '2' &post3 == '500'|
+          ans1 == '2' &post3 == '501'|
+          ans1 == '2' &post3 == '510'|
+          ans1 == '2' &post3 == '511'|
+          ans1 == '2' &post3 == '617'|
+          ans1 == '2' &post3 == '723'|
+          ans2 == '30' |
+          ans1 == '3' &post3 == '010'|
+          ans1 == '3' &post3 == '040'|
+          ans1 == '3' &post3 == '042'|
+          ans1 == '3' &post1 == '5'|
+          ans1 == '3' &post1 == '6'|
+          ans1 == '3' &post3 == '700'|
+          ans1 == '3' &post3 == '723'|
+          ans2 == '40' |
+          ans1 == '4' &post3 == '040'|
+          ans1 == '4' &post3 == '500'|
+          ans1 == '4' &post3 == '501'|
+          ans1 == '4' &post3 == '510'|
+          ans1 == '4' &post3 == '511'|
+          ans1 == '4' &post3 == '617'|
+          ans1 == '4' &post3 == '723'|
+          ans2 == '50' |
+          ans1 == '5' &post3 == '040'|
+          ans1 == '5' &post3 == '500'|
+          ans1 == '5' &post3 == '501'|
+          ans1 == '5' &post3 == '510'|
+          ans1 == '5' &post3 == '511'|
+          ans1 == '5' &post1 == '6'|
+          ans1 == '5' &post3 == '723'|
+          ans2 == '60' |
+          ans1 == '6' &post3 == '040'|
+          ans1 == '6' &post3 == '042'|
+          ans1 == '6' &post1 == '5'|
+          ans1 == '6' &post1 == '6'|
+          ans1 == '6' &post3 == '700'|
+          ans1 == '6' &post3 == '723'|
+          ans2 == '70' |
+          ans1 == '7' &post3 == '040'|
+          ans1 == '7' &post3 == '042'|
+          ans1 == '7' &post1 == '5'|
+          ans1 == '7' &post1 == '6'|
+          ans1 == '7' &post3 == '700'|
+          ans1 == '7' &post3 == '723'|
+          ans2 == '80' |
+          ans1 == '8' &post3 == '040'|
+          ans1 == '8' &post3 == '042'|
+          ans1 == '8' &post3 == '500'|
+          ans1 == '8' &post3 == '501'|
+          ans1 == '8' &post3 == '510'|
+          ans1 == '8' &post3 == '511'|
+          ans1 == '8' &post1 == '6'|
+          ans1 == '8' &post3 == '700'|
+          ans1 == '8' &post3 == '723'|
+          ans2 == '90' |
+          ans1 == '9' &post3 == '010'|
+          ans1 == '9' &post3 == '040'|
+          ans1 == '9' &post3 == '042'|
+          ans1 == '9' &post1 == '5'|
+          ans1 == '9' &post1== '6'|
+          ans1 == '9' &post3 == '700'|
+          ans1 == '9' &post3 == '723'|
+          ans1 == '9' &post3 == '728'|
+          ans1 == '9' &post3 == '729') 
+
+verwaltungsausgaben_per_gemeinde <- verwaltungsausgaben %>%
+  group_by(fj, gkz_neu, name) %>%
+  summarise(vwausgaben = sum(soll))
+  
 
 ```
 
