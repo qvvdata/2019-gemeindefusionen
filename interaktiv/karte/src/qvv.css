@@ -1,0 +1,85 @@
+@font-face {
+    font-family: 'Sailec';
+    src: url('https://data.addendum.org/gfx/fonts/Sailec/sailec_medium.eot');
+    src: url('https://data.addendum.org/gfx/fonts/Sailec/sailec_medium.eot?#iefix') format('embedded-opentype'),
+         url('https://data.addendum.org/gfx/fonts/Sailec/sailec_medium.woff2') format('woff2'),
+         url('https://data.addendum.org/gfx/fonts/Sailec/sailec_medium.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Sailec';
+    src: url('https://data.addendum.org/gfx/fonts/Sailec/sailec.eot');
+    src: url('https://data.addendum.org/gfx/fonts/Sailec/sailec.eot?#iefix') format('embedded-opentype'),
+         url('https://data.addendum.org/gfx/fonts/Sailec/sailec.woff2') format('woff2'),
+         url('https://data.addendum.org/gfx/fonts/Sailec/sailec.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Martha;
+    src: url('https://data.addendum.org/gfx/fonts/Martha/Martha-Regular.eot?#iefix');
+    src: url('https://data.addendum.org/gfx/fonts/Martha/Martha-Regular.eot?#iefix') format("eot"), url('https://data.addendum.org/gfx/fonts/Martha/Martha-Regular.ttf') format("truetype"), url('https://data.addendum.org/gfx/fonts/Martha/fonts/Martha-Regular.woff2') format("woff2"), url('https://data.addendum.org/gfx/fonts/Martha/fonts/Martha-Regular.woff') format("woff");
+    font-weight: normal;
+    font-style: normal
+}
+
+body {
+    font-family: Sailec, monospace;
+    font-size: 14px;
+    line-height: 21px;
+    margin: 0;
+    font-feature-settings: "tnum" on;
+    -webkit-font-feature-settings: "tnum" on;
+    -moz-font-feature-settings: "tnum" on;
+}
+html, body {
+    background: transparent;
+}
+
+h1 {
+    font-size: 21px;
+    line-height: 29px;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+
+#graph {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+footer {
+    display: flex;
+}
+
+footer p.detail {
+    font-size: 14px;
+    line-height: 21px;
+    margin: 0;
+}
+
+footer p.source {
+    color: #888;
+    text-align: right;
+    font-family: Martha, sans-serif;
+    font-size: 11px;
+    line-height: 17px;
+    margin: 0;
+    flex: 1;
+    white-space: nowrap;
+    padding-top: 1px;
+    -webkit-text-size-adjust: 100%;
+}
+p.source strong {
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+p {
+    line-height: 21px;
+    margin: 0px;
+}
