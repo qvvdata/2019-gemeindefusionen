@@ -1,0 +1,270 @@
+---
+title: "Report"
+author: "Gerald Gartner, Rückfragen unter 0681 816 717 59"
+date: "8.1.2019"
+output:
+  html_document: default
+---
+
+``` {r setup, include=FALSE}
+suppressWarnings(suppressPackageStartupMessages(needs(stringr)))
+```
+
+# Gemeindestrukturreform für die Lokalausgabe `r regionalausgabe`
+
+Dieser Bericht fasst die Eckdaten einer Spezialauswertung von Daten der Statistik Austria zum Thema Verwaltungsausgaben vor und nach der Gemeindestrukturreform in der Steiermark zusammen. Er umfasst Daten sowie Visualisierungen zur Veränderung der Verwaltungsausgaben, Personalausgaben, Gemeindereferate, Freiwillige Feuerwehren und den Ausgaben für gewählte Gemeindeorgane.  
+
+## Gesamtsumme der Verwaltungsausgaben je Regionalausgabe absolut und pro Kopf berechnen
+```{r}
+regionalausgabe_verwaltungsausgaben <- posten_data %>%
+  mutate(post1 = substr(post3,1,1), 
+         ans1 = substr(ans2, 1,1)) %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+   filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
+  filter(ans2 == "00" & post3 == "010" |
+         ans2 == '00' &post3 == '040' |
+          ans2 == '00' &post3 == '042'|
+          ans2 == '00' &post1 == '6'|
+          ans2 == '01' |
+          ans2 == '02' |
+          ans2 == '03' |
+          ans2 == '05' &post3 == '010'|
+          ans2 == '05' &post3 == '040'|
+          ans2 == '05' &post3 == '042'|
+          ans2 == '05' &post1 == '5'|
+          ans2 == '05' &post1 == '6'|
+          ans2 == '05' &post3 == '700'|
+          ans2 == '05' &post3 == '723'|
+          ans2 == '05' &post3 == '728'|
+          ans2 == '05' &post3 == '729'|
+          ans2 == '06' &post3 == '010'|
+          ans2 == '06' &post3 == '040'|
+          ans2 == '06' &post3 == '042'|
+          ans2 == '06' &post1 == '5'|
+          ans2 == '06' &post1 == '6'|
+          ans2 == '06' &post3 == '700'|
+          ans2 == '06' &post3 == '723'|
+          ans2 == '06' &post3 == '728'|
+          ans2 == '06' &post3 == '729'|
+          ans2 == '07' &post3 == '010'|
+          ans2 == '07' &post3 == '040'|
+          ans2 == '07' &post3 == '042'|
+          ans2 == '07' &post1 == '5'|
+          ans2 == '07' &post1 == '6'|
+          ans2 == '07' &post3 == '700'|
+          ans2 == '07' &post3 == '723'|
+          ans2 == '07' &post3 == '728'|
+          ans2 == '07' &post3 == '729'|
+          ans2 == '08' &post3 == '010'|
+          ans2 == '08' &post3 == '040'|
+          ans2 == '08' &post3 == '042'|
+          ans2 == '08' &post1 == '5'|
+          ans2 == '08' &post1 == '6'|
+          ans2 == '08' &post3 == '700'|
+          ans2 == '08' &post3 == '723'|
+          ans2 == '08' &post3 == '728'|
+          ans2 == '08' &post3 == '729'|
+          ans2 == '09' |
+          ans2 == '10' |
+          ans2 == '13' |
+          ans1 == '1' &post3 == '500'|
+          ans1 == '1' &post3 == '501'|
+          ans1 == '1' &post3 == '510'|
+          ans1 == '1' &post3 == '511'|
+          ans1 == '1' &post3 == '6'|
+          ans1 == '1' &post3 == '723'|
+          ans2 == '20' |
+          ans1 == '2' &post3 == '040'|
+          ans1 == '2' &post3 == '500'|
+          ans1 == '2' &post3 == '501'|
+          ans1 == '2' &post3 == '510'|
+          ans1 == '2' &post3 == '511'|
+          ans1 == '2' &post3 == '617'|
+          ans1 == '2' &post3 == '723'|
+          ans2 == '30' |
+          ans1 == '3' &post3 == '010'|
+          ans1 == '3' &post3 == '040'|
+          ans1 == '3' &post3 == '042'|
+          ans1 == '3' &post1 == '5'|
+          ans1 == '3' &post1 == '6'|
+          ans1 == '3' &post3 == '700'|
+          ans1 == '3' &post3 == '723'|
+          ans2 == '40' |
+          ans1 == '4' &post3 == '040'|
+          ans1 == '4' &post3 == '500'|
+          ans1 == '4' &post3 == '501'|
+          ans1 == '4' &post3 == '510'|
+          ans1 == '4' &post3 == '511'|
+          ans1 == '4' &post3 == '617'|
+          ans1 == '4' &post3 == '723'|
+          ans2 == '50' |
+          ans1 == '5' &post3 == '040'|
+          ans1 == '5' &post3 == '500'|
+          ans1 == '5' &post3 == '501'|
+          ans1 == '5' &post3 == '510'|
+          ans1 == '5' &post3 == '511'|
+          ans1 == '5' &post1 == '6'|
+          ans1 == '5' &post3 == '723'|
+          ans2 == '60' |
+          ans1 == '6' &post3 == '040'|
+          ans1 == '6' &post3 == '042'|
+          ans1 == '6' &post1 == '5'|
+          ans1 == '6' &post1 == '6'|
+          ans1 == '6' &post3 == '700'|
+          ans1 == '6' &post3 == '723'|
+          ans2 == '70' |
+          ans1 == '7' &post3 == '040'|
+          ans1 == '7' &post3 == '042'|
+          ans1 == '7' &post1 == '5'|
+          ans1 == '7' &post1 == '6'|
+          ans1 == '7' &post3 == '700'|
+          ans1 == '7' &post3 == '723'|
+          ans2 == '80' |
+          ans1 == '8' &post3 == '040'|
+          ans1 == '8' &post3 == '042'|
+          ans1 == '8' &post3 == '500'|
+          ans1 == '8' &post3 == '501'|
+          ans1 == '8' &post3 == '510'|
+          ans1 == '8' &post3 == '511'|
+          ans1 == '8' &post1 == '6'|
+          ans1 == '8' &post3 == '700'|
+          ans1 == '8' &post3 == '723'|
+          ans2 == '90' |
+          ans1 == '9' &post3 == '010'|
+          ans1 == '9' &post3 == '040'|
+          ans1 == '9' &post3 == '042'|
+          ans1 == '9' &post1 == '5'|
+          ans1 == '9' &post1== '6'|
+          ans1 == '9' &post3 == '700'|
+          ans1 == '9' &post3 == '723'|
+          ans1 == '9' &post3 == '728'|
+          ans1 == '9' &post3 == '729') #%>%
+#  filter(regionalausgabe=="Weiz") 
+regionalausgabe_ew <- regionalausgabe_verwaltungsausgaben %>%
+  distinct(fj, gkz_neu, .keep_all = TRUE) %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(ew = sum(ew))
+
+verwaltungsausgaben_gesamt <- regionalausgabe_verwaltungsausgaben %>%
+ group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  left_join(regionalausgabe_ew, by=c("fj"="fj", "gsrbetr"="gsrbetr")) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ew),0)
+
+
+plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes") +
+  expand_limits(y=c(0, NA)) +
+  ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
+plot(plot1)
+  
+```
+
+
+
+```{r}
+#Grafik der absoluten Kosten
+table1 <- verwaltungsausgaben_gesamt %>%
+  select(fj, gsrbetr, vwausgabenprokopf) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  rename("Fusionsgemeinde?" = gsrbetr)
+
+needs(knitr)
+needs(kableExtra)
+options(knitr.table.format = "html")
+# Verwaltungsausgaben seit 2010 für alle Gemeinden Regionals seit 2003 
+table1 %>% 
+  kable(caption = "Verwaltungsausgaben pro Kopf in Euro") %>%
+  kable_styling()
+
+```
+
+
+```{r echo=F, warning=F}
+regionalausgabe_ew <- verwaltungsausgaben %>%
+  distinct(fj, gkz_neu, name, .keep_all=TRUE) %>%
+  group_by(fj, gkz_neu, name, gsrbetr) %>%
+  summarise(ew = sum(ew)) 
+
+verwaltungsausgaben_gemeinden <- regionalausgabe_verwaltungsausgaben %>%
+ group_by(fj, gkz_neu, name, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  left_join(regionalausgabe_ew, by=c("gkz_neu"="gkz_neu", "fj"="fj", "gsrbetr"="gsrbetr")) %>%
+  mutate(vwausgabenprokopf = round((vwausgaben/ew),1)) %>%
+  select(-c(vwausgaben, ew, name.y)) %>%
+  spread(fj, vwausgabenprokopf) %>%
+    mutate(avg12_14 = round((`2012`+`2013`+`2014`)/3,1), 
+         avg15_17 =   round((`2015`+`2016`+`2017`)/3,1), 
+         avg_diff_pct = round((avg15_17/avg12_14-1)*100, 1)) %>%
+  arrange(desc(avg_diff_pct)) %>%
+  ungroup() %>%
+  rename("Dreijahresschnitt vor Fusion" = "avg12_14", 
+         "Dreijahresschnitt nach Fusion" = "avg15_17", 
+         "Fusionsgemeinde?" = gsrbetr, 
+         Gemeindename = name.x, 
+         "Differenz in %" =avg_diff_pct)
+
+table2 <- verwaltungsausgaben_gemeinden
+  
+table2 %>% 
+  kable(caption = "Entwicklung der Verwaltungsausgaben pro Kopf in Euro") %>%
+  kable_styling()
+
+```
+
+
+```{r}
+# Visualisierung der Differenz
+#Personalkosten pro Kopf zeichnen zeichnen
+map_data <- verwaltungsausgaben_gemeinden %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
+library(ggthemes)
+map_1 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  #scale_fill_gradient(low = "#ffffff", high = "#132B43",
+  #                     space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+panel.grid.minor = element_blank(), axis.line =element_blank()) #+
+theme()
+print(map_1)
+
+
+```
+
+```{r echo=F, warning=F}
+verwaltungsausgaben_gemeinden_text <- verwaltungsausgaben_gemeinden %>%
+  mutate(mehrweniger = ifelse(`Differenz in %` <0, "weniger", "mehr")) %>%
+  group_by(mehrweniger, `Fusionsgemeinde?`) %>%
+  summarise(count = n()) %>%
+  spread(mehrweniger, count)
+
+verwaltungsausgaben_gemeinden_text_fus <- verwaltungsausgaben_gemeinden_text %>%
+  filter(`Fusionsgemeinde?`=="Ja")
+verwaltungsausgaben_gemeinden_text_nfus <- verwaltungsausgaben_gemeinden_text %>%
+  filter(`Fusionsgemeinde?`=="Nein")
+
+```
+
+
+Bei Betrachtung der durchschnittlichen Verwaltungskosten pro Kopf von fusionierten Gemeinden zeigt sich in Ihrer Region, dass diese in `r verwaltungsausgaben_gemeinden_text_fus$mehr` Gemeinden gestiegen sind und in `r verwaltungsausgaben_gemeinden_text_fus$weniger` gefallen sind. Diese Zahl bezieht sich auf den Dreijahresdurchschnitt der Verwaltungskosten vor und nach der Zusammenlegungen (2012 bis 2014, sowie 2015 bis 2017). Bei nicht-fusionierten Gemeinden Ihrer Region sind der Verwaltungskosten pro Kopf in `r verwaltungsausgaben_gemeinden_text_nfus$mehr` gestiegen und in `r verwaltungsausgaben_gemeinden_text_nfus$weniger` gefallen. 
+
+
+
+```{r echo=F, warning=F}
+options(knitr.table.format = "html")
+# Bevölkerungsveränderung seit 1971 
+kable(data_groessteverluste_bl71) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```

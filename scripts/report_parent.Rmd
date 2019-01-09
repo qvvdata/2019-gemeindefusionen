@@ -1,0 +1,77 @@
+---
+title: "parten"
+author: 'Gerald Gartner'
+date: "February 7, 2016"
+output:
+  html_document:
+    fig_caption: yes
+    keep_md: yes
+    number_sections: no
+    theme: journal
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: true
+---
+```{r setup}
+library(knitr)
+knitr::read_chunk("scripts/theme_addendum.R")
+source("./scripts/theme_addendum.R")
+needs(markdown)
+needs(rmarkdown)
+needs(datasets)
+needs(kableExtra)
+needs(sf)
+needs(tidyverse)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(magrittr) # pipes
+library(stringr) # string manipulation
+library(readxl) # excel
+library(scales) # scales for ggplot2
+library(jsonlite) # json
+library(forcats) # easier factor handling,
+library(lintr) # code linting
+library(xlsx) #Excel
+library(googlesheets) # googlesheets (replace with googlesheets4 asap)
+source("./scripts/01-preprocessing.R")
+alldata <- data
+```
+
+
+```{r getdata, results=FALSE, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+#load("samples.RDa")
+library(knitr)
+```
+# Methods
+
+
+# Results
+```{r echo=T, eval=TRUE, include=FALSE}
+out <- NULL
+print(getwd())
+for(bl in regionalausgabe(1,8)){
+  print(bl)
+  landfilterdings <- bl
+  specnum<-0
+  data <- alldata %>% filter(blkz==landfilterdings)
+  ausgewaehlte_region <- paste("Land", data[1,]$bl)
+  
+  blsdef <- bl
+  env=new.env() #create a new empty environment, it inherits objects from the current environment.
+  rmarkdown::render('scripts/report.Rmd', output_file=paste0(bl,'.html'), envir = env, output_dir="output/generated")
+}
+```
+# Results
+```{r echo=T, eval=TRUE, include=FALSE}
+for(bez in c(707)) {
+  print(bez)
+  landfilterdings <- bez
+  specnum<-0
+  data <- alldata %>% filter(bezcode==landfilterdings)
+  ausgewaehlte_region <- paste("Bezirk", data[1,]$bezirk)
+  
+  blsdef <- bez
+  env=new.env() #create a new empty environment, it inherits objects from the current environment.
+  rmarkdown::render('scripts/report.Rmd', output_file=paste0(bez,'.html'), envir = env, output_dir="output/generated")
+}
+```
