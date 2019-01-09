@@ -36,14 +36,14 @@ verwaltungsausgaben_gesamt <- regionalausgabe_verwaltungsausgaben %>%
   mutate(vwausgabenprokopf = round(vwausgaben/ew),0)
 
 
-# plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
-#   geom_line() +
-#   theme_addendum()+
-#   theme(legend.position="right")+
-#   #geom_dl(aes(label = gsrbetr), method="angled.boxes") +
-#   #expand_limits(y=c(0, NA)) +
-#   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
-# plot(plot1)
+ plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+   geom_line() +
+   theme_addendum()+
+ theme(legend.position="right")+
+ geom_dl(aes(label = gsrbetr), method="angled.boxes") +
+ expand_limits(y=c(0, NA)) +
+   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
+ plot(plot1)
   
 ```
 

@@ -65,17 +65,4 @@ for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
   }
 }
 ```
-# Results
-```{r testchunk2, echo=T, eval=TRUE, include=FALSE}
-# for(bez in c(707)) {
-#   print(bez)
-#   landfilterdings <- bez
-#   specnum<-0
-#   data <- alldata %>% filter(bezcode==landfilterdings)
-#   ausgewaehlte_region <- paste("Bezirk", data[1,]$bezirk)
-#   
-#   blsdef <- bez
-#   env=new.env() #create a new empty environment, it inherits objects from the current environment.
-#   rmarkdown::render('scripts/report.Rmd', output_file=paste0(bez,'.html'), envir = env, output_dir="output/generated")
-# }
 ```
