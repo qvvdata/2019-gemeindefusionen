@@ -1,6 +1,7 @@
 library(knitr)
 knitr::read_chunk("scripts/theme_addendum.R")
 source("./scripts/theme_addendum.R")
+source("./scripts/verwaltungsausgaben.R")
 needs(markdown)
 needs(rmarkdown)
 needs(datasets)
