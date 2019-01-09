@@ -292,7 +292,7 @@ map_data <- gde_18 %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu"))
 
-
+needs(ggthemes)
 plot_1 <- ggplot() +
   # municipality polygons & outline
   geom_sf(data = map_data, aes(fill=avg15_17), color="white", size=0.001) +
@@ -301,10 +301,11 @@ plot_1 <- ggplot() +
   #coord_map(projection = "mercator") +
   # coord_sf did not work here
   scale_fill_gradient(low = "#E1A9A9", high = "#571F1E", 
-                       space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+                       space = "Lab", na.value = "black", guide = "colourbar") +
   labs(x = NULL, y = NULL, title = "personalkostenprokopf", caption = "Quelle: Statistik Austria, BEV.") +
   guides(fill=guide_legend(nrow=6,byrow=TRUE))+
-  theme_addendum()
+  theme_map()+
+  theme(panel.grid.major = element_line(colour = "white"))
 print(plot_1)
 
 add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'personalkostenprokopf')
@@ -325,57 +326,7 @@ personalkostenprokopf_mitansaetzen <- posten_data %>%
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
 
-# # Ohne Zuweisung der Gemeinden - Wie haben sich die Ausgaben gesamt entwickelt? --> Falsch, weil bevsumm!
-# personalkostenprokopfstmkggesamt <- posten_data %>%
-#   filter(gruppe=="Personal") %>%
-#   filter (hh=="1" | hh=="5") %>% 
-#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-#   group_by(fj,gsrbetr, gruppe) %>%
-#   summarise(personalausgaben = sum(soll), 
-#             bevsumme = sum(ew)) %>%
-#   mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
-#     ungroup() %>%
-#   select(fj, gsrbetr, personalausgabenprokopf) %>%
-#   spread(fj, personalausgabenprokopf) %>%
-#   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-#          avg15_17 = (`2015`+`2016`+`2017`)/3, 
-#          avg_diff = (avg15_17/avg12_14-1)*100, 
-#          avg_diff17 = (`2017`/`2016`-1)*100)
 
-# Gesamtentwicklung absolut --> falsch weil bevsum
-# personalkostenprokopfstmkggesamtabs <- posten_data %>%
-#   filter(gruppe=="Personal") %>%
-#   filter (hh=="1" | hh=="5") %>% 
-#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-#   group_by(fj,gsrbetr, gruppe) %>%
-#   summarise(personalausgaben = sum(soll), 
-#             bevsumme = sum(ew)) %>%
-#     ungroup() %>%
-#   select(fj, gsrbetr, personalausgaben) %>%
-#   spread(fj, personalausgaben) %>%
-#   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-#          avg15_17 = (`2015`+`2016`+`2017`)/3, 
-#          avg_diff = (avg15_17/avg12_14-1)*100, 
-#          avg_diff17 = (`2017`/`2016`-1)*100)
-
-
-# Nach Gemeindegröße die Entwicklung der Personalkosten von fusionierten und nicht-fusionierten ansehen --> Falsch weil bevsum
-# personalkostenprokopfstmkgemgr <- posten_data %>%
-#   filter(gruppe=="Personal") %>%
-#   filter (hh=="1" | hh=="5") %>% 
-#   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-#   group_by(fj,gsrbetr, gruppe, gemgrklas) %>%
-#   summarise(personalausgaben = sum(soll), 
-#             bevsumme = sum(ew)) %>%
-#   mutate(personalausgabenprokopf = round(personalausgaben/bevsumme,2)) %>%
-#     ungroup()
-# 
-# p <- ggplot(personalkostenprokopfstmkgemgr, aes(x = fj, y = personalausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
-#     geom_line(lwd=0.9) +
-#     facet_wrap(~gemgrklas)
-# 
-# print(p)
-# ggsave("output/ignore/p.pdf", width = 20, height = 20, units = "cm")
 
 ```
 
@@ -412,7 +363,8 @@ In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die 
 ```{r}
 # Map der Personalkostensteigerung pro Kopf
 # map dat mit Daten für die Visualisierung mergen
-map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
+map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) %>%
+  filter(gsrbetr=="Ja")
 
 #Personalkosten pro Kopf Erhöhung zeichnen zeichnen
 plot_1 <- ggplot() +
@@ -422,10 +374,13 @@ plot_1 <- ggplot() +
   coord_sf() +
   #coord_map(projection = "mercator") +
   # coord_sf did not work here
-  scale_fill_gradient(low = "#bf4342", high = "#519872", 
-                       space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "grey", high = "#ba2b58")+
+  #scale_fill_gradient(low = "#bf4342", high = "#519872", 
+  #                     space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
   labs(x = NULL, y = NULL, title = "personalkostenprokopferhöhung", caption = "Quelle: Statistik Austria, BEV.") +
-  guides(fill=guide_legend(nrow=6,byrow=TRUE)) 
+  guides(fill=guide_legend(nrow=6,byrow=TRUE)) +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
 
 plot(plot_1)
 #add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'rueckkehrer')
