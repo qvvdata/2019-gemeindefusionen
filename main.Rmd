@@ -289,7 +289,7 @@ map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) 
 map_data <- gde_18 %>% 
   mutate(gkz_neu=as.numeric(GKZ)) %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
-  left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu")) 
+  left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu"))
 
 
 plot_1 <- ggplot() +
