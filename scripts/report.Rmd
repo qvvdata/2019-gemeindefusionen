@@ -40,9 +40,9 @@ plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = g
   geom_line() +
   #theme_addendum()+
   #theme(legend.position="right")+
-  geom_dl(aes(label = gsrbetr), method="angled.boxes") +
   expand_limits(y=c(0, NA)) +
-  ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
+  ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene") +
+  guides(color=guide_legend("Fusionsgemeinde?"))
 plot(plot1)
   
 ```
