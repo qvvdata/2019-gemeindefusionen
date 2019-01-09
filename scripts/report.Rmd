@@ -153,14 +153,14 @@ verwaltungsausgaben_gesamt <- regionalausgabe_verwaltungsausgaben %>%
   mutate(vwausgabenprokopf = round(vwausgaben/ew),0)
 
 
-# plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
-#   geom_line() +
-#   theme_addendum()+
-#   theme(legend.position="right")+
-#   #geom_dl(aes(label = gsrbetr), method="angled.boxes") +
-#   #expand_limits(y=c(0, NA)) +
-#   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
-# plot(plot1)
+plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  #theme_addendum()+
+  #theme(legend.position="right")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes") +
+  expand_limits(y=c(0, NA)) +
+  ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
+plot(plot1)
   
 ```
 
@@ -185,7 +185,7 @@ table1 %>%
 
 
 ```{r reportchunk3, echo=F, warning=F}
-regionalausgabe_ew <- verwaltungsausgaben %>%
+regionalausgabe_ew <- regionalausgabe_verwaltungsausgaben %>%
   distinct(fj, gkz_neu, name, .keep_all=TRUE) %>%
   group_by(fj, gkz_neu, name, gsrbetr) %>%
   summarise(ew = sum(ew)) 
@@ -225,16 +225,15 @@ map_data <- verwaltungsausgaben_gemeinden %>% mutate(gkz_neu=as.character(gkz_ne
 needs(ggplot2)
 needs(ggthemes)
 
-#map_1 <- ggplot() +
-  # municipality polygons & outline
- # geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
-#  coord_sf() +
-  #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")
- # labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
- # theme_map() 
- # theme(panel.grid.major = element_line(colour = "white"))
+map_1 <- ggplot() +
+geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
+ coord_sf() +
+scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")
+labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+theme_map()
+theme(panel.grid.major = element_line(colour = "white"))
 
-#print(map_1)
+print(map_1)
 
 
 ```
