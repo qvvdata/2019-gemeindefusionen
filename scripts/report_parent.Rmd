@@ -34,7 +34,7 @@ library(lintr) # code linting
 library(xlsx) #Excel
 library(googlesheets) # googlesheets (replace with googlesheets4 asap)
 source("./scripts/01-preprocessing.R")
-alldata <- data
+
 ```
 
 
@@ -49,29 +49,25 @@ library(knitr)
 ```{r echo=T, eval=TRUE, include=FALSE}
 out <- NULL
 print(getwd())
-for(bl in regionalausgabe(1,8)){
-  print(bl)
-  landfilterdings <- bl
-  specnum<-0
-  data <- alldata %>% filter(blkz==landfilterdings)
-  ausgewaehlte_region <- paste("Land", data[1,]$bl)
+for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
+  #data <- alldata %>% filter(blkz==landfilterdings)
+  #ausgewaehlte_regionalausgabe <- paste("Land", data[1,]$bl)
   
-  blsdef <- bl
   env=new.env() #create a new empty environment, it inherits objects from the current environment.
   rmarkdown::render('scripts/report.Rmd', output_file=paste0(bl,'.html'), envir = env, output_dir="output/generated")
 }
 ```
 # Results
 ```{r echo=T, eval=TRUE, include=FALSE}
-for(bez in c(707)) {
-  print(bez)
-  landfilterdings <- bez
-  specnum<-0
-  data <- alldata %>% filter(bezcode==landfilterdings)
-  ausgewaehlte_region <- paste("Bezirk", data[1,]$bezirk)
-  
-  blsdef <- bez
-  env=new.env() #create a new empty environment, it inherits objects from the current environment.
-  rmarkdown::render('scripts/report.Rmd', output_file=paste0(bez,'.html'), envir = env, output_dir="output/generated")
-}
+# for(bez in c(707)) {
+#   print(bez)
+#   landfilterdings <- bez
+#   specnum<-0
+#   data <- alldata %>% filter(bezcode==landfilterdings)
+#   ausgewaehlte_region <- paste("Bezirk", data[1,]$bezirk)
+#   
+#   blsdef <- bez
+#   env=new.env() #create a new empty environment, it inherits objects from the current environment.
+#   rmarkdown::render('scripts/report.Rmd', output_file=paste0(bez,'.html'), envir = env, output_dir="output/generated")
+# }
 ```

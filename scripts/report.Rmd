@@ -138,8 +138,9 @@ regionalausgabe_verwaltungsausgaben <- posten_data %>%
           ans1 == '9' &post3 == '700'|
           ans1 == '9' &post3 == '723'|
           ans1 == '9' &post3 == '728'|
-          ans1 == '9' &post3 == '729') #%>%
-#  filter(regionalausgabe=="Weiz") 
+          ans1 == '9' &post3 == '729') %>%
+  filter(regionalausgabe==ausgewaehlte_regionalausgabe) 
+
 regionalausgabe_ew <- regionalausgabe_verwaltungsausgaben %>%
   distinct(fj, gkz_neu, .keep_all = TRUE) %>%
   group_by(fj, gsrbetr) %>%
