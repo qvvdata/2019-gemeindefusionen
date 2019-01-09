@@ -1,20 +1,3 @@
----
-title: "parten"
-author: 'Gerald Gartner'
-date: "February 7, 2016"
-output:
-  html_document:
-    fig_caption: yes
-    keep_md: yes
-    number_sections: no
-    theme: journal
-    toc: yes
-    toc_depth: 2
-    toc_float:
-      collapsed: true
----
-```{r setup}
-setwd('..')
 library(knitr)
 knitr::read_chunk("scripts/theme_addendum.R")
 source("./scripts/theme_addendum.R")
@@ -36,23 +19,11 @@ library(lintr) # code linting
 library(xlsx) #Excel
 library(googlesheets) 
 library(directlabels) # googlesheets (replace with googlesheets4 asap)
-#source("./scripts/01-preprocessing.R")
 
-```
-
-
-```{r getdata, results=FALSE, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#load("samples.RDa")
 library(knitr)
-```
-# Methods
 
-
-# Results
-```{r testchunk, echo=T, eval=TRUE, include=FALSE}
 out <- NULL
 print(getwd())
-setwd('..')
 for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
   if(ausgewaehlte_regionalausgabe!="-") {
     
@@ -63,6 +34,10 @@ for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
     env=new.env() #create a new empty environment, it inherits objects from the current environment.
     rmarkdown::render('scripts/report.Rmd', output_file=paste0(ausgewaehlte_regionalausgabe,'.html'), envir = env, output_dir="output/generated")
   }
+<<<<<<< HEAD:scripts/report_parent.Rmd
 }
 ```
 ```
+=======
+}
+>>>>>>> d0e0acf9130bd0b84df23c26775e76f0910b1414:scripts/report_parent.R
