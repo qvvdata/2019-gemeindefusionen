@@ -10,12 +10,12 @@ output:
 suppressWarnings(suppressPackageStartupMessages(needs(stringr)))
 ```
 
-# Gemeindestrukturreform für die Lokalausgabe `r regionalausgabe`
+# Gemeindestrukturreform für die Lokalausgabe `r ausgewaehlte_regionalausgabe`
 
 Dieser Bericht fasst die Eckdaten einer Spezialauswertung von Daten der Statistik Austria zum Thema Verwaltungsausgaben vor und nach der Gemeindestrukturreform in der Steiermark zusammen. Er umfasst Daten sowie Visualisierungen zur Veränderung der Verwaltungsausgaben, Personalausgaben, Gemeindereferate, Freiwillige Feuerwehren und den Ausgaben für gewählte Gemeindeorgane.  
 
 ## Gesamtsumme der Verwaltungsausgaben je Regionalausgabe absolut und pro Kopf berechnen
-```{r}
+```{r reportchunk1}
 regionalausgabe_verwaltungsausgaben <- posten_data %>%
   mutate(post1 = substr(post3,1,1), 
          ans1 = substr(ans2, 1,1)) %>%
@@ -153,20 +153,20 @@ verwaltungsausgaben_gesamt <- regionalausgabe_verwaltungsausgaben %>%
   mutate(vwausgabenprokopf = round(vwausgaben/ew),0)
 
 
-plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
-  geom_line() +
-  theme_addendum()+
-  theme(legend.position="none")+
-  geom_dl(aes(label = gsrbetr), method="angled.boxes") +
-  expand_limits(y=c(0, NA)) +
-  ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
-plot(plot1)
+# plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+#   geom_line() +
+#   theme_addendum()+
+#   theme(legend.position="right")+
+#   #geom_dl(aes(label = gsrbetr), method="angled.boxes") +
+#   #expand_limits(y=c(0, NA)) +
+#   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene")
+# plot(plot1)
   
 ```
 
 
 
-```{r}
+```{r reportchunk2}
 #Grafik der absoluten Kosten
 table1 <- verwaltungsausgaben_gesamt %>%
   select(fj, gsrbetr, vwausgabenprokopf) %>%
@@ -184,7 +184,7 @@ table1 %>%
 ```
 
 
-```{r echo=F, warning=F}
+```{r reportchunk3, echo=F, warning=F}
 regionalausgabe_ew <- verwaltungsausgaben %>%
   distinct(fj, gkz_neu, name, .keep_all=TRUE) %>%
   group_by(fj, gkz_neu, name, gsrbetr) %>%
@@ -217,34 +217,29 @@ table2 %>%
 ```
 
 
-```{r}
+```{r reportchunk4}
 # Visualisierung der Differenz
 #Personalkosten pro Kopf zeichnen zeichnen
 map_data <- verwaltungsausgaben_gemeinden %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
-library(ggthemes)
-map_1 <- ggplot() +
-  # municipality polygons & outline
-  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
-  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
-  coord_sf() +
-  #coord_map(projection = "mercator") +
-  # coord_sf did not work here
-  #scale_fill_gradient(low = "#ffffff", high = "#132B43",
-  #                     space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
-  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
-  labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
-  theme_map() +
-  theme(panel.grid.major = element_line(colour = "white"))
 
-theme(panel.border = element_blank(), panel.grid.major = element_blank(),
-panel.grid.minor = element_blank(), axis.line =element_blank()) #+
-theme()
-print(map_1)
+needs(ggplot2)
+needs(ggthemes)
+
+#map_1 <- ggplot() +
+  # municipality polygons & outline
+ # geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
+#  coord_sf() +
+  #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")
+ # labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+ # theme_map() 
+ # theme(panel.grid.major = element_line(colour = "white"))
+
+#print(map_1)
 
 
 ```
 
-```{r echo=F, warning=F}
+```{r reportchunk5, echo=F, warning=F}
 verwaltungsausgaben_gemeinden_text <- verwaltungsausgaben_gemeinden %>%
   mutate(mehrweniger = ifelse(`Differenz in %` <0, "weniger", "mehr")) %>%
   group_by(mehrweniger, `Fusionsgemeinde?`) %>%
@@ -263,9 +258,8 @@ Bei Betrachtung der durchschnittlichen Verwaltungskosten pro Kopf von fusioniert
 
 
 
-```{r echo=F, warning=F}
+```{r reportchunk6, echo=F, warning=F}
 options(knitr.table.format = "html")
-# Bevölkerungsveränderung seit 1971 
-kable(data_groessteverluste_bl71) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+
+
 ```

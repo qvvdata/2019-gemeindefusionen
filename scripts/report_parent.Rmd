@@ -14,6 +14,7 @@ output:
       collapsed: true
 ---
 ```{r setup}
+setwd('..')
 library(knitr)
 knitr::read_chunk("scripts/theme_addendum.R")
 source("./scripts/theme_addendum.R")
@@ -27,13 +28,14 @@ library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
 library(magrittr) # pipes
 library(stringr) # string manipulation
 library(readxl) # excel
-library(scales) # scales for ggplot2
+#library(scales) # scales for ggplot2
 library(jsonlite) # json
 library(forcats) # easier factor handling,
 library(lintr) # code linting
 library(xlsx) #Excel
-library(googlesheets) # googlesheets (replace with googlesheets4 asap)
-source("./scripts/01-preprocessing.R")
+library(googlesheets) 
+library(directlabels) # googlesheets (replace with googlesheets4 asap)
+#source("./scripts/01-preprocessing.R")
 
 ```
 
@@ -46,19 +48,24 @@ library(knitr)
 
 
 # Results
-```{r echo=T, eval=TRUE, include=FALSE}
+```{r testchunk, echo=T, eval=TRUE, include=FALSE}
 out <- NULL
 print(getwd())
+setwd('..')
 for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
-  #data <- alldata %>% filter(blkz==landfilterdings)
-  #ausgewaehlte_regionalausgabe <- paste("Land", data[1,]$bl)
-  
-  env=new.env() #create a new empty environment, it inherits objects from the current environment.
-  rmarkdown::render('scripts/report.Rmd', output_file=paste0(bl,'.html'), envir = env, output_dir="output/generated")
+  if(ausgewaehlte_regionalausgabe!="-") {
+    
+    print(ausgewaehlte_regionalausgabe)
+    #data <- alldata %>% filter(blkz==landfilterdings)
+    #ausgewaehlte_regionalausgabe <- paste("Land", data[1,]$bl)
+    
+    env=new.env() #create a new empty environment, it inherits objects from the current environment.
+    rmarkdown::render('scripts/report.Rmd', output_file=paste0(ausgewaehlte_regionalausgabe,'.html'), envir = env, output_dir="output/generated")
+  }
 }
 ```
 # Results
-```{r echo=T, eval=TRUE, include=FALSE}
+```{r testchunk2, echo=T, eval=TRUE, include=FALSE}
 # for(bez in c(707)) {
 #   print(bez)
 #   landfilterdings <- bez
