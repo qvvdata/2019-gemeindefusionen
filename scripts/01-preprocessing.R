@@ -47,11 +47,9 @@ filter(SOLL !=0)%>%
   ungroup() %>%
   select(fj, hh, ans2, post3, gkz_neu, soll)
 
-#gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
-
-
-#gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
-#saveRDS(gsr15, "output/gsr15.rds")
+# gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
+# gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
+# saveRDS(gsr15, "output/gsr15.rds")
 gsr15<- readRDS("output/gsr15.RDS")
 
 #gsr15 <- readRDS("output/ignore/gsr15.rds")
