@@ -292,9 +292,16 @@ map_data <- gde_18 %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu"))
 
+bezirksgrenzen <- bezirksgrenzen %>%
+  mutate(BEZ = as.numeric(BEZ)) %>%
+    filter(BEZ > 600 & BEZ <700) %>%
+  mutate(BEZ = as.character(BEZ))
+
+
 needs(ggthemes)
 plot_1 <- ggplot() +
   # municipality polygons & outline
+  geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
   geom_sf(data = map_data, aes(fill=avg15_17), color="white", size=0.001) +
   #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
   coord_sf() +
