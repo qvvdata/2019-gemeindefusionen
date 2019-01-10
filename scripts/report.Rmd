@@ -44,6 +44,9 @@ plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = g
   expand_limits(y=c(0, NA)) +
   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene") +
   guides(color=guide_legend("Fusionsgemeinde?"))
+
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_verwaltunsausgaben_zeit.pdf'), plot1)
+
 plot(plot1)
 
   
@@ -111,12 +114,19 @@ needs(ggplot2)
 needs(ggthemes)
 
 map_1 <- ggplot() +
-geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001) +
- coord_sf() +
-scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
-labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
-theme_map() +
-theme(panel.grid.major = element_line(colour = "white"))
+  geom_sf(data=bezirksgrenzen_2 %>%
+      mutate(bez=as.numeric(BEZ)) %>%
+      left_join(bezirke, by=c(bez='polbezcode')) %>%
+      filter(regionalausgabe==ausgewaehlte_regionalausgabe),
+    fill='lightyellow') +
+  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001, datum=sf::st_crs(4326)) +
+  coord_sf() +
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_personalkosten.pdf'), map_1)
 
 print(map_1)
 
