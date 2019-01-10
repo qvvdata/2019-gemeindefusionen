@@ -19,7 +19,6 @@ library(lintr) # code linting
 library(xlsx) #Excel
 library(googlesheets) 
 library(directlabels) # googlesheets (replace with googlesheets4 asap)
-
 library(knitr)
 
 out <- NULL

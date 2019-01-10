@@ -286,7 +286,9 @@ quantile(personalkostenprokopf_map$avg15_17, probs = seq(0, 1, by = 0.10))
 personalkostenprokopf_map$avg15_17[personalkostenprokopf_map$avg15_17 >= 464] <- 464
 
 #Personalkosten pro Kopf zeichnen zeichnen
-map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) 
+map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) %>% 
+  filter(gsrbetr=="Ja")
+
 map_data <- gde_18 %>% 
   mutate(gkz_neu=as.numeric(GKZ)) %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
@@ -301,7 +303,7 @@ bezirksgrenzen <- bezirksgrenzen %>%
 needs(ggthemes)
 plot_1 <- ggplot() +
   # municipality polygons & outline
-  geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
+  geom_sf(data = bezirksgrenzen, color="white", size = 1) +
   geom_sf(data = map_data, aes(fill=avg15_17), color="white", size=0.001) +
   #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
   coord_sf() +
@@ -309,8 +311,8 @@ plot_1 <- ggplot() +
   # coord_sf did not work here
   scale_fill_gradient(low = "#E1A9A9", high = "#571F1E", 
                        space = "Lab", na.value = "black", guide = "colourbar") +
-  labs(x = NULL, y = NULL, title = "personalkostenprokopf", caption = "Quelle: Statistik Austria, BEV.") +
-  guides(fill=guide_legend(nrow=6,byrow=TRUE))+
+  labs(x = NULL, y = NULL, title = "Höhe der Personalkosten pro Kopf", caption = "Quelle: Statistik Austria, BEV.") +
+  #guides(fill=guide_legend(nrow=6,byrow=TRUE))+
   theme_map()+
   theme(panel.grid.major = element_line(colour = "white"))
 print(plot_1)
@@ -462,7 +464,7 @@ referateprokopf_nfus <- personalkostenprokopf %>%
 
 
 ```
-42/128 gesunkene Kosten für Referate pro Kopf (40 %) bei fusionierten
+40/120 gesunkene Kosten für Referate pro Kopf (40 %) bei fusionierten
 23/159 gesunkene Kosten für Referate pro Kopf (15 %) bei nicht fusionierten
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Feuerwehren
@@ -489,7 +491,7 @@ feuerwehrenprokopf_nfus <- feuerwehrenprokopf %>%
   filter(gsrbetr=="Nein")  
 ```
 
-65/128 (50 %) gesunkene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
+58/119 (49 %) gesunkene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
 78/159 (49 %) gesunkene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
 
 
@@ -515,8 +517,8 @@ gemeindeorganeprokopf_fus <- gemeindeorganeprokopf %>%
 gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
   filter(gsrbetr=="Nein")  
 ```
-106/128 (84 %) gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
-0/159 gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
+102/120 (85 %) gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
+0/158 gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Amtsgebäude
 ```{r}
@@ -624,7 +626,6 @@ foerderungen_parteien_gem_avg <- posten_data %>%
   select(gkz_neu, name, soll, ew, sollproew, urbantyp) %>%
   arrange(-sollproew) %>%
   top_n(20, sollproew)
-  
 
 write.xlsx(foerderungen_parteien_gem_avg, "output/ignore/foerderungen_parteien_gem_avg.xlsx")
 
@@ -782,11 +783,6 @@ mieteinnahmen_stmk_ansaetze %>% write.xlsx("output/ignore/mieteinnahmen_stmk.xls
 # Hartberg mit seinen Umgebungsgemeinden (ergäbe mehr als 10.000 Einwohner) oder von Friedberg und Pinggau nicht angegangen
 # Gleisdorf gab es einst Außenstellen, die wurden bald geschlossen
 
-# Hat die politische Partizipation in den Wahlen nach der Fusion abgenommen?
-# Hat die politische Repräsentation abgenommen? Wie viele Gemeinderäte kommen nun auf die Bürger? Studie: Hat die Kleine zeitung darüber berichtet? Sollen wir das ein Jahr davor machen: Nach der Reform, vor der Wahl: Ihr Stimme ist so wenig wert wie nie
-# Können wir den Common-Pool-Effekt ( Noch schnell was großes anschaffen, damit wir es auf die große Gemeinde abwälzen können, nachweisen mit den außerordentlichen ausgaben?)
-
-
 #Verwaltung testen
 verwaltungsausgaben <- posten_data %>%
   mutate(post1 = substr(post3,1,1), 
@@ -809,10 +805,41 @@ verwaltungsausgabenprokopf <- verwaltungsausgaben %>%
 vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%
   filter(gsrbetr=="Ja")
 
-
 vwkostenprokopf_nfus <- verwaltungsausgabenprokopf %>%
   filter(gsrbetr=="Nein")
 
+#Verwaltungsausgaben pro Kopf zeichnen
+map_data_vw <- verwaltungsausgabenprokopf %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) %>% 
+  filter(gsrbetr=="Ja")
+
+map_data <- gde_18 %>% 
+  mutate(gkz_neu=as.numeric(GKZ)) %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu"))
+
+
+
+#Personalkosten pro Kopf Erhöhung zeichnen zeichnen
+plot_10 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
+  geom_sf(data = map_data_vw, aes(fill=avg_diff), color="black", size=0.001) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "white", high = "#ba2b58")+
+  #scale_fill_gradient(low = "#bf4342", high = "#519872", 
+  #                     space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  labs(x = NULL, y = NULL, title = "Verwaltungskosten pro Kopf: Erhöhung oder Ersparnis?", caption = "Quelle: Statistik Austria, BEV.") +
+ #guides(fill=guide_legend(nrow=6,byrow=TRUE)) +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+plot(plot_10)
+```
+
+``` {r}
 verwaltungsausgaben_aggregat <-verwaltungsausgaben %>%
   group_by(fj, gsrbetr) %>%
   summarise(vwausgaben = sum(soll)) %>%
@@ -833,7 +860,30 @@ plot1 <- ggplot(verwaltungsausgaben_aggregat, aes(fj, vwausgaben, color = gsrbet
 
 print(plot1)
 
-verwaltungsausgabenprokopf <-verwaltungsausgaben %>%
+verwaltungsausgaben_aggregat_avg_diff <- verwaltungsausgaben_aggregat %>%
+  spread(fj, vwausgaben) %>%
+  mutate(avgdiff_2011 = round((((`2011`/`2010`)-1)*100),2), 
+         avgdiff_2012 = round((((`2012`/`2011`)-1)*100),2), 
+         avgdiff_2013 = round((((`2013`/`2012`)-1)*100),2), 
+         avgdiff_2014 = round((((`2014`/`2013`)-1)*100),2), 
+         avgdiff_2015 = round((((`2015`/`2014`)-1)*100),2), 
+         avgdiff_2016 = round((((`2016`/`2015`)-1)*100),2), 
+         avgdiff_2017 = round((((`2017`/`2016`)-1)*100),2)) %>%
+  gather(type, value, `2010`:avgdiff_2017) %>%
+  separate(type, c("art", "fj"), sep="_") %>%
+  na.omit(fj)
+
+plot11 <- ggplot(verwaltungsausgaben_aggregat_avg_diff, aes(x = fj, y= value, fill = gsrbetr))+
+  geom_bar(stat = "identity")+
+  facet_wrap(~gsrbetr)
+plot(plot11)     
+
+verwaltungsausgaben_aggregat_avg_diff_dw <- verwaltungsausgaben_aggregat_avg_diff %>%
+  spread(fj, value)
+write.xlsx(verwaltungsausgaben_aggregat_avg_diff_dw, "output/ignore/verwaltungsausgaben_aggregat_avg_diff_dw.xlsx", sheetName = "Vwsteigerung pro Kopf")
+
+
+verwaltungsausgabenprokopf_gsrbetr <-verwaltungsausgaben %>%
   group_by(fj, gsrbetr) %>%
   summarise(vwausgaben = sum(soll)) %>%
   ungroup() %>%
@@ -844,7 +894,7 @@ gsrbetr_bev <- gemeinden_reg %>%
   filter(gkz >60000 & gkz < 70000) %>%
   select(gkz, jahr,ew) %>%
   group_by(gkz, jahr) %>%
-  do(borderman(.[,c('gkz','ew')])) %>%
+  #do(borderman(.[,c('gkz','ew')])) %>%
   left_join(gsr15)
 
 gsrbetr_bev_t <- gsrbetr_bev %>%
@@ -853,11 +903,11 @@ gsrbetr_bev_t <- gsrbetr_bev %>%
 
 # Join der Bevölkerung mit den Verwaltungsausgaben
 
-verwaltungsausgabenprokopf_t <- verwaltungsausgabenprokopf %>%
+verwaltungsausgabenprokopf_gsrbetr_t <- verwaltungsausgabenprokopf_gsrbetr %>%
   left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
   mutate(vwausgabenprokopf = vwausgaben/ew)
 
-plot2 <- ggplot(verwaltungsausgabenprokopf_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+plot2 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum()+
   theme(legend.position="none")+
@@ -886,10 +936,9 @@ verwaltungsausgabenprokopf_gemgrklas <-verwaltungsausgaben %>%
 
 p <- ggplot(verwaltungsausgabenprokopf_gemgrklas, aes(x = fj, y = vwausgabenprokopf, color=gsrbetr, group=gsrbetr)) +
     geom_line(lwd=0.9) +
-    facet_wrap(~gemgrklas)
+    facet_wrap(~gemgrklas)+
+  theme_minimal()
 plot(p)
-
-
 
 ```
 
@@ -930,7 +979,6 @@ verwaltungsausgaben_at <- posten_data %>%
 verwaltungsausgaben_per_gemeinde <- verwaltungsausgaben %>%
   group_by(fj, gkz_neu, name) %>%
   summarise(vwausgaben = sum(soll))
-  
 
 ```
 
