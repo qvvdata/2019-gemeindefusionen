@@ -159,11 +159,13 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
          bezcode = as.numeric(bezcode),
          polbezcode = as.numeric(polbezcode))
 
-gde_14 <- read_sf("input/geo/gemeinden_2014_bev.geojson") %>%
+gde_14 <- read_sf("input/geo/gemeinden_2014_bev_wgs.geojson") %>%
   mutate(GKZ=as.numeric(GKZ)) %>%
   as('Spatial') %>%
   #ms_simplify(keep=0.5, keep_shapes = T) %>%
   st_as_sf() %>%
+  group_by(GKZ) %>%
+  summarise() %>%
   filter(GKZ <70000 & GKZ >60000)
 
 gde_14$BL = substring(gde_14$GKZ,0,1)
@@ -172,16 +174,16 @@ bundeslaendergrenzen14 <- gde_14 %>% group_by(BL) %>% summarise()
 bezirksgrenzen <- gde_14 %>% group_by(BEZ) %>% summarise()
 
 #Exportieren der Karte vor 2014
-# map_2014 <- ggplot() +
-#   geom_sf(data = gde_14, color="black", size=0.1) +
-#   coord_sf()+
-#   #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
-#   #labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
-#   theme_map() +
-#   theme(panel.grid.major = element_line(colour = "white"))
-# 
-# plot(map_2014)
-# ggsave("map_2014.pdf", width = 10, height = 4)
+map_2014 <- ggplot() +
+  geom_sf(data = gde_14, color="black", size=0.1) +
+  coord_sf()+
+  #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  #labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+plot(map_2014)
+ggsave("map_2014.pdf", width = 10, height = 4)
 
 # Zusammenführen der Datensätze
  data_tt <- data %>%
