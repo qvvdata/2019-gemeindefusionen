@@ -134,6 +134,7 @@ gde_18$BEZ = substring(gde_18$GKZ,0,3)
 bundeslaendergrenzen <- gde_18 %>% group_by(BL) %>% summarise()
 bezirksgrenzen <- gde_18 %>% group_by(BEZ) %>% summarise()
 
+
 gde_18_2 <- read_sf("input/geo/grenzen_katastral_oesterreich_bev_2018.geojson") %>%
   mutate(GKZ=as.character(GKZ)) %>%
   as('Spatial') %>%
@@ -143,6 +144,8 @@ gde_18_2$BL = substring(gde_18_2$GKZ,0,1)
 gde_18_2$BEZ = substring(gde_18_2$GKZ,0,3)
 
 gde_18_2 <- gde_18_2 %>% group_by(GKZ) %>% summarise() 
+gde_18_2$BEZ = substring(gde_18_2$GKZ,0,3)
+bezirksgrenzen_2 <- gde_18_2 %>% group_by(BEZ) %>% summarise()
 
 
 # Laden der Urban-Rural-Typologie
