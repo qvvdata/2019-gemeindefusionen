@@ -137,7 +137,7 @@ sessionInfo()
 
 ### Load additional scripts
 
-```{r warning=TRUE, include=FALSE}
+```{r message=FALSE, warning=TRUE, include=FALSE}
 # if you want to outsource logic to other script files, see README for 
 # further information
 knitr::read_chunk("scripts/theme_addendum.R")
@@ -957,7 +957,8 @@ verwaltungsausgabenprokopf_vfgh <- verwaltungsausgaben %>%
   mutate(vwausgabenprokopf = vwausgaben/ew, 
          gsrbetr = "Ja, VFGH")
  
-test <- rbind(verwaltungsausgabenprokopf_t, verwaltungsausgabenprokopf_vfgh)
+test <- rbind(verwaltungsausgabenprokopf_gsrbetr_t, verwaltungsausgabenprokopf_vfgh)
+
 plot7 <- ggplot(test, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum()+

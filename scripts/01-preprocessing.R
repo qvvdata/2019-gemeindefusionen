@@ -147,6 +147,18 @@ gde_18_2 <- gde_18_2 %>% group_by(GKZ) %>% summarise()
 gde_18_2$BEZ = substring(gde_18_2$GKZ,0,3)
 bezirksgrenzen_2 <- gde_18_2 %>% group_by(BEZ) %>% summarise()
 
+#Exportieren der Karte von 2018
+map_2018 <- ggplot() +
+  geom_sf(data = gde_18_2 %>%filter(gkz), color="black", size=0.1) +
+  coord_sf()+
+  #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  #labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+plot(map_2014)
+ggsave("output/ignore/map_2014.pdf", device="pdf")
+
 
 # Laden der Urban-Rural-Typologie
 urbanrural <- read_excel("input/bessereheader/urbanrural.xlsx", sheet="data") %>%
@@ -159,7 +171,7 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
          bezcode = as.numeric(bezcode),
          polbezcode = as.numeric(polbezcode))
 
-gde_14 <- read_sf("input/geo/gemeinden_2014_bev_wgs.geojson") %>%
+gde_14 <- read_sf("input/geo/gemeinden_2014_4_wgs.geojson") %>%
   mutate(GKZ=as.numeric(GKZ)) %>%
   as('Spatial') %>%
   #ms_simplify(keep=0.5, keep_shapes = T) %>%
@@ -183,7 +195,7 @@ map_2014 <- ggplot() +
   theme(panel.grid.major = element_line(colour = "white"))
 
 plot(map_2014)
-ggsave("map_2014.pdf", width = 10, height = 4)
+ggsave("output/ignore/map_2014.pdf", device="pdf")
 
 # Zusammenführen der Datensätze
  data_tt <- data %>%
