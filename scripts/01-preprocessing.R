@@ -7,6 +7,18 @@ source('./scripts/borderman.R')
 #Funktion
 `%not in%` <- function (x, table) is.na(match(x, table, nomatch=NA_integer_))
 
+numerize <- function(data,vars){
+  data = as.data.frame(data)
+  variables <- colnames(data)
+  variables <- variables[! variables %in% vars]
+  for(i in variables){
+    data[,i]<- as.numeric(data[,i])
+    data[,i][is.na(data[,i])] <- 0
+  }
+  return(data)
+}
+
+needs(ggthemes)
 
 # Zwei geteilte Gemeinden, die auf drei Gemeinden gemeindet wurden, aus der Analyse ausschließen
 teilungen_exkl <- c("62336", "62349")
@@ -163,7 +175,7 @@ gde_18_2 <- gde_18_2 %>% group_by(GKZ) %>% summarise()
 gde_18_2$BEZ = substring(gde_18_2$GKZ,0,3)
 bezirksgrenzen_2 <- gde_18_2 %>% group_by(BEZ) %>% summarise()
 
-write_sf(gde_18_2, "output/gde_18_2.geojson", quiet = TRUE)
+#write_sf(gde_18_2, "output/gde_18_2.geojson", quiet = TRUE)
 
 gde_18_2_splitter <- read_sf("input/geo/gde_18_2_splitter.geojson") %>%
   mutate(GKZ=as.numeric(GKZ)) %>%
