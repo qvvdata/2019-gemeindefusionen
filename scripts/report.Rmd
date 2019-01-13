@@ -108,7 +108,7 @@ table2 %>%
 ```{r reportchunk4, echo=F, warning=F, message=F, results=F}
 # Visualisierung der Differenz
 #Personalkosten pro Kopf zeichnen zeichnen
-map_data <- verwaltungsausgaben_gemeinden %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18_2, by = c("gkz_neu" = "GKZ")) 
+map_data <- verwaltungsausgaben_gemeinden %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) 
 
 needs(ggplot2)
 needs(ggthemes)
@@ -119,7 +119,7 @@ map_1 <- ggplot() +
       left_join(bezirke, by=c(bez='polbezcode')) %>%
       filter(regionalausgabe==ausgewaehlte_regionalausgabe),
     fill='lightyellow') +
-  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.001, datum=sf::st_crs(4326)) +
+  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.01, datum=sf::st_crs(4326)) +
   coord_sf() +
   scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
   labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +

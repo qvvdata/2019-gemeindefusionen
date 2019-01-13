@@ -163,6 +163,19 @@ gde_18_2 <- gde_18_2 %>% group_by(GKZ) %>% summarise()
 gde_18_2$BEZ = substring(gde_18_2$GKZ,0,3)
 bezirksgrenzen_2 <- gde_18_2 %>% group_by(BEZ) %>% summarise()
 
+write_sf(gde_18_2, "output/gde_18_2.geojson", quiet = TRUE)
+
+gde_18_2_splitter <- read_sf("input/geo/gde_18_2_splitter.geojson") %>%
+  mutate(GKZ=as.numeric(GKZ)) %>%
+  as('Spatial') %>%
+  #ms_simplify(keep=0.5, keep_shapes = T) %>%
+  st_as_sf()
+
+
+
+
+
+
 #Exportieren der Karte von 2018
 map_2018 <- ggplot() +
   geom_sf(data = gde_18_2 %>%filter(GKZ <70000 & GKZ >60000), color="black", size=0.1) +
@@ -337,6 +350,6 @@ wahlen_bordermanned<- readRDS("output/wahlen_bordermanned.RDS")
 names(posten_data)
 # Endgütlige Namenszuweisung
 gemeindenamen18 <- read_excel("input/bessereheader/gemeindenamen2018inklteilungsasterix.xlsx")
-posten_data_nam <- posten_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
-ansaetze_data_nam <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
+posten_data <- posten_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
+ansaetze_data <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
 
