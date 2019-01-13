@@ -4,14 +4,13 @@ library(sf)
 library(rmapshaper)
 source('./scripts/borderman.R')
 
-#Laden der Finanzgebarung nach Ansatz
-ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx") %>%
-  mutate(gkz = as.numeric(gkz),
-         fj = as.numeric(fj))
-#ansatz_bordermanned <- ansatz %>% group_by(fj,hh,haushalt,ans3,bez) %>% do(borderman(.[,c('gkz','soll')]))
+#Funktion
+`%not in%` <- function (x, table) is.na(match(x, table, nomatch=NA_integer_))
 
-#saveRDS(ansatz_bordermanned, "output/ansatz_bordermanned.rds")
-ansatz_bordermanned<- readRDS("output/ansatz_bordermanned.RDS")
+
+# Zwei geteilte Gemeinden, die auf drei Gemeinden gemeindet wurden, aus der Analyse ausschließen
+teilungen_exkl <- c("62336", "62349")
+
 
 
 # Posten Daten reinladen 
@@ -26,14 +25,15 @@ fj17 <- read_excel("input/bessereheader/Gemeinden nach Posten_neu_AS2all_2017.xl
 
 data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
   mutate(gkz = as.numeric(gem),
-         FJ = as.numeric(FJ))
+         FJ = as.numeric(FJ)) %>%
+  filter(gkz %not in% teilungen_exkl)
 
-# data_bordermanned <- data %>%
-#   group_by(FJ,HH, ans2, post3) %>%
-#   do((borderman(.[,c('gkz','SOLL')])))
-
-#saveRDS(data_bordermanned, "output/data_bordermanned.rds")
-data_bordermanned<- readRDS("output/data_bordermanned.RDS")
+ # data_bordermanned <- data %>%
+ #    group_by(FJ,HH, ans2, post3) %>%
+ #     do((borderman(.[,c('gkz','SOLL')])))
+ # 
+ # saveRDS(data_bordermanned, "output/data_bordermanned.rds")
+data_bordermanned <- readRDS("output/data_bordermanned.rds") %>% filter(gkz_neu %not in% teilungen_exkl)
 
 
 # Der Borderman macht ein Gather und Spread auf Werte mit 0, deshalb sind im File dann zu viele Werte bei Ansätzen, die es eigenltich nicht gibt --> entfernen
@@ -47,10 +47,11 @@ filter(SOLL !=0)%>%
   ungroup() %>%
   select(fj, hh, ans2, post3, gkz_neu, soll)
 
-# gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% mutate(test =1) %>% filter(gemtypneu!="X")
-# gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
-# saveRDS(gsr15, "output/gsr15.rds")
-gsr15<- readRDS("output/gsr15.RDS")
+gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% filter(gemtypneu!="X")
+#gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) #%>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
+ 
+#saveRDS(gsr15, "output/gsr15.rds")
+#gsr15<- readRDS("output/gsr15.RDS")
 
 #gsr15 <- readRDS("output/ignore/gsr15.rds")
 vfgh <- read_excel("input/bessereheader/2015gsr.xls", sheet="vfgh") %>% rename(gkz = gkz_neu) 
@@ -73,34 +74,35 @@ haushalt_bez <- read_excel("input/bessereheader/mapping.xlsx", sheet ="haushalt"
 # 6. Kosten pro Kopf für die Verwaltung im Verlauf berechnen✅
 # Werte unter 0 raushauen ✅
 
-#Laden der Finanzgebarung nach Ansatz
+
+#Laden der Finanzgebarung nach Ansatz 
 ansatz <- read_excel("input/bessereheader/gemeindennachansatz.xlsx", sheet ="fileref",  trim_ws = TRUE) %>%
    mutate(gkz = as.numeric(gkz),
           fj = as.numeric(fj)) %>%
+   filter(gkz %not in% teilungen_exkl)%>%
    select(-c(haushalt, bez))
 
 ansatz2017 <- read_excel("input/bessereheader/Ansatz2017.xlsx", trim_ws = TRUE) %>%
    mutate(gkz = as.numeric(gem),
           fj = as.numeric(FJ))%>%
+  filter(gkz %not in% teilungen_exkl)%>%
    rename(hh = HH,
           soll = SOLL) %>%
    select(-c(FJ, gem))
 
-ansaetze_data <- bind_rows(ansatz2017, ansatz)
-
- ansaetze_data_bordermanned <- ansaetze_data %>% 
-    group_by(fj,hh,ans3) %>%
-    do(borderman(.[,c('gkz','soll')])) 
+ # ansaetze_data <- bind_rows(ansatz2017, ansatz)
+ # 
+ #  ansaetze_data_bordermanned <- ansaetze_data %>%
+ #     group_by(fj,hh,ans3) %>%
+ #     do(borderman(.[,c('gkz','soll')]))
+ # 
+ #  ansaetze_data <- ansaetze_data_bordermanned %>%
+ #  filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
+ # 
+ # saveRDS(ansaetze_data, "output/ansaetze_data.rds")
+ ansaetze_data <- readRDS("output/ansaetze_data.RDS")
  
- ansaetze_data <- ansaetze_data_bordermanned %>%
-   filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
-
-# Gefunden im Analyse-Schritt: gkz 62248, 62227, 62336 --> dürften nicht da sein --> lt Gabriel zu vernachlässigen
-
-
- 
-# Laden der Bevölkerungsdaten
-
+# Laden der Bevölkerungsdaten und Zuteilung der Gemeindegrößenklassen
 mylabels <- c("Bis 500","501- 1.000","1.001- 1.500","1.501- 2.000","2.001- 2.500","2.501- 3.000" ,  
               "3.001- 5.000","5.001- 10.000","10.001- 20.000","20.001- 30.000","30.001- 50.000","50.001-100.000","100.001-200.000",
                "200.001-500.000","Über 1 000.000", "über 1 000.000")
@@ -110,7 +112,8 @@ gemeinden_vz <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", s
   gather(jahr, wert, `1910`:`2011`) %>%
   filter(jahr!="2011")%>%
   spread(jahr, wert)
-gemeinden_reg <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", sheet="bev_register") %>%
+
+gemeinden_reg_all <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", sheet="bev_register") %>%
   rename("gem" = "gemeind")%>% 
   left_join(gemeinden_vz, by=c("gkz", "gkz")) %>%
   select(-`gem.y`) %>%
@@ -118,15 +121,28 @@ gemeinden_reg <- read_excel("input/bessereheader/beventwicklung1910_2018.xlsx", 
   arrange(jahr) %>%
   rename("name" = "gem.x")%>%
   mutate(jahr=as.numeric(jahr)) %>%
-  filter(jahr>=2010 & jahr<=2017) %>%
+  filter(jahr>=2010 & jahr<=2017)
+
+
+gemeinden_reg_wahl <- gemeinden_reg_all %>%
   mutate(gemgrklas = cut(ew, breaks=my_breaks, labels=mylabels))
+
+#  gemeinden_reg <- gemeinden_reg_all %>%
+#    group_by(gkz, name,jahr) %>%
+#    do(borderman(.[,c('gkz','ew')])) %>%
+#    group_by(gkz_neu, jahr) %>%
+#    summarise(ew = sum(ew))%>%
+#    mutate(gemgrklas = cut(ew, breaks=my_breaks, labels=mylabels))
+# #
+#  saveRDS(gemeinden_reg, "output/gemeinden_reg.rds")
+gemeinden_reg <- readRDS("output/gemeinden_reg.RDS") 
 
 #needs(rmapshaper)
 # Laden der Geodaten
-gde_18 <- read_sf("input/geo/gemeinden m bezirke 2018.geojson") %>%
+gde_18 <- read_sf("input/geo/gemeinden_2018_map_fusionen_inkl_splitter.geojson") %>%
   mutate(GKZ=as.character(GKZ)) %>%
   as('Spatial') %>%
-  ms_simplify(keep=0.5, keep_shapes = T) %>%
+  #ms_simplify(keep=0.5, keep_shapes = T) %>%
   st_as_sf()
 
 gde_18$BL = substring(gde_18$GKZ,0,1)
@@ -135,8 +151,8 @@ bundeslaendergrenzen <- gde_18 %>% group_by(BL) %>% summarise()
 bezirksgrenzen <- gde_18 %>% group_by(BEZ) %>% summarise()
 
 
-gde_18_2 <- read_sf("input/geo/grenzen_katastral_oesterreich_bev_2018.geojson") %>%
-  mutate(GKZ=as.character(GKZ)) %>%
+gde_18_2 <- read_sf("input/geo/gemeinden_2018_katastral_oktober.geojson") %>%
+  mutate(GKZ=as.numeric(GKZ)) %>%
   as('Spatial') %>%
   #ms_simplify(keep=0.5, keep_shapes = T) %>%
   st_as_sf()
@@ -149,15 +165,15 @@ bezirksgrenzen_2 <- gde_18_2 %>% group_by(BEZ) %>% summarise()
 
 #Exportieren der Karte von 2018
 map_2018 <- ggplot() +
-  geom_sf(data = gde_18_2 %>%filter(gkz), color="black", size=0.1) +
+  geom_sf(data = gde_18_2 %>%filter(GKZ <70000 & GKZ >60000), color="black", size=0.1) +
   coord_sf()+
   #scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
   #labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
 
-plot(map_2014)
-ggsave("output/ignore/map_2014.pdf", device="pdf")
+plot(map_2018)
+ggsave("output/ignore/map_2018.pdf", device="pdf")
 
 
 # Laden der Urban-Rural-Typologie
@@ -171,6 +187,7 @@ bezirke <-  read_excel("input/bessereheader/polbezirke2018.xls") %>%
          bezcode = as.numeric(bezcode),
          polbezcode = as.numeric(polbezcode))
 
+#Laden der alten GEmeindedaten für visuellen Vergleich
 gde_14 <- read_sf("input/geo/gemeinden_2014_4_wgs.geojson") %>%
   mutate(GKZ=as.numeric(GKZ)) %>%
   as('Spatial') %>%
@@ -200,10 +217,10 @@ ggsave("output/ignore/map_2014.pdf", device="pdf")
 # Zusammenführen der Datensätze
  data_tt <- data %>%
    filter(ans2!="72" & ans2!="19") %>% # Das sind 5 Zeilen, die Buchungsfehler sind
-   left_join(gemeinden_reg, by=c("gkz_neu"="gkz", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
+   left_join(gemeinden_reg, by=c("gkz_neu"="gkz_neu", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
    left_join(ansatz_bez, by=c("ans2"="ansatz")) %>% # Namen der Ansätze
    left_join(posten_bez, by=c("post3"="posten")) %>%  # Namen der Posten
-   left_join(urbanrural, by = c("gkz_neu"="gkz")) %>% # Typologie hinzufügen
+   #left_join(urbanrural, by = c("gkz_neu"="gkz")) %>% # Typologie hinzufügen
    left_join(gsr15, by=c("gkz_neu" = "gkz")) %>% # von Gemeindestrukturreform betroffen?
    rename(posten_bez = `bezeichnung.y`, 
           ansatz_bez = `bezeichnung.x`)
@@ -237,7 +254,7 @@ ggsave("output/ignore/map_2014.pdf", device="pdf")
  # Ansätze-Daten zusammenführen
  ansaetze_data_tt <- ansaetze_data %>%
    #filter(ans2!="72" & ans3!="19") %>% # Das sind 5 Zeilen, die Buchungsfehler sind
-   left_join(gemeinden_reg, by=c("gkz_neu"="gkz", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
+   left_join(gemeinden_reg, by=c("gkz_neu"="gkz_neu", "fj"="jahr")) %>% # für die Pro-Kopf-berechnung
    left_join(ansatz3_bez, by=c("ans3"="ansaetze")) %>% # Namen der Ansätze
    left_join(urbanrural, by = c("gkz_neu"="gkz")) %>% # Typologie hinzufügen
    left_join(gsr15, by=c("gkz_neu" = "gkz")) %>% # von Gemeindestrukturreform betroffen?
@@ -249,12 +266,77 @@ ggsave("output/ignore/map_2014.pdf", device="pdf")
  
 ansaetze_data <- ansaetze_data_tt
 
+
  
 #Bevölkerung und Zahl der Gemeinden 1961 bis 2011 nach der Gemeindegröße und Bundesländern (Gebietsstand: jeweiliger Erhebungsstichtag)
 gemstruktur <- read_excel("input/bessereheader/gemeindegroessenklassenbundesländer1961bis2018.xlsx")%>%
 gather(type,value, österreich_bev:wien_gemzahl)%>%
 separate(type, into=c("bl", "typ"), sep="_")
 
+##################################################
+### DATEN FÜR POLITISCHE TEILHABE ################
+##################################################
+
+# Laden der Wahldaten 
+ltwstmk2005 <- read_csv("input/bessereheader/ltwstmk2005.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2005, wahl= "ltw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+ltwstmk2010 <- read_csv("input/bessereheader/ltwstmk2010.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2010, wahl= "ltw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+ltwstmk2015 <- read_csv("input/bessereheader/ltwstmk2015.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2015, wahl= "ltw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+
+nrw2008 <- read_csv("input/bessereheader/nrw2008.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2008, wahl= "nrw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+nrw2013 <- read_csv("input/bessereheader/nrw2013.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2013, wahl= "nrw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+nrw2017 <- read_csv("input/bessereheader/nrw2017.csv") %>% mutate(gkz = substr(GKZ, 2,6), jahr=2017, wahl= "nrw") %>% numerize(vars = c("Name","wahl")) %>% select(-GKZ)
+
+#Reshape für Merge
+ltwstmk2005 <- ltwstmk2005 %>%
+  gather(partei, count, Wahlberechtigte:pf)
+
+ltwstmk2010 <- ltwstmk2010 %>%
+  gather(partei, count, Wahlberechtigte:puma)
+
+ltwstmk2015 <- ltwstmk2015 %>%
+  gather(partei, count, Wahlberechtigte:pirat)
+
+nrw2008 <- nrw2008 %>%
+  gather(partei, count, Wahlberechtigte:stark)
+
+nrw2013 <- nrw2013 %>%
+  gather(partei, count, Wahlberechtigte:m)
+
+nrw2017 <- nrw2017 %>%
+  gather(partei, count, Wahlberechtigte:m)
 
 
+wahlen <- bind_rows(ltwstmk2005, ltwstmk2010, ltwstmk2015, nrw2008, nrw2013, nrw2017) %>% filter(gkz<70000 & gkz>60000)
+
+# Borderman-Variante zerstört die Teilungen, deshalb unten anders gelöst
+#wahlen_bordermanned <- wahlen %>% group_by(Name, gkz, jahr, wahl, partei) %>% do(borderman_propagate_fusions(.[,c('gkz','count')]))
+
+
+# Teilungen raushauen, nicht mit Borderman, weil dann auch neue entfernt werden
+
+teilungen <- c("61040", 
+               "62227",
+               "62248",
+               "62336",
+               "62349")
+
+#wahlen_bordermanned <- wahlen_bordermanned %>% filter(gkz %not in% teilungen) %>% group_by(jahr, wahl, gkz, partei) %>% summarise(count = sum(count))
+
+#wahlen_bordermanned_tw <- wahlen_bordermanned %>% group_by(jahr, wahl, gkz, partei) %>% summarise(count = sum(count)) %>% left_join(select(gemeinden_reg18, gkz, name.x), by=c("gkz"="gkz")) %>%rename(name = name.x)
+
+#saveRDS(wahlen_bordermanned, "output/wahlen_bordermanned.rds")
+wahlen_bordermanned<- readRDS("output/wahlen_bordermanned.RDS")
+
+
+#testen, wie viele gemeinden in der steiermark enthalten sind
+# wahltest <- wahlen_bordermanned_tw %>%
+#   spread(partei, count) %>%
+#   filter(jahr=="2005")
+# Alles korrekt
+
+names(posten_data)
+# Endgütlige Namenszuweisung
+gemeindenamen18 <- read_excel("input/bessereheader/gemeindenamen2018inklteilungsasterix.xlsx")
+posten_data_nam <- posten_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
+ansaetze_data_nam <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
 

@@ -1,0 +1,93 @@
+---
+title: "Report für die Steiermark"
+author: "Gerald Gartner, Rückfragen unter 0681 816 717 59"
+date: "9.1.2019"
+output:
+  html_document: default
+---
+
+``` {r setup, include=FALSE}
+suppressWarnings(suppressPackageStartupMessages(needs(stringr)))
+source("../scripts/theme_addendum.R")
+source("../scripts/verwaltungsausgaben.R")
+#source(".../scripts/01-preprocessing.R") Load manually
+#source("./main.Rmd") # load manually
+
+needs(markdown)
+needs(rmarkdown)
+needs(datasets)
+needs(kableExtra)
+needs(ggthemes)
+needs(sf)
+needs(tidyverse)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(magrittr) # pipes
+library(stringr) # string manipulation
+library(readxl) # excel
+#library(scales) # scales for ggplot2
+library(jsonlite) # json
+library(forcats) # easier factor handling,
+library(lintr) # code linting
+library(xlsx) #Excel
+library(googlesheets) 
+library(directlabels) # googlesheets (replace with googlesheets4 asap)
+library(knitr)
+
+```
+
+### Kostenanalyse der Auswirkungen der Gemeindestrukturreform in der Steiermark
+
+Dieser Bericht fasst die Eckdaten einer Spezialauswertung von Daten der Statistik Austria zum Thema Verwaltungsausgaben vor und nach der Gemeindestrukturreform in der Steiermark zusammen. Er umfasst Daten sowie Visualisierungen zur Veränderung der Verwaltungsausgaben, Personalausgaben, Gemeindereferate, Freiwillige Feuerwehren und den Ausgaben für gewählte Gemeindeorgane.  
+
+#### Personalausgaben
+```{r reportchunk1, echo=F, warning=F}
+plot_1 <- ggplot() +
+  geom_sf(data = map_data, aes(fill=avg15_17), color="white", size=0.001) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  scale_fill_gradient(low = "#E1A9A9", high = "#571F1E", 
+                       space = "Lab", na.value = "black", guide = "colourbar") +
+  labs(x = NULL, y = NULL, title = "Höhe der Personalkosten pro Kopf", caption = "Quelle: Statistik Austria, BEV.") +
+  guides(fill=guide_legend(nrow=6,byrow=TRUE))+
+  theme_map()+
+  theme(panel.grid.major = element_line(colour = "white"))
+print(plot_1)
+```
+
+### Gesamtsumme der Verwaltungsausgaben je Regionalausgabe absolut und pro Kopf berechnen
+```{r reportchunk2, warning=F, echo=F}
+plot2 <- ggplot(verwaltungsausgabenprokopf_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 700)
+plot(plot2)
+
+verwaltungsausgabenprokopf_t_table <- verwaltungsausgabenprokopf_t %>%
+  select(-c(vwausgaben, ew)) %>%
+  mutate(vwausgabenprokopf = round(vwausgabenprokopf, 1)) %>%
+  rename("Fusionsgemeinden?" = gsrbetr) %>%
+spread(fj, vwausgabenprokopf)
+
+needs(knitr)
+needs(kableExtra)
+options(knitr.table.format = "html")
+
+# Verwaltungsausgaben seit 2010 für alle Gemeinden seit 2003 
+verwaltungsausgabenprokopf_t_table %>% 
+  kable(caption = "Steiermark: Verwaltungsausgaben pro Kopf in Euro") %>%
+  kable_styling()
+
+
+```
+
+
+
+```{r reportchunk6, echo=F, warning=F}
+options(knitr.table.format = "html")
+render("stmk.Rmd", output_format = "word_document", output_dir="output/generated")
+
+```

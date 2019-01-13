@@ -1,6 +1,10 @@
 suppressPackageStartupMessages(library("dplyr"))
 library(tidyr)
 
+# 1. der name von remove_teilungen ist jetzt borderman_remove_teilungen
+# 2. borderman() macht jetzt automatisch remove_teilungen mit
+# 3. wenn du nur GKZ austauschen willst, kannst du einfach borderman_propagate_fusions machen – das entfernt allerdings auch keine teilungen!
+
 
 borderman_fusionen_cache <- NULL
 

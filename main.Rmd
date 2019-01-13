@@ -212,14 +212,16 @@ Die Gemeindestrukturreform in den 70er-Jahren hat in Niederösterreich zur Verdr
 Wie haben sich die Personalausgaben pro Kopf je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
 
 ```{r}
+
 personalkostenprokopf <- posten_data %>%
   filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  filter (hh=="1" | hh=="5") %>%
+  filter(gkz_neu >60000 & gkz_neu <70000) %>% 
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(personalausgaben = sum(soll)) %>%
   mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
     ungroup() %>%
-  select(fj, gkz_neu, name, personalausgabenprokopf, gsrbetr) %>%
+  select(fj, gkz_neu, name,personalausgabenprokopf, gsrbetr) %>%
   spread(fj, personalausgabenprokopf) %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
@@ -266,25 +268,6 @@ personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkosten
 write.xlsx(personalkostenprokopf_map, "output/ignore/klz_personalkostenprokopf.xlsx", sheetName = "Personalkosten pro Kopf")
 
 
-#Visualisierung der Personalkosten pro Kopf mit Quantilen für die Kleine Zeitung
-q <- ecdf(personalkostenprokopf_map$avg15_17)
-
-p <- ggplot() +
-  geom_sf(
-    data= (personalkostenprokopf_map %>%
-             mutate(
-               gkz=as.character(gkz_neu),
-               q=round(q(avg15_17)*3)+1) %>%
-             left_join(gde_18, by = c("gkz" = "GKZ"))),
-    aes(fill=q), color="white", size=0.01) +
-  coord_sf(datum=sf::st_crs(4326))
-print(p)
-
-quantile(personalkostenprokopf_map$avg15_17, probs = seq(0, 1, by = 0.10))
-
-# Maximum für höchsten Decil setzen in der Visualisierung
-personalkostenprokopf_map$avg15_17[personalkostenprokopf_map$avg15_17 >= 464] <- 464
-
 #Personalkosten pro Kopf zeichnen zeichnen
 map_data <- personalkostenprokopf_map %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) %>% 
   filter(gsrbetr=="Ja")
@@ -310,7 +293,7 @@ plot_1 <- ggplot() +
   #coord_map(projection = "mercator") +
   # coord_sf did not work here
   scale_fill_gradient(low = "#E1A9A9", high = "#571F1E", 
-                       space = "Lab", na.value = "black", guide = "colourbar") +
+                       space = "Lab", na.value = "yellow", guide = "colourbar") +
   labs(x = NULL, y = NULL, title = "Höhe der Personalkosten pro Kopf", caption = "Quelle: Statistik Austria, BEV.") +
   #guides(fill=guide_legend(nrow=6,byrow=TRUE))+
   theme_map()+
@@ -323,7 +306,7 @@ add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'personalkostenproko
 # Ansätze nicht zusammenwerfen für Dechantskirchen, also wo sind die Personalkosten warum gestiegen 
 personalkostenprokopf_mitansaetzen <- posten_data %>%
   filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>%# auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
+  filter (hh=="1" | hh=="5") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew, ans2, ansatz_bez) %>%
   summarise(personalausgaben = sum(soll)) %>%
     ungroup() %>%
@@ -891,11 +874,10 @@ verwaltungsausgabenprokopf_gsrbetr <-verwaltungsausgaben %>%
 
 # Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
 gsrbetr_bev <- gemeinden_reg %>%
-  filter(gkz >60000 & gkz < 70000) %>%
-  select(gkz, jahr,ew) %>%
-  group_by(gkz, jahr) %>%
-  #do(borderman(.[,c('gkz','ew')])) %>%
-  left_join(gsr15)
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  select(gkz_neu,jahr,ew) %>%
+  group_by(gkz_neu, jahr) %>%
+  left_join(gsr15, by=c("gkz_neu"="gkz"))
 
 gsrbetr_bev_t <- gsrbetr_bev %>%
   group_by(gsrbetr, jahr) %>%
@@ -969,7 +951,7 @@ plot(plot7)
 
 ```
 
-```{r}
+```{r message=FALSE}
 # Gibt es die U-Kurve bei Verwaltungsausgaben in Österreich?
 verwaltungsausgaben_at <- posten_data %>%
   mutate(post1 = substr(post3,1,1), 
@@ -980,6 +962,31 @@ verwaltungsausgaben_at <- posten_data %>%
 verwaltungsausgaben_per_gemeinde <- verwaltungsausgaben %>%
   group_by(fj, gkz_neu, name) %>%
   summarise(vwausgaben = sum(soll))
+
+```
+
+```{r}
+# Wahlgeschichte
+wahlen_bordermanned_t <- wahlen_bordermanned %>%
+  left_join(gsr15, by=c("gkz_neu"="gkz")) %>%
+  filter(partei=="gültig" | partei =="ungültig" | partei=="Wahlberechtigte")%>%
+  spread(partei, count) %>%
+  mutate(beteiligte = gültig+ungültig)%>%
+  group_by(jahr, wahl, gsrbetr) %>%
+  summarise(beteiligte = sum(beteiligte), 
+            wb = sum(Wahlberechtigte)) %>%
+  mutate(wb_pct = beteiligte/wb*100) %>%
+  select(jahr, wahl, gsrbetr, wb_pct) %>%
+  spread(jahr, wb_pct) 
+
+plot12 <- ggplot(wahlen_bordermanned_t, aes(jahr, y= wb_pct, color = gsrbetr)) +
+  geom_bar(stat = "identity")+
+  facet_grid(~~wahl)+
+  theme_addendum()+
+  theme(legend.position="none")
+  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 700)
+plot(plot12)
 
 ```
 

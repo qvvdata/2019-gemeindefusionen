@@ -119,3 +119,14 @@ filtervw <- function(a){
            ans1 == '9' &post3 == '728'|
            ans1 == '9' &post3 == '729'))
 }
+
+numerize <- function(data,vars){
+  data = as.data.frame(data)
+  variables <- colnames(data)
+  variables <- variables[! variables %in% vars]
+  for(i in variables){
+    data[,i]<- as.numeric(data[,i])
+    data[,i][is.na(data[,i])] <- 0
+  }
+  return(data)
+}
