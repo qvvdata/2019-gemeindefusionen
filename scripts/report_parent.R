@@ -30,6 +30,7 @@ for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
     #data <- alldata %>% filter(blkz==landfilterdings)
     #ausgewaehlte_regionalausgabe <- paste("Land", data[1,]$bl)
     
+    karte_nur_fusionsgemeinden <- F
     env=new.env() #create a new empty environment, it inherits objects from the current environment.
     rmarkdown::render('scripts/report.Rmd', output_file=paste0(ausgewaehlte_regionalausgabe,'.html'), envir = env, output_dir="output/generated")
   }

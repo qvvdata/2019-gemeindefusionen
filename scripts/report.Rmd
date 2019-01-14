@@ -110,6 +110,9 @@ table2 %>%
 # Visualisierung der Differenz
 #Personalkosten pro Kopf zeichnen zeichnen
 map_data <- verwaltungsausgaben_gemeinden %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) 
+if(karte_nur_fusionsgemeinden) {
+  map_data <- map_data %>% filter(`Fusionsgemeinde?`=="Ja")
+}
 
 needs(ggplot2)
 needs(ggthemes)
@@ -119,7 +122,8 @@ map_1 <- ggplot() +
       mutate(bez=as.numeric(BEZ)) %>%
       left_join(bezirke, by=c(bez='polbezcode')) %>%
       filter(regionalausgabe==ausgewaehlte_regionalausgabe),
-    fill='lightyellow') +
+    fill='lightyellow',
+    color='grey') +
   geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.01, datum=sf::st_crs(4326)) +
   coord_sf() +
   scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
@@ -128,6 +132,37 @@ map_1 <- ggplot() +
   theme(panel.grid.major = element_line(colour = "white"))
 
 ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_personalkosten.pdf'), map_1)
+
+print(map_1)
+
+
+```
+
+```{r reportchunk4_1, echo=F, warning=F, message=F, results=F}
+# Visualisierung der Differenz
+#Personalkosten pro Kopf zeichnen zeichnen
+#Nur Fusionsgemeinden
+map_data <- verwaltungsausgaben_gemeinden %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) 
+map_data <- map_data %>% filter(`Fusionsgemeinde?`=="Ja")
+
+needs(ggplot2)
+needs(ggthemes)
+
+map_1 <- ggplot() +
+  geom_sf(data=bezirksgrenzen_2 %>%
+      mutate(bez=as.numeric(BEZ)) %>%
+      left_join(bezirke, by=c(bez='polbezcode')) %>%
+      filter(regionalausgabe==ausgewaehlte_regionalausgabe),
+    fill='lightyellow',
+    color='grey') +
+  geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.01, datum=sf::st_crs(4326)) +
+  coord_sf() +
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  labs(title = "Veränderung der Pro-Kopf-Kosten (Nur Fusionsgemeinden)", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_personalkosten_nurfusionsgemeinden.pdf'), map_1)
 
 print(map_1)
 
