@@ -45,7 +45,7 @@ data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
  #     do((borderman(.[,c('gkz','SOLL')])))
  # 
  # saveRDS(data_bordermanned, "output/data_bordermanned.rds")
-data_bordermanned <- readRDS("output/data_bordermanned.rds") %>% filter(gkz_neu %not in% teilungen_exkl)
+c
 
 
 # Der Borderman macht ein Gather und Spread auf Werte mit 0, deshalb sind im File dann zu viele Werte bei Ansätzen, die es eigenltich nicht gibt --> entfernen

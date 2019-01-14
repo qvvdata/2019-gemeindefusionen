@@ -37,13 +37,66 @@ write.xlsx(as.data.frame(wahlbeteiligung), "output/ignore/wahlbeteiligung.xlsx")
 
 ```{r}
 # Laden der Bevölkerungsdaten und Zuteilung der Gemeindegrößenklassen
-gemeinderäte <- c(9,15,21,25, 31)
+gemeinderäte <- c("9","15","21","25", "31")
 gr_ew_breaks <- c(0, 1000, 3000, 5000,10000,1000000)
+
+bev_stmk2008 <- read_excel("input/bessereheader/bev_stmk_2008.xlsx") %>% # Dieses Jahr ist laut GO wesentlich für die GR-Zahl-Festsetzung
+  mutate(gemraete = cut(ew, breaks=gr_ew_breaks, labels=gemeinderäte), 
+         gemraete = as.numeric(as.character(gemraete)), 
+         gemraete2 = ifelse(gkz==60101, "48", gemraete), 
+         gemraete= as.numeric(gemraete2)) %>%
+  select(-gemraete2)
+
+ gemeinderaete2010 <- bev_stmk2008 %>%
+   select(-c(name, ew)) %>%
+    group_by() %>%
+     do((borderman(.[,c('gkz','gemraete')]))) %>% filter(gkz_neu %not in% teilungen_exkl) %>%
+   mutate(jahr = 2010)
+  
+  #saveRDS(gemeinderaete2010, "output/gemeinderaete2010.rds")
+  #gemeinderaete2010_t <- readRDS("output/gemeinderaete2010") %>% filter(gkz_neu %not in% teilungen_exkl)
+  
+ # Wahlberechtigte für 2010 wahl berechnen, dann mergen mit GR-Zahl
+ gemraete15 <- read_excel("input/bessereheader/gemraete2015.xls") %>%# Dieses Jahr ist laut GO wesentlich für die GR-Zahl-Festsetzung
+ select(c(gkz, gemraete15)) %>%
+   rename(gkz_neu=gkz, 
+          gemraete = gemraete15) %>%
+   mutate(jahr=2015)
+ 
+ gemraete_2010_2015 <- bind_rows(gemeinderaete2010, gemraete15)
+ 
+ 
+ wahlen_bordermanned_wb <- wahlen_bordermanned %>%
+  left_join(gsr15, by=c("gkz"="gkz")) %>%
+  filter(partei=="gültig" | partei =="ungültig" | partei=="Wahlberechtigte")%>%
+  filter(wahl=="ltw" & jahr =="2015" | jahr=="2010") %>%
+  spread(partei, count) %>%
+  mutate(beteiligte = gültig+ungültig)%>%
+  group_by(jahr, wahl, gsrbetr) %>%
+  select(jahr, wahl, gkz, name, gsrbetr, gültig, ungültig, Wahlberechtigte, beteiligte) %>%
+   left_join(gemraete_2010_2015, by=c("jahr"="jahr", "gkz"="gkz_neu")) %>%
+   filter(gkz !=60101) %>%# Graz rausnehmen, weil Staturstadt
+  mutate(wahleinfluss= gemraete/Wahlberechtigte)
+ 
+   
+wahlen_bd_gsrbetr <- wahlen_bordermanned_wb %>%
+  group_by(jahr, wahl, gsrbetr) %>%
+  summarise(gemraete = sum(gemraete), 
+            Wahlberechtigte=sum(Wahlberechtigte)) %>%
+  mutate(wahleinfluss_pct = gemraete/Wahlberechtigte)
+
+#Wie hat sich der Wert einer Stimme verändert?
+  wahlen_bd_gsrbetr_diff <- wahlen_bd_gsrbetr %>%
+    select(jahr, gsrbetr, wahleinfluss_pct) %>%
+    spread(jahr, wahleinfluss_pct) %>%
+    mutate(wertverlust = (((`2015`/`2010`)-1)*100))
+ 
+ 
+
+  
+  
+  
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 

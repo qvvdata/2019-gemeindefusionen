@@ -523,7 +523,7 @@ gemeindeorganeprokopf_line <- ansaetze_data %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
   filter (hh=="1" | hh=="5") %>%
   group_by(fj, gsrbetr) %>%
-  summarise(gemeindeorgane = sum(soll)) %>%
+  summarise(gemeindeorgane = sum(soll))
 
 gemeindeorganeprokopf_line_gsrbetr_t <- gemeindeorganeprokopf_line %>%
   left_join(gsrbetr_bev_t_gemorg, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
