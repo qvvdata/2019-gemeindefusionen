@@ -874,8 +874,8 @@ map_data_vw_anim <- verwaltungsausgabenprokopf %>% left_join(gde_18_2_splitter, 
   mutate(effekt= ifelse(avg_diff<=0, "l", "h"))
 
 
-#Personalkosten pro Kopf Erhöhung zeichnen zeichnen
-plot_11 <- ggplot() +
+#verwaltungsausgabenprokopf pro Kopf Erhöhung/ersparnis  zeichnen
+plot_12 <- ggplot() +
   # municipality polygons & outline
   geom_sf(data = bezirksgrenzen, color="darkgrey", size = 0.1) +
   geom_sf(data = map_data_vw_anim, aes(fill=effekt), color="black", size=0.01) +
@@ -885,8 +885,8 @@ plot_11 <- ggplot() +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
 
-plot(plot_11)
-ggsave("output/ignore/plot_11.pdf", device="pdf")
+plot(plot_12)
+ggsave("output/ignore/plot_12.pdf", device="pdf")
 
 ```
 
@@ -932,10 +932,12 @@ verwaltungsausgaben_aggregat_avg_diff <- verwaltungsausgaben_aggregat %>%
   separate(type, c("art", "fj"), sep="_") %>%
   na.omit(fj)
 
-plot11 <- ggplot(verwaltungsausgaben_aggregat_avg_diff, aes(x = fj, y= value, fill = gsrbetr))+
+plot14 <- ggplot(verwaltungsausgaben_aggregat_avg_diff, aes(x = fj, y= value, fill = gsrbetr))+
   geom_bar(stat = "identity")+
   facet_wrap(~gsrbetr)
-plot(plot11)     
+plot(plot14)     
+
+ggsave("output/ignore/plot11.pdf", device="pdf")
 
 verwaltungsausgaben_aggregat_avg_diff_dw <- verwaltungsausgaben_aggregat_avg_diff %>%
   spread(fj, value)
@@ -965,7 +967,7 @@ verwaltungsausgabenprokopf_gsrbetr_t <- verwaltungsausgabenprokopf_gsrbetr %>%
   left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
   mutate(vwausgabenprokopf = vwausgaben/ew)
 
-plot2 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+plot29 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum()+
   theme(legend.position="none")+
@@ -974,7 +976,7 @@ plot2 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf,
    theme_minimal()
 plot(plot2) 
  
-ggsave("output/ignore/plot2.pdf", device="pdf")
+ggsave("output/ignore/plot29.pdf", device="pdf")
   
 
 # Personenzahl nach Gemeindegrößenklasse und gsr-betr
