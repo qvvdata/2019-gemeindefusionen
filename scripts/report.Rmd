@@ -17,6 +17,7 @@ Dieser Bericht fasst die Eckdaten einer Spezialauswertung von Daten der Statisti
 ## Gesamtsumme der Verwaltungsausgaben je Regionalausgabe absolut und pro Kopf berechnen
 ```{r reportchunk1, echo=F, warning=F}
 regionalausgabe_verwaltungsausgaben <- posten_data %>%
+  filter(gkz_neu!="62274") %>%
   mutate(post1 = substr(post3,1,1), 
          ans1 = substr(ans2, 1,1)) %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
