@@ -20,6 +20,9 @@ library(xlsx) #Excel
 library(googlesheets) 
 library(directlabels) # googlesheets (replace with googlesheets4 asap)
 library(knitr)
+#devtools::install_github("yutannihilation/ggsflabel")
+library(ggsflabel)
+
 
 out <- NULL
 print(getwd())

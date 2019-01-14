@@ -114,6 +114,8 @@ if(karte_nur_fusionsgemeinden) {
   map_data <- map_data %>% filter(`Fusionsgemeinde?`=="Ja")
 }
 
+map_limits <- c(min(map_data$`Differenz in %`), max(map_data$`Differenz in %`))
+
 needs(ggplot2)
 needs(ggthemes)
 
@@ -125,8 +127,9 @@ map_1 <- ggplot() +
     fill='lightyellow',
     color='grey') +
   geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.01, datum=sf::st_crs(4326)) +
+  geom_sf_label_repel(data=map_data, aes(label = paste(Gemeindename, `Fusionsgemeinde?`)), size=1.5) +
   coord_sf() +
-  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58", limits=map_limits)+
   labs(title = "Veränderung der Pro-Kopf-Kosten", caption = "Quelle: Statistik Austria, BEV.") +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
@@ -156,8 +159,9 @@ map_1 <- ggplot() +
     fill='lightyellow',
     color='grey') +
   geom_sf(data = map_data, aes(fill=`Differenz in %`), color="white", size=0.01, datum=sf::st_crs(4326)) +
+  geom_sf_label_repel(data=map_data, aes(label = Gemeindename), size=1.5) +
   coord_sf() +
-  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58")+
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "#f0edf1", high = "#ba2b58", limits=map_limits)+
   labs(title = "Veränderung der Pro-Kopf-Kosten (Nur Fusionsgemeinden)", caption = "Quelle: Statistik Austria, BEV.") +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
