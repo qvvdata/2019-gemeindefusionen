@@ -46,7 +46,7 @@ plot1 <- ggplot(verwaltungsausgaben_gesamt, aes(fj, vwausgabenprokopf, color = g
   ggtitle("Verwaltungsausgaben pro Kopf", subtitle="'Ja' für Fusionsgemeinden, 'Nein' für Nichtbetroffene") +
   guides(color=guide_legend("Fusionsgemeinde?"))
 
-ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_verwaltunsausgaben_zeit.pdf'), plot1)
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_verwaltungsausgaben_zeit.pdf'), plot1)
 
 plot(plot1)
 
@@ -108,7 +108,7 @@ table2 %>%
 
 ```{r reportchunk4, echo=F, warning=F, message=F, results=F}
 # Visualisierung der Differenz
-#Personalkosten pro Kopf zeichnen zeichnen
+#VW pro Kopf zeichnen zeichnen
 map_data <- verwaltungsausgaben_gemeinden %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) 
 if(karte_nur_fusionsgemeinden) {
   map_data <- map_data %>% filter(`Fusionsgemeinde?`=="Ja")
@@ -134,16 +134,14 @@ map_1 <- ggplot() +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
 
-ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_personalkosten.pdf'), map_1)
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_verwaltungskosten.pdf'), map_1)
 
 print(map_1)
-
-
 ```
 
 ```{r reportchunk4_1, echo=F, warning=F, message=F, results=F}
 # Visualisierung der Differenz
-#Personalkosten pro Kopf zeichnen zeichnen
+#VW pro Kopf zeichnen zeichnen
 #Nur Fusionsgemeinden
 map_data <- verwaltungsausgaben_gemeinden %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) 
 map_data <- map_data %>% filter(`Fusionsgemeinde?`=="Ja")
@@ -166,7 +164,7 @@ map_1 <- ggplot() +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
 
-ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_personalkosten_nurfusionsgemeinden.pdf'), map_1)
+ggsave(paste0('../output/generated/',ausgewaehlte_regionalausgabe,'_differenz_verwaltungskosten_nurfusionsgemeinden.pdf'), map_1)
 
 print(map_1)
 
