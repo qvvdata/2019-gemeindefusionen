@@ -363,5 +363,8 @@ names(posten_data)
 # Endgütlige Namenszuweisung
 gemeindenamen18 <- read_excel("input/bessereheader/gemeindenamen2018inklteilungsasterix.xlsx")
 posten_data <- posten_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
-ansaetze_data <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
+ansaetze_data <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu")) %>%
+  filter(gkz_neu %not in% teilungen_exkl)
+
+
 

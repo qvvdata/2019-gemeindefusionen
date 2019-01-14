@@ -1,0 +1,49 @@
+---
+title: "Wie hat sich die politische Teilhabe in der Steiermark nach der Gemeindestrukturreform verändert?"
+output: html_notebook
+---
+
+Wie hat sich die politische Teilhabe in den Gemeinden verändert?
+
+
+```{r}
+# Wahlanalysen
+wahlen_bordermanned_t <- wahlen_bordermanned %>%
+  left_join(gsr15, by=c("gkz"="gkz")) %>%
+  filter(partei=="gültig" | partei =="ungültig" | partei=="Wahlberechtigte")%>%
+  spread(partei, count) %>%
+  mutate(beteiligte = gültig+ungültig)%>%
+  group_by(jahr, wahl, gsrbetr) %>%
+  summarise(beteiligte = sum(beteiligte), 
+            wb = sum(Wahlberechtigte)) %>%
+  mutate(wb_pct = beteiligte/wb*100) %>%
+  select(jahr, wahl, gsrbetr, wb_pct) 
+
+plot12 <- ggplot(wahlen_bordermanned_t, aes(jahr, y= wb_pct, color = gsrbetr)) +
+  geom_bar(aes(fill = gsrbetr), position = "dodge", stat="identity")+
+  facet_grid(~wahl)+
+  theme_addendum()+
+  theme(legend.position="none")
+plot(plot12)
+
+#Differenz kalkulieren
+wahlbeteiligung <- wahlen_bordermanned_t %>%
+  spread(gsrbetr, wb_pct) 
+
+#Herausschreiben für Datawrapper
+write.xlsx(as.data.frame(wahlbeteiligung), "output/ignore/wahlbeteiligung.xlsx")
+
+```
+
+```{r}
+# Laden der Bevölkerungsdaten und Zuteilung der Gemeindegrößenklassen
+gemeinderäte <- c(9,15,21,25, 31)
+gr_ew_breaks <- c(0, 1000, 3000, 5000,10000,1000000)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+

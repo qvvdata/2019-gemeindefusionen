@@ -322,7 +322,10 @@ personalkostenprokopf_mitansaetzen <- posten_data %>%
 
 ```
 
-In sieben von 119 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten pro Kopf gesunken. In der anderen 96 Prozent der Gemeinden sind die Personalkosten pro Kopf gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten pro Kopf in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen. 
+In sieben von 119 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten pro Kopf gesunken. In der anderen 96 Prozent der Gemeinden sind die Personalkosten pro Kopf gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten pro Kopf in 23 von 158 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen. 
+
+8/127 (96 %) gestiegene Kosten pro Kopf für Personal in fusionierten Gemeinden
+23/158 (85 %) gestiegene Kosten pro Kopf für Personal in nicht fusionierten Gemeinden
 
 #Wie haben sich die Personalausgaben absolut je Gemeinde verändert? Welche Unterschiede gibt es nach Gemeindegrößentyp?
 ```{r}
@@ -348,7 +351,7 @@ personalausgaben_absolut_nfus <- personalausgaben_absolut %>%
   filter(gsrbetr=="Nein")
 ```
 
-In sieben von 128 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten absolut gesunken. In der anderen 96 Prozent der Gemeinden sind die Personalkosten absolut tendenziell gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten absolut in 23 von 159 gesunken. In den verbleibenden 85 Prozent sind die Kosten gestiegen.
+In neun von 127 von der Gemeindestrukturreform betroffenen Gemeinden sind die Personalkosten absolut gesunken. In der anderen 93 Prozent der Gemeinden sind die Personalkosten absolut tendenziell gestiegen. Bei jenen Gemeinden, die von der Gemeindestrukturreform nicht betroffen waren, sind die Personalkosten absolut in 22 von 158 gesunken. In den verbleibenden 86 Prozent sind die Kosten gestiegen.
 
 
 
@@ -419,8 +422,8 @@ energiekostenprokopf_nfus <- energiekostenprokopf %>%
 
 ```
 
-58/128 von gsrbetr Gemeinden gesunken 45 %
-102/159 von nicht_gsrbetr Gemeinden gesunken 64 %
+69/127 von fusionierten Gemeinden gestiegen 54 %
+57/158 von nicht_gsrbetr Gemeinden gestiegen 36 %
 
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Gemeindereferate ("Standesamt", "Bauamt", "Amt für Raumordnung und Raumplanung", "Sozialamt", "Zentralamt")
@@ -447,8 +450,8 @@ referateprokopf_nfus <- personalkostenprokopf %>%
 
 
 ```
-40/120 gesunkene Kosten für Referate pro Kopf (40 %) bei fusionierten
-23/159 gesunkene Kosten für Referate pro Kopf (15 %) bei nicht fusionierten
+85/127 gestiegene Kosten für Referate pro Kopf (67 %) bei fusionierten
+135/158 gestiegene Kosten für Referate pro Kopf (85 %) bei nicht fusionierten
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Feuerwehren
 
@@ -474,8 +477,8 @@ feuerwehrenprokopf_nfus <- feuerwehrenprokopf %>%
   filter(gsrbetr=="Nein")  
 ```
 
-58/119 (49 %) gesunkene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
-78/159 (49 %) gesunkene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
+63/127 (50 %) gestiegene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
+80/158 (51 %) gesunkene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
 
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für gewählte Gemeindeorgane
@@ -498,10 +501,52 @@ gemeindeorganeprokopf_fus <- gemeindeorganeprokopf %>%
 
 
 gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
-  filter(gsrbetr=="Nein")  
+  filter(gsrbetr=="Nein") 
+
+
+
+# Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
+gsrbetr_bev_gemorg <- gemeinden_reg %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  select(gkz_neu,jahr,ew) %>%
+ # group_by(gkz_neu, jahr) %>%
+  left_join(gsr15, by=c("gkz_neu"="gkz"))
+
+gsrbetr_bev_t_gemorg <- gsrbetr_bev_gemorg %>%
+  group_by(gsrbetr, jahr) %>%
+  summarise(ew = sum(ew)) 
+
+# Join der Bevölkerung mit den GR-Ausgaben
+gemeindeorganeprokopf_line <- ansaetze_data %>%
+  filter(gkz_neu %not in% teilungen_exkl) %>%
+  filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  filter (hh=="1" | hh=="5") %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(gemeindeorgane = sum(soll)) %>%
+
+gemeindeorganeprokopf_line_gsrbetr_t <- gemeindeorganeprokopf_line %>%
+  left_join(gsrbetr_bev_t_gemorg, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
+  mutate(gemeindeorganeprokopf = round((gemeindeorgane/ew),2)) 
+
+
+plot21 <- ggplot(gemeindeorganeprokopf_line_gsrbetr_t, aes(fj, gemeindeorganeprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 70)+
+   theme_minimal()
+plot(plot21) 
+ 
+ggsave("output/ignore/plot21.pdf", device="pdf")
+
+gemeindeorganeprokopf_line_gsrbetr_t_exp <- gemeindeorganeprokopf_line_gsrbetr_t %>%
+  select(-c(ew, gemeindeorgane)) %>%
+  spread(fj, gemeindeorganeprokopf)
 ```
-102/120 (85 %) gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
-0/158 gesunkene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
+21/127 (17 %) gestiegene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
+158/158 (100%) gestiegene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Amtsgebäude
 ```{r}
@@ -552,8 +597,8 @@ bauhofprokopf_nfus <- bauhofprokopf %>%
   filter(gsrbetr=="Nein")  
 ```
 
-18/71 (25 %) gesunkene Kosten pro Kopf bei Bauhöfen in fusionierten Gemeinden
-22/57 (38 %) gesunkene Kosten pro Kopf bei Bauhöfen in nicht fusionierten Gemeinden
+54/101 gestiegene Kosten pro Kopf bei Bauhöfen in fusionierten Gemeinden
+35/57 gestiegene Kosten pro Kopf bei Bauhöfen in nicht fusionierten Gemeinden
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Fuhrpark
 
@@ -577,8 +622,8 @@ fuhrparkprokopf_fus <- fuhrparkprokopf %>%
 fuhrparkprokopf_nfus <- fuhrparkprokopf %>%
   filter(gsrbetr=="Nein")  
 ```
-26/71  (37 %) gesunkene Kosten pro Kopf bei Fuhrpark in fusionierten Gemeinden
-31/65  (48 %) gesunkene Kosten pro Kopf bei Fuhrpark in nicht fusionierten Gemeinden
+44/70  (63 %) gestiegene Kosten pro Kopf bei Fuhrpark in fusionierten Gemeinden
+34/65  (52 %) gestiegene Kosten pro Kopf bei Fuhrpark in nicht fusionierten Gemeinden
 
 ```{r}
 # Wie hoch sind die Förderungen je Gemeinde für politische Parteien?
@@ -792,7 +837,7 @@ vwkostenprokopf_nfus <- verwaltungsausgabenprokopf %>%
   filter(gsrbetr=="Nein")
 
 #Verwaltungsausgaben pro Kopf zeichnen
-map_data_vw <- verwaltungsausgabenprokopf %>% mutate(gkz_neu=as.character(gkz_neu)) %>% left_join(gde_18, by = c("gkz_neu" = "GKZ")) %>% 
+map_data_vw <- verwaltungsausgabenprokopf %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) %>% 
   filter(gsrbetr=="Ja")
 
 map_data <- gde_18 %>% 
@@ -806,7 +851,7 @@ map_data <- gde_18 %>%
 plot_10 <- ggplot() +
   # municipality polygons & outline
   geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
-  geom_sf(data = map_data_vw, aes(fill=avg_diff), color="black", size=0.001) +
+  geom_sf(data = map_data_vw, aes(fill=avg_diff), color="black", size=0.01) +
   #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
   coord_sf() +
   #coord_map(projection = "mercator") +
@@ -821,6 +866,31 @@ plot_10 <- ggplot() +
 
 plot(plot_10)
 ```
+```{r}
+# Map zeichnen für Animation- Klarer Cut-off Ersparnis/Erhöhung für fusionierte
+#Verwaltungsausgaben pro Kopf zeichnen
+map_data_vw_anim <- verwaltungsausgabenprokopf %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) %>% 
+  filter(gsrbetr=="Ja") %>%
+  mutate(effekt= ifelse(avg_diff<=0, "l", "h"))
+
+
+#Personalkosten pro Kopf Erhöhung zeichnen zeichnen
+plot_11 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = bezirksgrenzen, color="darkgrey", size = 0.1) +
+  geom_sf(data = map_data_vw_anim, aes(fill=effekt), color="black", size=0.01) +
+  coord_sf() +
+  scale_fill_manual(values=c("#a54657", "#3d8052"))+
+ # labs(x = NULL, y = NULL, title = "Verwaltungskosten pro Kopf: Erhöhung oder Ersparnis?", caption = "Quelle: Statistik Austria, BEV.") +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+plot(plot_11)
+ggsave("output/ignore/plot_11.pdf", device="pdf")
+
+```
+
+
 
 ``` {r}
 verwaltungsausgaben_aggregat <-verwaltungsausgaben %>%
@@ -832,6 +902,12 @@ verwaltungsausgaben_aggregat <-verwaltungsausgaben %>%
   #mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
   #       avg15_17 = (`2015`+`2016`+`2017`)/3, 
   #       avg_diff = (avg15_17/avg12_14-1)*100)
+
+verwaltungsausgaben_aggregat_sums <-verwaltungsausgaben_aggregat %>%
+  spread(fj, vwausgaben) %>%
+  mutate(vwausgabenvor = `2012`+`2014`+`2013`,
+         vwausgabendanach = `2015`+`2016`+`2017`, 
+         vwausgaben_vor_danach_diff = ((vwausgabendanach/vwausgabenvor)-1)*100)
 
 needs(directlabels)
 plot1 <- ggplot(verwaltungsausgaben_aggregat, aes(fj, vwausgaben, color = gsrbetr)) +
@@ -894,8 +970,11 @@ plot2 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf,
   theme_addendum()+
   theme(legend.position="none")+
   geom_dl(aes(label = gsrbetr), method="angled.boxes")+
-  ylim(0, 700)
-plot(plot2)
+  ylim(0, 700)+
+   theme_minimal()
+plot(plot2) 
+ 
+ggsave("output/ignore/plot2.pdf", device="pdf")
   
 
 # Personenzahl nach Gemeindegrößenklasse und gsr-betr
@@ -968,7 +1047,7 @@ verwaltungsausgaben_per_gemeinde <- verwaltungsausgaben %>%
 ```{r}
 # Wahlgeschichte
 wahlen_bordermanned_t <- wahlen_bordermanned %>%
-  left_join(gsr15, by=c("gkz_neu"="gkz")) %>%
+  left_join(gsr15, by=c("gkz"="gkz")) %>%
   filter(partei=="gültig" | partei =="ungültig" | partei=="Wahlberechtigte")%>%
   spread(partei, count) %>%
   mutate(beteiligte = gültig+ungültig)%>%
@@ -976,17 +1055,20 @@ wahlen_bordermanned_t <- wahlen_bordermanned %>%
   summarise(beteiligte = sum(beteiligte), 
             wb = sum(Wahlberechtigte)) %>%
   mutate(wb_pct = beteiligte/wb*100) %>%
-  select(jahr, wahl, gsrbetr, wb_pct) %>%
-  spread(jahr, wb_pct) 
+  select(jahr, wahl, gsrbetr, wb_pct) 
 
 plot12 <- ggplot(wahlen_bordermanned_t, aes(jahr, y= wb_pct, color = gsrbetr)) +
-  geom_bar(stat = "identity")+
-  facet_grid(~~wahl)+
+  geom_bar(aes(fill = gsrbetr), position = "dodge", stat="identity")+
+  facet_grid(~wahl)+
   theme_addendum()+
   theme(legend.position="none")
-  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+
-  ylim(0, 700)
 plot(plot12)
+
+#Differenz kalkulieren
+wahlbeteiligung <- wahlen_bordermanned_t %>%
+  spread(jahr, wb_pct) 
+
+#Herausschreiben für Datawrapper
 
 ```
 
