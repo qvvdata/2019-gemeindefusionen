@@ -82,8 +82,8 @@ bev_stmk2008 <- read_excel("input/bessereheader/bev_stmk_2008.xlsx") %>% # Diese
 wahlen_bd_gsrbetr <- wahlen_bordermanned_wb %>%
   group_by(jahr, wahl, gsrbetr) %>%
   summarise(gemraete = sum(gemraete), 
-            Wahlberechtigte=sum(Wahlberechtigte)) %>%
-  mutate(wahleinfluss_pct = gemraete/Wahlberechtigte)
+            wahlbeteiligte=sum(beteiligte)) %>%
+  mutate(wahleinfluss_pct = gemraete/wahlbeteiligte)
 
 #Wie hat sich der Wert einer Stimme verändert?
   wahlen_bd_gsrbetr_diff <- wahlen_bd_gsrbetr %>%
