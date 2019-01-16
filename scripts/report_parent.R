@@ -28,7 +28,6 @@ out <- NULL
 print(getwd())
 for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
   if(ausgewaehlte_regionalausgabe!="-") {
-    
     print(ausgewaehlte_regionalausgabe)
     #data <- alldata %>% filter(blkz==landfilterdings)
     #ausgewaehlte_regionalausgabe <- paste("Land", data[1,]$bl)
@@ -37,6 +36,4 @@ for(ausgewaehlte_regionalausgabe in unique(posten_data$regionalausgabe)) {
     env=new.env() #create a new empty environment, it inherits objects from the current environment.
     rmarkdown::render('scripts/report.Rmd', output_file=paste0(ausgewaehlte_regionalausgabe,'.html'), envir = env, output_dir="output/generated")
   }
-
 }
-
