@@ -78,6 +78,9 @@ bev_stmk2008 <- read_excel("input/bessereheader/bev_stmk_2008.xlsx") %>% # Diese
    filter(gkz !=60101) %>%# Graz rausnehmen, weil Staturstadt
   mutate(wahleinfluss= gemraete/Wahlberechtigte)
  
+ test <- wahlen_bordermanned_wb %>% 
+   filter(jahr==2010 & gsrbetr=="Ja") %>% 
+   mutate(mutate = mean(wahleinfluss))
    
 wahlen_bd_gsrbetr <- wahlen_bordermanned_wb %>%
   group_by(jahr, wahl, gsrbetr) %>%
@@ -90,11 +93,6 @@ wahlen_bd_gsrbetr <- wahlen_bordermanned_wb %>%
     select(jahr, gsrbetr, wahleinfluss_pct) %>%
     spread(jahr, wahleinfluss_pct) %>%
     mutate(wertverlust = (((`2015`/`2010`)-1)*100))
- 
- 
-
-  
-  
   
 ```
 

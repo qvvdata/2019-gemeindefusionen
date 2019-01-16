@@ -45,12 +45,11 @@ data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
  #     do((borderman(.[,c('gkz','SOLL')])))
  # 
  # saveRDS(data_bordermanned, "output/data_bordermanned.rds")
-c
+data_bordermanned <- readRDS("output/data_bordermanned.rds") %>% filter(gkz_neu %not in% teilungen_exkl)
 
 
-# Der Borderman macht ein Gather und Spread auf Werte mit 0, deshalb sind im File dann zu viele Werte bei Ansätzen, die es eigenltich nicht gibt --> entfernen
 data <- data_bordermanned %>%
-filter(SOLL !=0)%>%
+  filter(SOLL !=0)%>%
   filter(SOLL >0)%>% # Überträge aus dem Vorjahr weg
   mutate(fj = as.numeric(FJ), 
          gkz_neu = as.numeric(gkz_neu), 
@@ -59,13 +58,17 @@ filter(SOLL !=0)%>%
   ungroup() %>%
   select(fj, hh, ans2, post3, gkz_neu, soll)
 
-gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>% rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>% filter(gemtypneu!="X")
+# GSR 2015 : Ist die Gemeinde von Zusammenlegungen betroffen?
+gsr15 <- read_excel("input/bessereheader/2015gsr.xls", sheet="gsrliste") %>%
+  rename(gkz = gkz_neu) %>% select(gkz, gemtypneu, gsrbetr, gsrbeschreibung) %>%
+  filter(gemtypneu!="X")
+
 #gsr15 %>% group_by(gkz, gemtypneu, gsrbetr, gsrbeschreibung) #%>% do(borderman(.[,c('gkz','test')])) %>% select(-test)
  
 #saveRDS(gsr15, "output/gsr15.rds")
 #gsr15<- readRDS("output/gsr15.RDS")
-
 #gsr15 <- readRDS("output/ignore/gsr15.rds")
+
 vfgh <- read_excel("input/bessereheader/2015gsr.xls", sheet="vfgh") %>% rename(gkz = gkz_neu) 
 
 # braucht mehr Leistung
@@ -112,7 +115,7 @@ ansatz2017 <- read_excel("input/bessereheader/Ansatz2017.xlsx", trim_ws = TRUE) 
  #  filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
  # 
  # saveRDS(ansaetze_data, "output/ansaetze_data.rds")
- ansaetze_data <- readRDS("output/ansaetze_data.RDS")
+ansaetze_data <- readRDS("output/ansaetze_data.RDS")
  
 # Laden der Bevölkerungsdaten und Zuteilung der Gemeindegrößenklassen
 mylabels <- c("Bis 500","501- 1.000","1.001- 1.500","1.501- 2.000","2.001- 2.500","2.501- 3.000" ,  

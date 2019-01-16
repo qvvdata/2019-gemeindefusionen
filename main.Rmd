@@ -503,6 +503,10 @@ gemeindeorganeprokopf_fus <- gemeindeorganeprokopf %>%
 gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
   filter(gsrbetr=="Nein") 
 
+# Testen warum Beträge höher als in Gabriels Dokument
+gemeindeorgane_check <- ansaetze_data %>%
+  filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
+  filter (hh=="1" | hh=="5")
 
 
 # Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
@@ -544,6 +548,44 @@ ggsave("output/ignore/plot21.pdf", device="pdf")
 gemeindeorganeprokopf_line_gsrbetr_t_exp <- gemeindeorganeprokopf_line_gsrbetr_t %>%
   select(-c(ew, gemeindeorgane)) %>%
   spread(fj, gemeindeorganeprokopf)
+
+# Gemeindeorgane insgesamt 
+gemeindeorgane_absolut_gsrbetr <- ansaetze_data %>%
+  filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
+  filter (hh=="1" | hh=="5") %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  group_by(fj, gsrbetr, gruppe) %>%
+  summarise(gemeindeorgane = sum(soll))
+
+gemeindeorgane_absolut_gsrbetr_plot <- ggplot(gemeindeorgane_absolut_gsrbetr, aes(fj, gemeindeorgane, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 37000000)+
+   theme_minimal()
+plot(gemeindeorgane_absolut_gsrbetr_plot)  
+
+
+ggsave("output/ignore/gemeindeorgane_absolut_gsrbetr_plot.pdf", device="pdf")
+
+# Table für Gemeideorganeausgaben
+gemeindeorgane_absolut_gsrbetr_table <- gemeindeorgane_absolut_gsrbetr %>%
+  spread(fj, gemeindeorgane) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`), 
+         avg15_17 = (`2015`+`2016`+`2017`), 
+         avg_diff = (avg15_17/avg12_14-1)*100) %>%
+  rename(`Summe 12-14`= avg12_14, 
+         `Summe 15-17`= avg15_17, 
+         `Differenz vorher/nachher in %` = avg_diff) %>%
+  select(-gruppe)
+options(knitr.table.format = "html")
+needs(knitr)
+needs(kableExtra)
+gemeindeorgane_absolut_gsrbetr_table %>% 
+  kable(caption = "Ausgaben für gewählte Gemeindeorgane absolut in Euro") %>%
+  kable_styling()
+
 ```
 21/127 (17 %) gestiegene Kosten pro Kopf für gewählte Gemeindeorgane in fusionierten Gemeinden
 158/158 (100%) gestiegene Kosten pro Kopf für gewählte Gemeindeorgane in nicht fusionierten Gemeinden
@@ -651,7 +693,7 @@ foerderungen_parteien_gem_avg <- posten_data %>%
   mutate(sollproew = round(soll/ew, 1))%>%
   arrange(-sollproew)%>%
   ungroup() %>%
-  select(gkz_neu, name, soll, ew, sollproew, urbantyp) %>%
+  select(gkz_neu, name, soll, ew, sollproew) %>%
   arrange(-sollproew) %>%
   top_n(20, sollproew)
 
@@ -663,7 +705,7 @@ foerderungen_parteien_gem_avg_allyears <- posten_data %>%
   filter (hh=="1" | hh=="5") %>%
   mutate(sollproew = round(soll/ew, 1)) %>%
   ungroup() %>%
-  select(gkz_neu, name, fj, sollproew, urbantyp) 
+  select(gkz_neu, name, fj, sollproew) 
 
 foerderungen_parteien_gem_avg_allyears_spreaded <- foerderungen_parteien_gem_avg_allyears%>%
   spread(fj, sollproew)
@@ -726,17 +768,20 @@ foerderungen_parteien_map <- foerderungen_parteien_gem %>%
   select(gkz_neu, name, soll, sollprokopf) 
 
 gemeinden_reg18 <- gemeinden_reg %>% 
-  left_join(foerderungen_parteien_map, by=c("gkz"="gkz_neu"))%>% 
+  left_join(foerderungen_parteien_map, by=c("gkz_neu"="gkz_neu"))%>% 
   filter(jahr==2017) %>%
-  rename(jahr2 = jahr)
+  rename(jahr2 = jahr, 
+         gkz= gkz_neu)
 
-gemeinden_reg18_t <- borderman_propagate_fusions(gemeinden_reg18) %>%
-  select(gkz, `name.x`, soll, sollprokopf) %>%
-  mutate(soll = replace_na(soll, 0), 
-         sollprokopf = replace_na(sollprokopf, 0))%>%
-  rename(name = `name.x`)
 
-write.xlsx(gemeinden_reg18_t, "output/ignore/gemeinden_reg18_t.xlsx")
+# gemeinden_reg18_t <- borderman_propagate_fusions(gemeinden_reg18) %>%
+#   ungroup() %>%
+#   select(gkz, `name.x`, soll, sollprokopf) %>%
+#   mutate(soll = replace_na(soll, 0), 
+#          sollprokopf = replace_na(sollprokopf, 0))%>%
+#   rename(name = `name.x`)
+# 
+# write.xlsx(gemeinden_reg18_t, "output/ignore/gemeinden_reg18_t.xlsx")
 
 
 
@@ -819,16 +864,22 @@ verwaltungsausgaben <- posten_data %>%
    filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
  filtervw() # lookup verwaltungsausgaben.R for defintion
 
+# Superwichtige Berechnung
 verwaltungsausgabenprokopf <- verwaltungsausgaben %>%
   group_by(fj, gkz_neu, name, gsrbetr, ew) %>%
   summarise(vwausgaben = sum(soll)) %>%
   mutate(vwausgabenprokopf = round(vwausgaben/ew,2)) %>%
-    ungroup() %>%
+  ungroup() %>%
   select(fj, gkz_neu, name, vwausgabenprokopf, gsrbetr) %>%
   spread(fj, vwausgabenprokopf) %>%
-  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-         avg15_17 = (`2015`+`2016`+`2017`)/3, 
-         avg_diff = (avg15_17/avg12_14-1)*100)
+  mutate(avg12_14 = round((((`2012`+`2013`+`2014`)/3)),1),
+         avg15_17 = round((((`2015`+`2016`+`2017`)/3)),1), 
+         avg_diff = round((((avg15_17/avg12_14-1)*100)),1))
+
+# Herausschreiben für die interaktive Karte
+write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
+write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
+
 
 vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%
   filter(gsrbetr=="Ja")
@@ -866,6 +917,7 @@ plot_10 <- ggplot() +
 
 plot(plot_10)
 ```
+
 ```{r}
 # Map zeichnen für Animation- Klarer Cut-off Ersparnis/Erhöhung für fusionierte
 #Verwaltungsausgaben pro Kopf zeichnen
@@ -932,6 +984,8 @@ verwaltungsausgaben_aggregat_avg_diff <- verwaltungsausgaben_aggregat %>%
   separate(type, c("art", "fj"), sep="_") %>%
   na.omit(fj)
 
+# Beim nächsten Mal so auflösen: verwaltungsausgaben_aggregat %>% mutate(fj_next=fj+1) %>% left_join(verwaltungsausgaben_aggregat, by=c('fj_next'='fj'))
+
 plot14 <- ggplot(verwaltungsausgaben_aggregat_avg_diff, aes(x = fj, y= value, fill = gsrbetr))+
   geom_bar(stat = "identity")+
   facet_wrap(~gsrbetr)
@@ -962,7 +1016,6 @@ gsrbetr_bev_t <- gsrbetr_bev %>%
   summarise(ew = sum(ew)) 
 
 # Join der Bevölkerung mit den Verwaltungsausgaben
-
 verwaltungsausgabenprokopf_gsrbetr_t <- verwaltungsausgabenprokopf_gsrbetr %>%
   left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
   mutate(vwausgabenprokopf = vwausgaben/ew)
@@ -974,7 +1027,7 @@ plot29 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf
   geom_dl(aes(label = gsrbetr), method="angled.boxes")+
   ylim(0, 700)+
    theme_minimal()
-plot(plot2) 
+plot(plot29) 
  
 ggsave("output/ignore/plot29.pdf", device="pdf")
   
@@ -1032,19 +1085,6 @@ plot(plot7)
 
 ```
 
-```{r message=FALSE}
-# Gibt es die U-Kurve bei Verwaltungsausgaben in Österreich?
-verwaltungsausgaben_at <- posten_data %>%
-  mutate(post1 = substr(post3,1,1), 
-         ans1 = substr(ans2, 1,1)) %>%
-   filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
-  filtervw()
-
-verwaltungsausgaben_per_gemeinde <- verwaltungsausgaben %>%
-  group_by(fj, gkz_neu, name) %>%
-  summarise(vwausgaben = sum(soll))
-
-```
 
 ```{r}
 # Wahlgeschichte
