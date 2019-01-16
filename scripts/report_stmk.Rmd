@@ -58,7 +58,8 @@ print(plot_1)
 
 ### Gesamtsumme der Verwaltungsausgaben je Regionalausgabe absolut und pro Kopf berechnen
 ```{r reportchunk2, warning=F, echo=F}
-plot2 <- ggplot(verwaltungsausgabenprokopf_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+
+plot2 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum()+
   theme(legend.position="none")+

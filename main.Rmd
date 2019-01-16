@@ -263,6 +263,11 @@ klz_personalkostenprokopf_fus <-  personalkostenprokopf_fus %>%
 personalkostenprokopf_nfus <- personalkostenprokopf %>%
   filter(gsrbetr=="Nein")
 
+personalkostenprokopf_summary <- personalkostenprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n())
+
 personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkostenprokopf_nfus) %>% select(-c(trend, pvalue, sig, posneg))
   
 write.xlsx(personalkostenprokopf_map, "output/ignore/klz_personalkostenprokopf.xlsx", sheetName = "Personalkosten pro Kopf")
@@ -403,6 +408,7 @@ plot(plot_1)
 energiekostenprokopf <- posten_data %>%
   filter(gruppe=="Energie") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
   filter (hh=="1") %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(energieausgaben = sum(soll))%>%
   mutate(energieausgabenprokopf = round(energieausgaben/ew,2)) %>%
@@ -419,6 +425,11 @@ energiekostenprokopf_fus <- energiekostenprokopf %>%
 energiekostenprokopf_nfus <- energiekostenprokopf %>%
   filter(gsrbetr=="Nein")
   
+print(energiekostenprokopf_summary <- energiekostenprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
 
 ```
 
@@ -431,6 +442,7 @@ energiekostenprokopf_nfus <- energiekostenprokopf %>%
 referateprokopf <- ansaetze_data %>%
   filter(gruppe=="gemeindereferate") %>% 
   filter (hh=="1") %>%
+   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(referateausgaben = sum(soll)) %>%
   mutate(referateausgabenprokopf = round(referateausgaben/ew,2)) %>%
@@ -448,16 +460,22 @@ referateprokopf_fus <- referateprokopf %>%
 referateprokopf_nfus <- personalkostenprokopf %>%
   filter(gsrbetr=="Nein")  
 
+print(referateprokopf_summary <- referateprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
 
 ```
-85/127 gestiegene Kosten für Referate pro Kopf (67 %) bei fusionierten
-135/158 gestiegene Kosten für Referate pro Kopf (85 %) bei nicht fusionierten
+89/127 gestiegene Kosten für Referate pro Kopf (67 %) bei fusionierten
+126/158 gestiegene Kosten für Referate pro Kopf (85 %) bei nicht fusionierten
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Feuerwehren
 
 ```{r}
 feuerwehrenprokopf <- ansaetze_data %>%
   filter(gruppe=="Freiwillige Feuerwehren") %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(feuerwehren = sum(soll)) %>%
@@ -475,10 +493,16 @@ feuerwehrenprokopf_fus <- feuerwehrenprokopf %>%
 
 feuerwehrenprokopf_nfus <- feuerwehrenprokopf %>%
   filter(gsrbetr=="Nein")  
+
+print(feuerwehrenprokopf_summary <- feuerwehrenprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
 ```
 
-63/127 (50 %) gestiegene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
-80/158 (51 %) gesunkene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
+69/127 (50 %) gestiegene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
+90/158 (51 %) gestiegene Kosten pro Kopf für Feuerwehren in nicht fusionierten Gemeinden
 
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für gewählte Gemeindeorgane
@@ -502,6 +526,12 @@ gemeindeorganeprokopf_fus <- gemeindeorganeprokopf %>%
 
 gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
   filter(gsrbetr=="Nein") 
+
+print(gemeindeorganeprokopf_summary <- gemeindeorganeprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
 
 # Testen warum Beträge höher als in Gabriels Dokument
 gemeindeorgane_check <- ansaetze_data %>%
@@ -595,6 +625,7 @@ gemeindeorgane_absolut_gsrbetr_table %>%
 amtsgebaeudeprokopf <- ansaetze_data %>%
   filter(gruppe=="Amtsgebaeude") %>% 
   filter (hh=="1") %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(amtsgebaeude = sum(soll)) %>%
   mutate(amtsgebaeudeprokopf = round(amtsgebaeude/ew,2)) %>%
@@ -611,6 +642,8 @@ amtsgebaeudeprokopf_fus <- amtsgebaeudeprokopf %>%
 
 amtsgebaeudeprokopf_nfus <- amtsgebaeudeprokopf %>%
   filter(gsrbetr=="Nein")  
+
+
 ```
 Keine umfassende Betrachtung möglich, weil Daten fehlen von vielen Gemeinden. 
 
@@ -621,6 +654,7 @@ Keine umfassende Betrachtung möglich, weil Daten fehlen von vielen Gemeinden.
 bauhofprokopf <- ansaetze_data %>%
   filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% 
   filter (hh=="1") %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(bauhof = sum(soll)) %>%
   mutate(bauhofprokopf = round(bauhof/ew,2)) %>%
@@ -637,6 +671,13 @@ bauhofprokopf_fus <- bauhofprokopf %>%
 
 bauhofprokopf_nfus <- bauhofprokopf %>%
   filter(gsrbetr=="Nein")  
+
+print(bauhofprokopf_summary <- bauhofprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
+
 ```
 
 54/101 gestiegene Kosten pro Kopf bei Bauhöfen in fusionierten Gemeinden
@@ -663,6 +704,12 @@ fuhrparkprokopf_fus <- fuhrparkprokopf %>%
 
 fuhrparkprokopf_nfus <- fuhrparkprokopf %>%
   filter(gsrbetr=="Nein")  
+
+print(fuhrparkprokopf_summary <- fuhrparkprokopf %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
 ```
 44/70  (63 %) gestiegene Kosten pro Kopf bei Fuhrpark in fusionierten Gemeinden
 34/65  (52 %) gestiegene Kosten pro Kopf bei Fuhrpark in nicht fusionierten Gemeinden
@@ -1114,6 +1161,18 @@ wahlbeteiligung <- wahlen_bordermanned_t %>%
 
 ```
 
+```{r}
+# Wie findet man eine Gemeinde, die höhere Verwaltungsausgaben und höhere Personalkosten hat und dagegen war? 
+
+vw_pers_erhöhung <- verwaltungsausgabenprokopf %>%
+  left_join(personalkostenprokopf %>% select(gkz_neu, avg_diff), by=c("gkz_neu"="gkz_neu")) %>%
+  left_join(vfgh, by=c("gkz_neu"="gkz")) %>%
+  rename( diff_vw = `avg_diff.x`, 
+         diff_pers = `avg_diff.y`) %>%
+  mutate(erh_index = (diff_vw+diff_pers)/2)
+  
+
+```
 
 ## Linting
 
