@@ -21,7 +21,7 @@ regionalausgabe_verwaltungsausgaben <- posten_data %>%
   mutate(post1 = substr(post3,1,1), 
          ans1 = substr(ans2, 1,1)) %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-   filter (hh=="1" | hh=="5") %>% 
+   filter (hh=="1") %>% 
    filtervw()  %>% # lookup verwaltungsausgaben.R for definition
  filter(regionalausgabe==ausgewaehlte_regionalausgabe) 
 

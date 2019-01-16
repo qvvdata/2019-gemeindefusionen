@@ -215,7 +215,7 @@ Wie haben sich die Personalausgaben pro Kopf je Gemeinde verändert? Welche Unte
 
 personalkostenprokopf <- posten_data %>%
   filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   filter(gkz_neu >60000 & gkz_neu <70000) %>% 
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(personalausgaben = sum(soll)) %>%
@@ -306,7 +306,7 @@ add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'personalkostenproko
 # Ansätze nicht zusammenwerfen für Dechantskirchen, also wo sind die Personalkosten warum gestiegen 
 personalkostenprokopf_mitansaetzen <- posten_data %>%
   filter(gruppe=="Personal") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew, ans2, ansatz_bez) %>%
   summarise(personalausgaben = sum(soll)) %>%
     ungroup() %>%
@@ -331,7 +331,7 @@ In sieben von 119 von der Gemeindestrukturreform betroffenen Gemeinden sind die 
 ```{r}
 personalausgaben_absolut <- posten_data %>%
   filter(gruppe=="Personal") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(personalausgaben = sum(soll)) %>%
   #mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
@@ -402,7 +402,7 @@ plot(plot_1)
 #Energiekosten pro Kopf
 energiekostenprokopf <- posten_data %>%
   filter(gruppe=="Energie") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(energieausgaben = sum(soll))%>%
   mutate(energieausgabenprokopf = round(energieausgaben/ew,2)) %>%
@@ -430,7 +430,7 @@ energiekostenprokopf_nfus <- energiekostenprokopf %>%
 ```{r}
 referateprokopf <- ansaetze_data %>%
   filter(gruppe=="gemeindereferate") %>% 
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(referateausgaben = sum(soll)) %>%
   mutate(referateausgabenprokopf = round(referateausgaben/ew,2)) %>%
@@ -458,7 +458,7 @@ referateprokopf_nfus <- personalkostenprokopf %>%
 ```{r}
 feuerwehrenprokopf <- ansaetze_data %>%
   filter(gruppe=="Freiwillige Feuerwehren") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(feuerwehren = sum(soll)) %>%
   mutate(feuerwehrenprokopf = round(feuerwehren/ew,2)) %>%
@@ -485,7 +485,7 @@ feuerwehrenprokopf_nfus <- feuerwehrenprokopf %>%
 ```{r}
 gemeindeorganeprokopf <- ansaetze_data %>%
   filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(gemeindeorgane = sum(soll)) %>%
   mutate(gemeindeorganeprokopf = round(gemeindeorgane/ew,2)) %>%
@@ -506,7 +506,7 @@ gemeindeorganeprokopf_nfus <- gemeindeorganeprokopf %>%
 # Testen warum Beträge höher als in Gabriels Dokument
 gemeindeorgane_check <- ansaetze_data %>%
   filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
-  filter (hh=="1" | hh=="5")
+  filter (hh=="1")
 
 
 # Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
@@ -525,7 +525,7 @@ gemeindeorganeprokopf_line <- ansaetze_data %>%
   filter(gkz_neu %not in% teilungen_exkl) %>%
   filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gsrbetr) %>%
   summarise(gemeindeorgane = sum(soll))
 
@@ -552,7 +552,7 @@ gemeindeorganeprokopf_line_gsrbetr_t_exp <- gemeindeorganeprokopf_line_gsrbetr_t
 # Gemeindeorgane insgesamt 
 gemeindeorgane_absolut_gsrbetr <- ansaetze_data %>%
   filter(gruppe=="Gewaehlte Gemeindeorgane") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
   group_by(fj, gsrbetr, gruppe) %>%
   summarise(gemeindeorgane = sum(soll))
@@ -594,7 +594,7 @@ gemeindeorgane_absolut_gsrbetr_table %>%
 ```{r}
 amtsgebaeudeprokopf <- ansaetze_data %>%
   filter(gruppe=="Amtsgebaeude") %>% 
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(amtsgebaeude = sum(soll)) %>%
   mutate(amtsgebaeudeprokopf = round(amtsgebaeude/ew,2)) %>%
@@ -620,7 +620,7 @@ Keine umfassende Betrachtung möglich, weil Daten fehlen von vielen Gemeinden.
 ```{r}
 bauhofprokopf <- ansaetze_data %>%
   filter(gruppe=="Wirtschaftshoefe (Bauhof)") %>% 
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(bauhof = sum(soll)) %>%
   mutate(bauhofprokopf = round(bauhof/ew,2)) %>%
@@ -647,7 +647,7 @@ bauhofprokopf_nfus <- bauhofprokopf %>%
 ```{r}
 fuhrparkprokopf <- ansaetze_data %>%
   filter(gruppe=="Fuhrpark") %>% 
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(fuhrpark = sum(soll)) %>%
   mutate(fuhrparkprokopf = round(fuhrpark/ew,2)) %>%
@@ -671,7 +671,7 @@ fuhrparkprokopf_nfus <- fuhrparkprokopf %>%
 # Wie hoch sind die Förderungen je Gemeinde für politische Parteien?
 foerderungen_parteien_gem <- posten_data %>%
   filter(ans2=="00" & post3=="757" & fj =="2017") %>%
-  filter (hh=="1" | hh=="5") 
+  filter (hh=="1") 
 
 test <- foerderungen_parteien_gem %>%
   group_by(gkz_neu) %>%
@@ -679,7 +679,7 @@ test <- foerderungen_parteien_gem %>%
 
 foerderungen_parteien_gem_bl <- posten_data %>%
   filter(ans2=="00" & post3=="757")  %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   mutate(blcode = substr(gkz_neu, 1,1)) %>%
   group_by(fj, ans2, post3, blcode) %>%
   summarise(sum = sum(soll))
@@ -689,7 +689,7 @@ options(scipen=999)
 # Welche GEmeinden geben pro Kopf 2017 am meisten für ihre Parteien aus?
 foerderungen_parteien_gem_avg <- posten_data %>%
   filter(ans2=="00" & post3=="757" & fj =="2017")  %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   mutate(sollproew = round(soll/ew, 1))%>%
   arrange(-sollproew)%>%
   ungroup() %>%
@@ -702,7 +702,7 @@ write.xlsx(foerderungen_parteien_gem_avg, "output/ignore/foerderungen_parteien_g
 # Waren die Top-20-Gemeinden auch in den Vorjahren führend/überdurchschnittlich?
 foerderungen_parteien_gem_avg_allyears <- posten_data %>%
   filter(ans2=="00" & post3=="757" & gkz_neu %in% foerderungen_parteien_gem_avg$gkz_neu)  %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   mutate(sollproew = round(soll/ew, 1)) %>%
   ungroup() %>%
   select(gkz_neu, name, fj, sollproew) 
@@ -721,14 +721,14 @@ foerderungen_parteien_gem_avg_allyears_top
 # Gemeindeförderungen je Partei Export Datawrapper
 foerderungen_parteien_gem_avg_allyears_dw <- posten_data %>%
   filter(ans2=="00" & post3=="757" & fj=="2017") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   mutate(sollproew = round(soll/ew, 1)) %>%
   ungroup()
   
 #Wie hoch ist der durchschnitt in allen Gemeinden 2017?
 foerderungen_parteien_gem_avg_allyears_dw_all <- posten_data %>%
   filter(ans2=="00" & post3=="757") %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(ans2, fj) %>%
   summarise(sumew = sum(ew), 
             sumsoll = sum(soll)) %>%
@@ -740,7 +740,7 @@ gkz_tv <- c("31042", "31513")
 # Hürm und Seefeeld Kadolz
 foerderungen_parteien_gem_avg_allyears_dw_tv <- posten_data %>%
   filter(ans2=="00" & post3=="757" & gkz_neu %in% gkz_tv) %>%
-  filter (hh=="1" | hh=="5") %>%
+  filter (hh=="1") %>%
   group_by(ans2, fj, name) %>%
   summarise(sumew = sum(ew), 
             sumsoll = sum(soll)) %>%
@@ -861,7 +861,7 @@ verwaltungsausgaben <- posten_data %>%
   mutate(post1 = substr(post3,1,1), 
          ans1 = substr(ans2, 1,1)) %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-   filter (hh=="1" | hh=="5") %>% # Nur Ausgaben
+   filter (hh=="1")  %>% # | hh=="5") %>% # Nur Ausgaben
  filtervw() # lookup verwaltungsausgaben.R for defintion
 
 # Superwichtige Berechnung
@@ -898,7 +898,7 @@ map_data <- gde_18 %>%
 
 
 
-#Personalkosten pro Kopf Erhöhung zeichnen zeichnen
+#vew pro Kopf Erhöhung zeichnen zeichnen
 plot_10 <- ggplot() +
   # municipality polygons & outline
   geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
