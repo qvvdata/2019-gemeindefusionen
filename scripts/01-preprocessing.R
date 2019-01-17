@@ -369,5 +369,16 @@ posten_data <- posten_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_ne
 ansaetze_data <- ansaetze_data %>% left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu")) %>%
   filter(gkz_neu %not in% teilungen_exkl)
 
+# Neue Daten der Statistik ausschließlich Geld für  
+# politikerbezüge <- read_excel("input/bessereheader/gemeindebezuegederorgane.xlsx") %>%
+#   mutate(gkz = as.numeric(gkz))%>%
+#   gather(key, value, `2010`:`2017`) %>%
+#   filter(!is.na(value)) %>%
+#   group_by(key) %>%
+#   do((borderman(.[,c('gkz','value')])))
+# # 
+#  saveRDS(politikerbezüge, "output/politikerbezüge.rds")
+politikerbezüge_bordermanned <- readRDS("output/politikerbezüge.rds") %>% ungroup() %>% mutate(key = as.numeric(key)) %>% filter(gkz_neu %not in% teilungen_exkl) 
 
+#rm(fj10, fj11, fj12, fj13, fj14, fj15, fj16, fj17, ansaetze_data_bordermanned, ansaetze_data_ttt, ansaetze_data_tt, data_tt, data_bordermanned, gemeindeorgane_check, nrw2017)
 
