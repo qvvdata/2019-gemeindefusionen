@@ -96,5 +96,44 @@ wahlen_bd_gsrbetr <- wahlen_bordermanned_wb %>%
   
 ```
 
+```{r}
+# wahlen_bordermanned_wb reframen
+wahlen_bordermanned_wb_long <- wahlen_bordermanned_wb %>%
+  gather(key, value, gültig:wahleinfluss)%>%
+  spread(jahr, value)%>%
+  mutate(diff_pct= ((`2015`/`2010`)-1)*100)
+
+# karte mit den Wertverlusten
+#Verwaltungsausgaben pro Kopf zeichnen
+map_data_wählerwert <- verwaltungsausgabenprokopf %>% left_join(gde_18_2_splitter, by = c("gkz_neu" = "GKZ")) %>% 
+  filter(gsrbetr=="Ja")
+
+map_data <- gde_18 %>% 
+  mutate(gkz_neu=as.numeric(GKZ)) %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu")) 
+
+
+
+#vew pro Kopf Erhöhung zeichnen zeichnen
+plot_10 <- ggplot() +
+  # municipality polygons & outline
+  geom_sf(data = bezirksgrenzen, color="black", size = 0.1) +
+  geom_sf(data = map_data_vw, aes(fill=avg_diff), color="black", size=0.01) +
+  #geom_sf(data = bundeslaendergrenzen, color="white", fill="transparent", size=0.1) +
+  coord_sf() +
+  #coord_map(projection = "mercator") +
+  # coord_sf did not work here
+  scale_fill_gradient2(low = "#84a07c", midpoint = 0, mid = "white", high = "#ba2b58")+
+  #scale_fill_gradient(low = "#bf4342", high = "#519872", 
+  #                     space = "Lab", na.value = "#af3b6e", guide = "colourbar") +
+  labs(x = NULL, y = NULL, title = "Verwaltungskosten pro Kopf: Erhöhung oder Ersparnis?", caption = "Quelle: Statistik Austria, BEV.") +
+ #guides(fill=guide_legend(nrow=6,byrow=TRUE)) +
+  theme_map() +
+  theme(panel.grid.major = element_line(colour = "white"))
+
+plot(plot_10)
+
+```
 
 

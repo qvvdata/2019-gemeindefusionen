@@ -924,8 +924,8 @@ verwaltungsausgabenprokopf <- verwaltungsausgaben %>%
          avg_diff = round((((avg15_17/avg12_14-1)*100)),1))
 
 # Herausschreiben für die interaktive Karte
-write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
-write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
+#write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
+#write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
 
 
 vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%
