@@ -100,7 +100,7 @@ legend.linear = function(MAP) {
 
         var div = L.DomUtil.create('div', 'info legend category');
         div.innerHTML = (MAP.categories_display_values || MAP.categories).map(
-            (x,i) => `<span style="background: ${scale(x)}"></span>&nbsp;${MAP.categories_display[i]}%`).join('<br />');
+            (x,i) => `<span style="background: ${scale(x)}"></span>&nbsp;${MAP.categories_display?MAP.categories_display[i]:x}%`).join('<br />');
         return div;
     };
 
@@ -116,5 +116,39 @@ legend.linear = function(MAP) {
     return legend;
 
 }
+
+legend.linear_or_null = function(MAP) {
+    var legend = L.control({position: 'topleft'});
+    var scale = d3scale.scaleLinear().range(MAP.colorschemes).clamp(true);
+    if(MAP.categories) {
+        scale = scale.domain(MAP.categories);
+    }
+
+    legend.onAdd = function (map) {
+        if(MAP.categories) {
+            for(var e of document.querySelectorAll('span.scalevalue')) {
+                e.style.borderBottom = `4px solid ${scale(e.innerHTML)}`;
+            }
+        }
+
+        var div = L.DomUtil.create('div', 'info legend category');
+        div.innerHTML = (MAP.categories_display_values || MAP.categories).map(
+            (x,i) => `<span style="background: ${scale(x)}"></span>&nbsp;${MAP.categories_display?MAP.categories_display[i]:x}%`).join('<br />');
+        return div;
+    };
+
+
+    legend.getColor = function(data) {
+        var d = MAP.value(data);
+
+        window.thescale = scale;
+
+        return {'fillColor': d[0]?scale(d[1]):MAP.colorscheme_null};
+    };
+
+    return legend;
+
+}
+
 
 export {legend};
