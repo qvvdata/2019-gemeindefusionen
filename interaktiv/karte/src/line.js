@@ -8,6 +8,7 @@ export function redraw(data, container, settings, first) {
   settings = settings || {};
   settings.xlabel = settings.xlabel || '';
   settings.ylabel = settings.ylabel || '';
+  settings.yline = settings.yline || undefined;
   var margin = {top: 0, right: 20, bottom: 24, left: 30};
 
   var width = container.node().clientWidth - margin.left - margin.right;
@@ -158,6 +159,15 @@ export function redraw(data, container, settings, first) {
       .duration(time)
       .attr("d", path);
 
+    var yline = svg.selectAll(".yline")
+        .data(settings.yline!==undefined ? [[settings.yline,settings.yline]] : []);
+    yline.exit().remove();
+    yline.enter().append('path')
+        .merge(yline)
+        .attr('class', 'yline')
+        .transition()
+        .attr('d', d3.line().x((x) => xScale(x)).y((x,i) => yScale.range()[i]));
+
   var check_overlap = function(e1,e2) {
     try {
       var rect1 = e1.getBoundingClientRect();
@@ -180,10 +190,10 @@ export function redraw(data, container, settings, first) {
       .sort()
     lines.classed('active', (d) => d[0].active).classed('highlight', (d) => d[0].highlight);
     var tl = data.filter((x) => x[0].active)[0];
-    tooltip_render(margin, svg, container, tooltip_active_start, tl[0],
-      xScale,xValue,yScale,yValue,(x) => 5,width,height);
-    tooltip_render(margin, svg, container, tooltip_active_end, tl[tl.length-1],
-      xScale,xValue,yScale,yValue,(x) => 5,width,height, null, true);
+    //tooltip_render(margin, svg, container, tooltip_active_start, tl[0],
+    //  xScale,xValue,yScale,yValue,(x) => 5,width,height);
+    //tooltip_render(margin, svg, container, tooltip_active_end, tl[tl.length-1],
+    //  xScale,xValue,yScale,yValue,(x) => 5,width,height, null, true);
     if(check_overlap(tooltip.node(), tooltip_active_start.node())) {
       tooltip_active_start.style('opacity', 0);
     }

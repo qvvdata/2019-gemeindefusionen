@@ -28,8 +28,8 @@ maps['parteienfoerderungen_gemeinden_2017'] = {
 };
 
 maps['verwaltungsausgabenprokopf'] = {
-  title: '',
-  description: ``,
+  title: 'Gestiegene Verwaltungsausgaben in fast allen fusionierten Gemeinden',
+  description: `Vergleich des Drei-Jahres-Durchschnitts für Verwaltungsausgaben pro Kopf vor und nach der Reform.`,
   data: 'verwaltungsausgabenprokopf.csv',
   topojson: 'gemeindegrenzen_2018_splitter_topo.json',
   source: '',
@@ -41,9 +41,58 @@ maps['verwaltungsausgabenprokopf'] = {
   categories: [-25,0,25],
   value: (d) => [d.gsrbetr=='Ja', d.avg_diff],
   tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
-      return `<h4>${d.name}</h4>Kostenveränderung: ${changepctfmt(d.avg_diff)}%<br />${d.gsrbetr=='Ja'?' ':'keine '}Fusionsgemeinde<br /><div class="chart" style="height: 150px"></div>`;
+      return `${
+          d.gsrbetr=='Ja'?`
+            In den drei Jahren nach der Reform lagen die durchschnittlichen Verwaltungsausgaben in ${d.name} pro Kopf ${changepctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'} den Ausgaben davor.
+            `:`
+            ${d.name} war nicht von der Gemeindestrukturreform 2015 betroffen.`
+      }
+
+      <div class="chart" style="height: 150px"></div>`;
   },
   bundesland_message: ``,
+  post_draw_tooltip: function(elem, source_feature, fmt) {
+      setTimeout(() => {
+          var data = source_feature.data;
+          var jahre = Object.keys(data).filter(x => !isNaN(+x)).sort().map(x => +x);
+          var line = jahre.map((j) => {return {'xvalue': j, 'yvalue': data[j], 'title': '',
+            active: true,
+            label: ``,
+            text: `${j}: ${fmt(data[j])} €`,
+            radius: 1 }});
+
+          redraw([
+            line
+          ],
+            d3.select(elem).selectAppend('div.chart'), {
+            xfmt: (x) => x,
+            ylabel: '',
+            yline: 2015
+        }, true);
+      }, 100)
+  }
+};
+
+
+maps['wahlbeteiligung'] = {
+  title: 'Wie viel Wert Ihre Stimme bei Landtagswahlen verloren hat',
+  description: `Vergleich des potentiellen Einflusses einer Wählerstimme auf die Zusammensetzung des Gemeinderates vor und nach der Gemeindestrukturreform.`,
+  data: 'wahlen_bordermanned_wb_long.csv',
+  topojson: 'gemeindegrenzen_2018_splitter_topo.json',
+  source: '',
+  scale: 'linear_or_null',
+  search: true,
+  feature_name_override: 'name',
+  colorschemes: ['#516d87', '#f1f1f1','#a54657'].reverse(),
+  colorscheme_null: 'lightyellow',
+  categories: [-50,0,5],
+  value: (d) => [true, d.diff_pct],
+  tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
+      return `<h4>${d.name}</h4>Änderung des Stimmeineinflusses: ${changepctfmt(d.diff_pct)}%<br />${d.gsrbetr=='Ja'?' ':'keine '}Fusionsgemeinde<br />`;
+      //`<div class="chart" style="height: 150px"></div>`;
+  },
+  bundesland_message: ``,
+  /*
   post_draw_tooltip: function(elem, source_feature, fmt) {
       setTimeout(() => {
           console.log(elem.innerHTML)
@@ -63,9 +112,10 @@ maps['verwaltungsausgabenprokopf'] = {
             d3.select(elem).selectAppend('div.chart'), {
             xfmt: (x) => x,
             ylabel: '',
+            yline: 2015
         }, true);
-      }, 100)
-  }
+    }, 100)
+}*/
 };
 
 Object.keys(maps).map((x) => {maps[x].map=x});

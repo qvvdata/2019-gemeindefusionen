@@ -81,7 +81,7 @@ queue.queue()
         smoothFactor: L.Browser.retina?0.5:1,
         style: function(feature) {
           feature.data = data.filter((x) => (x.gkz||x.gkz_neu)==feature.properties.GKZ)[0];
-          if(!feature.properties.name && MAP.feature_name_override) {
+          if(feature.data && !feature.properties.name && MAP.feature_name_override) {
               feature.properties.name = feature.data[MAP.feature_name_override];
           }
           var r = {
