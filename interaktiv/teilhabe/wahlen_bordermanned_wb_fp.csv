@@ -1,0 +1,575 @@
+gkz,name,gsrbetr,key,value
+60101,Graz,Nein,fp_pct,7.991960721908201
+60101,Graz,Nein,wb_pct,1.8045114979561632
+60305,Frauental an der Laßnitz,Nein,fp_pct,13.050797240883558
+60305,Frauental an der Laßnitz,Nein,wb_pct,-4.431300295498218
+60318,Lannach,Nein,fp_pct,16.27877521294449
+60318,Lannach,Nein,wb_pct,-1.3833619732649964
+60323,Pölfing-Brunn,Nein,fp_pct,20.58298709589643
+60323,Pölfing-Brunn,Nein,wb_pct,-0.9886372007834296
+60324,Preding,Nein,fp_pct,18.896247125779027
+60324,Preding,Nein,wb_pct,-0.2467136090028319
+60326,Sankt Josef (Weststeiermark),Nein,fp_pct,14.329821393589928
+60326,Sankt Josef (Weststeiermark),Nein,wb_pct,0.0015426283301422927
+60329,Sankt Peter im Sulmtal,Nein,fp_pct,25.054500155714734
+60329,Sankt Peter im Sulmtal,Nein,wb_pct,-0.3621116828664057
+60341,Wettmannstätten,Nein,fp_pct,22.59302067126028
+60341,Wettmannstätten,Nein,wb_pct,-1.0600312989045335
+60344,Deutschlandsberg,Ja,fp_pct,17.501169181864363
+60344,Deutschlandsberg,Ja,wb_pct,-6.022073233842114
+60345,Eibiswald,Ja,fp_pct,25.556421049236377
+60345,Eibiswald,Ja,wb_pct,-6.134325242519239
+60346,Groß Sankt Florian,Ja,fp_pct,18.351511896000254
+60346,Groß Sankt Florian,Ja,wb_pct,-2.1371268261782745
+60347,Sankt Martin im Sulmtal,Ja,fp_pct,25.160332469302567
+60347,Sankt Martin im Sulmtal,Ja,wb_pct,-1.7389662054347355
+60348,Sankt Stefan ob Stainz,Ja,fp_pct,23.95566029726177
+60348,Sankt Stefan ob Stainz,Ja,wb_pct,0.39523682157091855
+60349,Schwanberg,Ja,fp_pct,26.600067028686333
+60349,Schwanberg,Ja,wb_pct,0.07956315794544366
+60350,Stainz,Ja,fp_pct,22.74316800433357
+60350,Stainz,Ja,wb_pct,-4.835262065141208
+60351,Wies,Ja,fp_pct,26.378108502134054
+60351,Wies,Ja,wb_pct,-3.0906372683915677
+60608,Feldkirchen bei Graz,Nein,fp_pct,19.892875865435023
+60608,Feldkirchen bei Graz,Nein,wb_pct,-1.9578320783036176
+60611,Gössendorf,Nein,fp_pct,20.681682486154667
+60611,Gössendorf,Nein,wb_pct,2.375352291892895
+60613,Gratkorn,Nein,fp_pct,19.640587215088466
+60613,Gratkorn,Nein,wb_pct,-9.135138414637893
+60617,Hart bei Graz,Nein,fp_pct,8.820698762282056
+60617,Hart bei Graz,Nein,wb_pct,-2.57199210802829
+60618,Haselsdorf-Tobelbad,Nein,fp_pct,13.829619092776985
+60618,Haselsdorf-Tobelbad,Nein,wb_pct,-4.075508212503038
+60619,Hausmannstätten,Nein,fp_pct,12.114864491913671
+60619,Hausmannstätten,Nein,wb_pct,-1.243487971657899
+60623,Kainbach bei Graz,Nein,fp_pct,10.294706076790591
+60623,Kainbach bei Graz,Nein,wb_pct,-1.527670898547548
+60624,Kalsdorf bei Graz,Nein,fp_pct,21.89821084459905
+60624,Kalsdorf bei Graz,Nein,wb_pct,-2.0529210439936634
+60626,Kumberg,Nein,fp_pct,12.247700731015101
+60626,Kumberg,Nein,wb_pct,3.2092982912655046
+60628,Laßnitzhöhe,Nein,fp_pct,10.833634471495523
+60628,Laßnitzhöhe,Nein,wb_pct,-0.2029330380485561
+60629,Lieboch,Nein,fp_pct,14.914576429089209
+60629,Lieboch,Nein,wb_pct,-4.977714569138968
+60632,Peggau,Nein,fp_pct,15.536907536907538
+60632,Peggau,Nein,wb_pct,-1.1420270900446496
+60639,Sankt Bartholomä,Nein,fp_pct,15.069929957433944
+60639,Sankt Bartholomä,Nein,wb_pct,0.7782924226917913
+60641,Sankt Oswald bei Plankenwarth,Nein,fp_pct,13.682461626382336
+60641,Sankt Oswald bei Plankenwarth,Nein,wb_pct,-0.6435006435006301
+60642,Sankt Radegund bei Graz,Nein,fp_pct,11.715855163226955
+60642,Sankt Radegund bei Graz,Nein,wb_pct,-4.400401413735587
+60645,Semriach,Nein,fp_pct,15.831055399354366
+60645,Semriach,Nein,wb_pct,-0.37149075582919977
+60646,Stattegg,Nein,fp_pct,9.342280601561015
+60646,Stattegg,Nein,wb_pct,-1.937115404272717
+60647,Stiwoll,Nein,fp_pct,25.76470588235294
+60647,Stiwoll,Nein,wb_pct,-4.587881664293619
+60648,Thal,Nein,fp_pct,10.772378258233985
+60648,Thal,Nein,wb_pct,1.9237493379679904
+60651,Übelbach,Nein,fp_pct,18.11580821790772
+60651,Übelbach,Nein,wb_pct,-6.720036499448263
+60653,Vasoldsberg,Nein,fp_pct,16.838796587337225
+60653,Vasoldsberg,Nein,wb_pct,-2.9589188677605804
+60654,Weinitzen,Nein,fp_pct,9.822768974145118
+60654,Weinitzen,Nein,wb_pct,-2.5378694833374382
+60655,Werndorf,Nein,fp_pct,17.65733155521687
+60655,Werndorf,Nein,wb_pct,-0.35773615684017557
+60656,Wundschuh,Nein,fp_pct,17.06915690423957
+60656,Wundschuh,Nein,wb_pct,-3.2627257799671554
+60659,Deutschfeistritz,Ja,fp_pct,15.88175089277916
+60659,Deutschfeistritz,Ja,wb_pct,0.9235682357785606
+60660,Dobl-Zwaring,Ja,fp_pct,20.63152757813739
+60660,Dobl-Zwaring,Ja,wb_pct,-1.913147192837826
+60661,Eggersdorf bei Graz,Ja,fp_pct,16.423947784069107
+60661,Eggersdorf bei Graz,Ja,wb_pct,-6.967994983288662
+60662,Fernitz-Mellach,Ja,fp_pct,18.769976201311056
+60662,Fernitz-Mellach,Ja,wb_pct,-2.8643512153853194
+60663,Frohnleiten,Ja,fp_pct,14.676610739018793
+60663,Frohnleiten,Ja,wb_pct,-6.668102679363223
+60664,Gratwein-Straßengel,Ja,fp_pct,18.562767680802434
+60664,Gratwein-Straßengel,Ja,wb_pct,-1.6861553497488728
+60665,Hitzendorf,Ja,fp_pct,17.337007460728074
+60665,Hitzendorf,Ja,wb_pct,-2.8104785368780156
+60666,Nestelbach bei Graz,Ja,fp_pct,17.081232320747752
+60666,Nestelbach bei Graz,Ja,wb_pct,-7.08779153006158
+60667,Raaba-Grambach,Ja,fp_pct,15.142413237112759
+60667,Raaba-Grambach,Ja,wb_pct,-3.9181580725346237
+60668,Sankt Marein bei Graz,Ja,fp_pct,18.273453289093005
+60668,Sankt Marein bei Graz,Ja,wb_pct,-2.099351863641033
+60669,Seiersberg-Pirka,Ja,fp_pct,14.629187053894405
+60669,Seiersberg-Pirka,Ja,wb_pct,0.08856465846587724
+60670,Premstätten,Ja,fp_pct,17.70502263476754
+60670,Premstätten,Ja,wb_pct,-5.116691955945036
+61001,Allerheiligen bei Wildon,Nein,fp_pct,8.387846916669318
+61001,Allerheiligen bei Wildon,Nein,wb_pct,-3.1917309986917886
+61002,Arnfels,Nein,fp_pct,21.402956036935944
+61002,Arnfels,Nein,wb_pct,0.6533724506427419
+61007,Empersdorf,Nein,fp_pct,17.635850240535447
+61007,Empersdorf,Nein,wb_pct,-0.62028878855984
+61008,Gabersdorf,Nein,fp_pct,24.037191641903682
+61008,Gabersdorf,Nein,wb_pct,-3.665996396468138
+61012,Gralla,Nein,fp_pct,25.63069216757741
+61012,Gralla,Nein,wb_pct,2.398094820086591
+61013,Großklein,Nein,fp_pct,23.09551371096363
+61013,Großklein,Nein,wb_pct,-1.0118810074911977
+61016,Heimschuh,Nein,fp_pct,21.96088631932917
+61016,Heimschuh,Nein,wb_pct,0.9124507861958193
+61017,Hengsberg,Nein,fp_pct,16.08277364312943
+61017,Hengsberg,Nein,wb_pct,3.388348906731764
+61019,Kitzeck im Sausal,Nein,fp_pct,12.067143689158833
+61019,Kitzeck im Sausal,Nein,wb_pct,2.687135626971809
+61020,Lang,Nein,fp_pct,17.057286807240153
+61020,Lang,Nein,wb_pct,1.4155378486055952
+61021,Lebring-Sankt Margarethen,Nein,fp_pct,18.86292039695683
+61021,Lebring-Sankt Margarethen,Nein,wb_pct,0.28768331153801796
+61024,Oberhaag,Nein,fp_pct,24.222073531483307
+61024,Oberhaag,Nein,wb_pct,-2.573042310213772
+61027,Ragnitz,Nein,fp_pct,22.332328019531808
+61027,Ragnitz,Nein,wb_pct,0.22172210481218713
+61030,Sankt Andrä-Höch,Nein,fp_pct,24.12563830812217
+61030,Sankt Andrä-Höch,Nein,wb_pct,0.9497964721845307
+61032,Sankt Johann im Saggautal,Nein,fp_pct,22.393475146037694
+61032,Sankt Johann im Saggautal,Nein,wb_pct,-0.11561107954998562
+61033,Sankt Nikolai im Sausal,Nein,fp_pct,21.07944864848271
+61033,Sankt Nikolai im Sausal,Nein,wb_pct,-0.5427360812110464
+61043,Tillmitsch,Nein,fp_pct,26.241727621037967
+61043,Tillmitsch,Nein,wb_pct,-0.3760850812367522
+61045,Wagna,Nein,fp_pct,19.518333649249175
+61045,Wagna,Nein,wb_pct,-5.509513664120647
+61049,Ehrenhausen an der Weinstraße,Ja,fp_pct,27.683776190326643
+61049,Ehrenhausen an der Weinstraße,Ja,wb_pct,-3.9109201329316434
+61050,Gamlitz,Ja,fp_pct,27.282991803648883
+61050,Gamlitz,Ja,wb_pct,0.27508287887681604
+61051,Gleinstätten,Ja,fp_pct,22.174065502489654
+61051,Gleinstätten,Ja,wb_pct,1.2285582826496437
+61052,Heiligenkreuz am Waasen,Ja,fp_pct,15.127761823829335
+61052,Heiligenkreuz am Waasen,Ja,wb_pct,-3.3477800833915765
+61053,Leibnitz,Ja,fp_pct,21.229145110217164
+61053,Leibnitz,Ja,wb_pct,-5.799353977057002
+61054,Leutschach an der Weinstraße,Ja,fp_pct,25.486780593643054
+61054,Leutschach an der Weinstraße,Ja,wb_pct,-3.9521674483004574
+61055,Sankt Georgen an der Stiefing,Ja,fp_pct,18.65329069527543
+61055,Sankt Georgen an der Stiefing,Ja,wb_pct,-1.0460743770435954
+61056,Sankt Veit in der Südsteiermark,Ja,fp_pct,22.214660682714538
+61056,Sankt Veit in der Südsteiermark,Ja,wb_pct,-7.494364502296563
+61057,Schwarzautal,Ja,fp_pct,22.800819252432156
+61057,Schwarzautal,Ja,wb_pct,-2.680149171935355
+61058,Straß in Steiermark,Ja,fp_pct,23.834321042581774
+61058,Straß in Steiermark,Ja,wb_pct,-2.792863949524815
+61059,Wildon,Ja,fp_pct,20.392059539594523
+61059,Wildon,Ja,wb_pct,2.771221927301241
+61101,Eisenerz,Nein,fp_pct,9.130360589548022
+61101,Eisenerz,Nein,wb_pct,0.39903426864081837
+61105,Kalwang,Nein,fp_pct,7.604985730094937
+61105,Kalwang,Nein,wb_pct,2.662017776721214
+61106,Kammern im Liesingtal,Nein,fp_pct,18.612328915121427
+61106,Kammern im Liesingtal,Nein,wb_pct,-2.488197722854764
+61107,Kraubath an der Mur,Nein,fp_pct,14.987271327926116
+61107,Kraubath an der Mur,Nein,wb_pct,-2.5158047276112825
+61108,Leoben,Nein,fp_pct,13.335338026995894
+61108,Leoben,Nein,wb_pct,-1.7757929019071526
+61109,Mautern in Steiermark,Nein,fp_pct,7.347842529570512
+61109,Mautern in Steiermark,Nein,wb_pct,2.0206931748097787
+61110,Niklasdorf,Nein,fp_pct,20.085653379083418
+61110,Niklasdorf,Nein,wb_pct,-6.197770798135906
+61111,Proleb,Nein,fp_pct,11.27462385605708
+61111,Proleb,Nein,wb_pct,-2.2178516727636293
+61112,Radmer,Nein,fp_pct,17.562407895324434
+61112,Radmer,Nein,wb_pct,-2.9532349122965798
+61113,Sankt Michael in Obersteiermark,Nein,fp_pct,14.440931742155742
+61113,Sankt Michael in Obersteiermark,Nein,wb_pct,-3.0886606962451566
+61114,Sankt Peter-Freienstein,Nein,fp_pct,20.16255962749183
+61114,Sankt Peter-Freienstein,Nein,wb_pct,-7.016259531196894
+61115,Sankt Stefan ob Leoben,Nein,fp_pct,16.874485834006073
+61115,Sankt Stefan ob Leoben,Nein,wb_pct,1.2557999305030307
+61116,Traboch,Nein,fp_pct,16.174938561812162
+61116,Traboch,Nein,wb_pct,-1.4480408858603084
+61118,Vordernberg,Nein,fp_pct,16.246103294296066
+61118,Vordernberg,Nein,wb_pct,-0.6707789800114483
+61119,Wald am Schoberpaß,Nein,fp_pct,13.371762740183794
+61119,Wald am Schoberpaß,Nein,wb_pct,3.638800733279453
+61120,Trofaiach,Ja,fp_pct,14.187658193513418
+61120,Trofaiach,Ja,wb_pct,-3.910885721216829
+61203,Aigen im Ennstal,Nein,fp_pct,15.642427173058323
+61203,Aigen im Ennstal,Nein,wb_pct,-0.3292068096582881
+61204,Altaussee,Nein,fp_pct,8.283018867924529
+61204,Altaussee,Nein,wb_pct,-7.299720038763866
+61205,Altenmarkt bei Sankt Gallen,Nein,fp_pct,14.855649853611535
+61205,Altenmarkt bei Sankt Gallen,Nein,wb_pct,-1.5240850155916519
+61206,Ardning,Nein,fp_pct,15.551021145199442
+61206,Ardning,Nein,wb_pct,-0.44395870504718005
+61207,Bad Aussee,Nein,fp_pct,6.70333151960548
+61207,Bad Aussee,Nein,wb_pct,-1.9058345098529372
+61213,Gröbming,Nein,fp_pct,8.533257906466119
+61213,Gröbming,Nein,wb_pct,-4.098346143715986
+61215,Grundlsee,Nein,fp_pct,8.149954627949185
+61215,Grundlsee,Nein,wb_pct,-1.5263505086162397
+61217,Haus,Nein,fp_pct,17.051336748423978
+61217,Haus,Nein,wb_pct,-4.204649129167606
+61222,Lassing,Nein,fp_pct,13.414090522692872
+61222,Lassing,Nein,wb_pct,-6.187622742345702
+61236,Ramsau am Dachstein,Nein,fp_pct,30.272244022362216
+61236,Ramsau am Dachstein,Nein,wb_pct,-0.6906489118553196
+61243,Selzthal,Nein,fp_pct,9.520756184150981
+61243,Selzthal,Nein,wb_pct,-2.299080889451055
+61247,Trieben,Nein,fp_pct,18.121650203090827
+61247,Trieben,Nein,wb_pct,-1.849224933753682
+61251,Wildalpen,Nein,fp_pct,12.276437325691479
+61251,Wildalpen,Nein,wb_pct,-1.662472355677565
+61252,Wörschach,Nein,fp_pct,12.410714285714286
+61252,Wörschach,Nein,wb_pct,-0.11230479857570685
+61253,Admont,Ja,fp_pct,13.011274336930095
+61253,Admont,Ja,wb_pct,-4.747421095788027
+61254,Aich,Ja,fp_pct,20.85271317829457
+61254,Aich,Ja,wb_pct,-1.789242590559823
+61255,Bad Mitterndorf,Ja,fp_pct,24.45565765047849
+61255,Bad Mitterndorf,Ja,wb_pct,-1.657706093189958
+61256,Gaishorn am See,Ja,fp_pct,15.067265186530914
+61256,Gaishorn am See,Ja,wb_pct,-1.8507416533211227
+61257,Irdning-Donnersbachtal,Ja,fp_pct,14.868180473770533
+61257,Irdning-Donnersbachtal,Ja,wb_pct,-4.791972589329404
+61258,Landl,Ja,fp_pct,12.987638071008648
+61258,Landl,Ja,wb_pct,-7.7484579914000165
+61259,Liezen,Ja,fp_pct,16.245632787651637
+61259,Liezen,Ja,wb_pct,-5.391729083294749
+61260,Michaelerberg-Pruggern,Ja,fp_pct,16.151228696624344
+61260,Michaelerberg-Pruggern,Ja,wb_pct,-2.465451784358379
+61261,Mitterberg-Sankt Martin,Ja,fp_pct,15.847102886098257
+61261,Mitterberg-Sankt Martin,Ja,wb_pct,-5.048920377867759
+61262,Öblarn,Ja,fp_pct,18.685448799865277
+61262,Öblarn,Ja,wb_pct,-3.914684087164936
+61263,Rottenmann,Ja,fp_pct,12.365332542077455
+61263,Rottenmann,Ja,wb_pct,-5.249174684687233
+61264,Sankt Gallen,Ja,fp_pct,12.998794454490657
+61264,Sankt Gallen,Ja,wb_pct,-3.637449744944746
+61265,Schladming,Ja,fp_pct,23.48827561497629
+61265,Schladming,Ja,wb_pct,-2.307771846704526
+61266,Sölk,Ja,fp_pct,25.08698277597263
+61266,Sölk,Ja,wb_pct,-5.7614044856415205
+61267,Stainach-Pürgg,Ja,fp_pct,15.676202381107395
+61267,Stainach-Pürgg,Ja,wb_pct,-6.708485223375952
+61410,Mühlen,Nein,fp_pct,11.896797306629834
+61410,Mühlen,Nein,wb_pct,-0.704842931937165
+61413,Niederwölz,Nein,fp_pct,26.29644370566338
+61413,Niederwölz,Nein,wb_pct,5.491990846681915
+61425,Sankt Peter am Kammersberg,Nein,fp_pct,14.016615712595613
+61425,Sankt Peter am Kammersberg,Nein,wb_pct,-1.2353593758786872
+61428,Schöder,Nein,fp_pct,20.812260380128883
+61428,Schöder,Nein,wb_pct,2.277825072046525
+61437,Krakau,Ja,fp_pct,18.563831272158787
+61437,Krakau,Ja,wb_pct,-2.816268512403724
+61438,Murau,Ja,fp_pct,16.58892011896929
+61438,Murau,Ja,wb_pct,-3.0688252296483967
+61439,Neumarkt in der Steiermark,Ja,fp_pct,28.98072831935928
+61439,Neumarkt in der Steiermark,Ja,wb_pct,-2.065070845856596
+61440,Oberwölz,Ja,fp_pct,19.724466896272325
+61440,Oberwölz,Ja,wb_pct,-0.729096218125818
+61441,Ranten,Ja,fp_pct,17.720475898324253
+61441,Ranten,Ja,wb_pct,-4.294598304931469
+61442,Sankt Georgen am Kreischberg,Ja,fp_pct,16.551386951582522
+61442,Sankt Georgen am Kreischberg,Ja,wb_pct,-1.4533900504118549
+61443,Sankt Lambrecht,Ja,fp_pct,17.359623904397356
+61443,Sankt Lambrecht,Ja,wb_pct,-1.9150334266613243
+61444,Scheifling,Ja,fp_pct,22.34727787223418
+61444,Scheifling,Ja,wb_pct,-4.724588856610438
+61445,Stadl-Predlitz,Ja,fp_pct,27.105040661032803
+61445,Stadl-Predlitz,Ja,wb_pct,-0.21334115041365465
+61446,Teufenbach-Katsch,Ja,fp_pct,24.29041903193656
+61446,Teufenbach-Katsch,Ja,wb_pct,-5.946221709197346
+61611,Krottendorf-Gaisfeld,Nein,fp_pct,20.958196394993497
+61611,Krottendorf-Gaisfeld,Nein,wb_pct,-2.050724505541794
+61612,Ligist,Nein,fp_pct,21.78111210234493
+61612,Ligist,Nein,wb_pct,1.1707862618484768
+61615,Mooskirchen,Nein,fp_pct,16.723502361621115
+61615,Mooskirchen,Nein,wb_pct,-2.871618506703058
+61618,Rosental an der Kainach,Nein,fp_pct,22.30272581951047
+61618,Rosental an der Kainach,Nein,wb_pct,-1.3981116012692354
+61621,Sankt Martin am Wöllmißberg,Nein,fp_pct,24.37538036752182
+61621,Sankt Martin am Wöllmißberg,Nein,wb_pct,-1.2012838335944735
+61624,Stallhofen,Nein,fp_pct,24.453769238683797
+61624,Stallhofen,Nein,wb_pct,-1.0489326046181304
+61625,Voitsberg,Nein,fp_pct,21.619526313004368
+61625,Voitsberg,Nein,wb_pct,0.8272745901539622
+61626,Bärnbach,Ja,fp_pct,22.955805615967574
+61626,Bärnbach,Ja,wb_pct,-1.3315416343862552
+61627,Edelschrott,Ja,fp_pct,23.824533271313655
+61627,Edelschrott,Ja,wb_pct,-0.9694593634841766
+61628,Geistthal-Södingberg,Ja,fp_pct,25.354585822723763
+61628,Geistthal-Södingberg,Ja,wb_pct,-3.3048406578091587
+61629,Hirschegg-Pack,Ja,fp_pct,24.361470410055546
+61629,Hirschegg-Pack,Ja,wb_pct,-9.092946605141734
+61630,Kainach bei Voitsberg,Ja,fp_pct,28.84163268693407
+61630,Kainach bei Voitsberg,Ja,wb_pct,-4.102582783869437
+61631,Köflach,Ja,fp_pct,22.883437333861792
+61631,Köflach,Ja,wb_pct,1.5942324843323519
+61632,Maria Lankowitz,Ja,fp_pct,25.114691425450573
+61632,Maria Lankowitz,Ja,wb_pct,-6.598091153803011
+61633,Söding-Sankt Johann,Ja,fp_pct,19.075996239862462
+61633,Söding-Sankt Johann,Ja,wb_pct,-0.20949335685540404
+61701,Albersdorf-Prebuch,Nein,fp_pct,18.268755710466653
+61701,Albersdorf-Prebuch,Nein,wb_pct,-1.32081554377163
+61708,Fischbach,Nein,fp_pct,17.216109412779737
+61708,Fischbach,Nein,wb_pct,-1.1437043312506603
+61710,Floing,Nein,fp_pct,17.952380952380956
+61710,Floing,Nein,wb_pct,-2.3733067729083785
+61711,Gasen,Nein,fp_pct,9.321585716703332
+61711,Gasen,Nein,wb_pct,-1.2021525677744194
+61716,Markt Hartmannsdorf,Nein,fp_pct,18.47590099869735
+61716,Markt Hartmannsdorf,Nein,wb_pct,0.45712594910679627
+61719,Hofstätten an der Raab,Nein,fp_pct,16.686814958091556
+61719,Hofstätten an der Raab,Nein,wb_pct,-0.9908240127824612
+61727,Ludersdorf-Wilfersdorf,Nein,fp_pct,16.71413581172238
+61727,Ludersdorf-Wilfersdorf,Nein,wb_pct,0.15119992521527337
+61728,Miesenbach bei Birkfeld,Nein,fp_pct,17.667238421955407
+61728,Miesenbach bei Birkfeld,Nein,wb_pct,-1.4365744078983909
+61729,Mitterdorf an der Raab,Nein,fp_pct,11.562767957713104
+61729,Mitterdorf an der Raab,Nein,wb_pct,1.7865455114880575
+61730,Mortantsch,Nein,fp_pct,12.21762590906371
+61730,Mortantsch,Nein,wb_pct,-0.02303685470144501
+61731,Naas,Nein,fp_pct,17.308073937514923
+61731,Naas,Nein,wb_pct,-4.878932602776658
+61740,Puch bei Weiz,Nein,fp_pct,17.052101386481805
+61740,Puch bei Weiz,Nein,wb_pct,1.4093500570125457
+61741,Ratten,Nein,fp_pct,10.286814634640722
+61741,Ratten,Nein,wb_pct,-2.5923811581010057
+61743,Rettenegg,Nein,fp_pct,13.83064516129032
+61743,Rettenegg,Nein,wb_pct,-3.0484721519901825
+61744,Sankt Kathrein am Hauenstein,Nein,fp_pct,20.081764887380437
+61744,Sankt Kathrein am Hauenstein,Nein,wb_pct,-5.839646464646464
+61745,Sankt Kathrein am Offenegg,Nein,fp_pct,15.356193921969261
+61745,Sankt Kathrein am Offenegg,Nein,wb_pct,-0.26132103180773925
+61746,Sankt Margarethen an der Raab,Nein,fp_pct,13.57281900763159
+61746,Sankt Margarethen an der Raab,Nein,wb_pct,-3.888925080927983
+61748,Sinabelkirchen,Nein,fp_pct,19.81479255658929
+61748,Sinabelkirchen,Nein,wb_pct,1.5195392242636245
+61750,Strallegg,Nein,fp_pct,16.596038501968387
+61750,Strallegg,Nein,wb_pct,1.0550578948179918
+61751,Thannhausen,Nein,fp_pct,11.803005440072221
+61751,Thannhausen,Nein,wb_pct,-0.09115172254888648
+61756,Anger,Ja,fp_pct,17.609822195099248
+61756,Anger,Ja,wb_pct,-2.859110882572537
+61757,Birkfeld,Ja,fp_pct,17.905328850469665
+61757,Birkfeld,Ja,wb_pct,-3.3352322165143136
+61758,Fladnitz an der Teichalm,Ja,fp_pct,17.357330783393394
+61758,Fladnitz an der Teichalm,Ja,wb_pct,0.04469091321661267
+61759,Gersdorf an der Feistritz,Ja,fp_pct,19.594978011065397
+61759,Gersdorf an der Feistritz,Ja,wb_pct,0.10972481712531135
+61760,Gleisdorf,Ja,fp_pct,13.849788872243522
+61760,Gleisdorf,Ja,wb_pct,-2.4121972331680865
+61761,Gutenberg-Stenzengreith,Ja,fp_pct,12.869403963320508
+61761,Gutenberg-Stenzengreith,Ja,wb_pct,-4.607939862423777
+61762,Ilztal,Ja,fp_pct,20.74192973069378
+61762,Ilztal,Ja,wb_pct,-1.531480431083395
+61763,Passail,Ja,fp_pct,16.549403337897765
+61763,Passail,Ja,wb_pct,-1.6356474022688303
+61764,Pischelsdorf am Kulm,Ja,fp_pct,21.900107337324265
+61764,Pischelsdorf am Kulm,Ja,wb_pct,-0.7035847792402166
+61765,Sankt Ruprecht an der Raab,Ja,fp_pct,19.06141219397192
+61765,Sankt Ruprecht an der Raab,Ja,wb_pct,-0.7664408813172159
+61766,Weiz,Ja,fp_pct,12.223284504226903
+61766,Weiz,Ja,wb_pct,-3.3484841070152527
+62007,Fohnsdorf,Nein,fp_pct,19.309856331754258
+62007,Fohnsdorf,Nein,wb_pct,-6.1348182280843915
+62008,Gaal,Nein,fp_pct,10.464832584303931
+62008,Gaal,Nein,wb_pct,-1.0436689869465283
+62010,Hohentauern,Nein,fp_pct,12.925056627895666
+62010,Hohentauern,Nein,wb_pct,-5.753118599888282
+62014,Kobenz,Nein,fp_pct,11.384613391256543
+62014,Kobenz,Nein,wb_pct,-6.329294717135653
+62021,Pusterwald,Nein,fp_pct,15.376123122663579
+62021,Pusterwald,Nein,wb_pct,-1.625472766254731
+62026,Sankt Georgen ob Judenburg,Nein,fp_pct,7.942288446569555
+62026,Sankt Georgen ob Judenburg,Nein,wb_pct,3.1233512714994305
+62032,Sankt Peter ob Judenburg,Nein,fp_pct,16.424192649517497
+62032,Sankt Peter ob Judenburg,Nein,wb_pct,-2.8379739204998202
+62034,Seckau,Nein,fp_pct,10.711331679073613
+62034,Seckau,Nein,wb_pct,-4.124379586966299
+62036,Unzmarkt-Frauenburg,Nein,fp_pct,17.943650469579417
+62036,Unzmarkt-Frauenburg,Nein,wb_pct,1.584114083860527
+62038,Zeltweg,Nein,fp_pct,20.549347043502245
+62038,Zeltweg,Nein,wb_pct,-4.020962006363462
+62039,Lobmingtal,Ja,fp_pct,18.404774475250072
+62039,Lobmingtal,Ja,wb_pct,-5.353736940188
+62040,Judenburg,Ja,fp_pct,19.98635836728559
+62040,Judenburg,Ja,wb_pct,-5.125192195427708
+62041,Knittelfeld,Ja,fp_pct,18.92251757636722
+62041,Knittelfeld,Ja,wb_pct,-6.788562536266845
+62042,Obdach,Ja,fp_pct,15.583181585284006
+62042,Obdach,Ja,wb_pct,-2.473472395913433
+62043,Pöls-Oberkurzheim,Ja,fp_pct,16.67772983737139
+62043,Pöls-Oberkurzheim,Ja,wb_pct,-5.900706851610096
+62044,Pölstal,Ja,fp_pct,25.956782644902724
+62044,Pölstal,Ja,wb_pct,-5.525512331273788
+62045,Sankt Marein-Feistritz,Ja,fp_pct,15.023385114372138
+62045,Sankt Marein-Feistritz,Ja,wb_pct,-6.584497905623309
+62046,Sankt Margarethen bei Knittelfeld,Ja,fp_pct,14.256804044584458
+62046,Sankt Margarethen bei Knittelfeld,Ja,wb_pct,-5.318498941690436
+62047,Spielberg,Ja,fp_pct,17.21269464498804
+62047,Spielberg,Ja,wb_pct,0.7129969224271377
+62048,Weißkirchen in Steiermark,Ja,fp_pct,17.078280576011238
+62048,Weißkirchen in Steiermark,Ja,wb_pct,-3.166082374078343
+62105,Breitenau am Hochlantsch,Nein,fp_pct,18.054667519181585
+62105,Breitenau am Hochlantsch,Nein,wb_pct,-0.1980504218313115
+62115,Krieglach,Nein,fp_pct,17.200634702732017
+62115,Krieglach,Nein,wb_pct,-1.8686876042589589
+62116,Langenwang,Nein,fp_pct,14.058532674061208
+62116,Langenwang,Nein,wb_pct,-0.8776068139872422
+62125,Pernegg an der Mur,Nein,fp_pct,16.824795234006118
+62125,Pernegg an der Mur,Nein,wb_pct,-1.5139686184462278
+62128,Sankt Lorenzen im Mürztal,Nein,fp_pct,14.560198690496197
+62128,Sankt Lorenzen im Mürztal,Nein,wb_pct,-2.6747875365252227
+62131,Spital am Semmering,Nein,fp_pct,15.798508819785416
+62131,Spital am Semmering,Nein,wb_pct,-4.47786247760223
+62132,Stanz im Mürztal,Nein,fp_pct,17.560415065213533
+62132,Stanz im Mürztal,Nein,wb_pct,-7.388536983279593
+62135,Turnau,Nein,fp_pct,14.96034887382133
+62135,Turnau,Nein,wb_pct,5.64864434409489
+62138,Aflenz,Ja,fp_pct,15.00302107468078
+62138,Aflenz,Ja,wb_pct,0.05471008766630803
+62139,Bruck an der Mur,Ja,fp_pct,15.48808800410956
+62139,Bruck an der Mur,Ja,wb_pct,-2.3053858586480303
+62140,Kapfenberg,Ja,fp_pct,15.74413084839983
+62140,Kapfenberg,Ja,wb_pct,-4.296052348691589
+62141,Kindberg,Ja,fp_pct,15.781614061923813
+62141,Kindberg,Ja,wb_pct,-5.515904928754324
+62142,Mariazell,Ja,fp_pct,13.19672543301178
+62142,Mariazell,Ja,wb_pct,-6.852236315202525
+62143,Mürzzuschlag,Ja,fp_pct,18.96816041252319
+62143,Mürzzuschlag,Ja,wb_pct,-1.19742073212457
+62144,Neuberg an der Mürz,Ja,fp_pct,21.230606385350494
+62144,Neuberg an der Mürz,Ja,wb_pct,-5.67624135764936
+62145,Sankt Barbara im Mürztal,Ja,fp_pct,21.156602267057835
+62145,Sankt Barbara im Mürztal,Ja,wb_pct,-7.874635721267374
+62146,Sankt Marein im Mürztal,Ja,fp_pct,14.890019918286706
+62146,Sankt Marein im Mürztal,Ja,wb_pct,-2.7004998658293147
+62147,Thörl,Ja,fp_pct,19.83468527495733
+62147,Thörl,Ja,wb_pct,-7.976244299692453
+62148,Tragöß-Sankt Katharein,Ja,fp_pct,16.100161690902247
+62148,Tragöß-Sankt Katharein,Ja,wb_pct,-0.7776734804229761
+62202,Bad Blumau,Nein,fp_pct,28.797961630695443
+62202,Bad Blumau,Nein,wb_pct,3.822662231848625
+62205,Buch-Sankt Magdalena,Ja,fp_pct,18.57467778620167
+62205,Buch-Sankt Magdalena,Ja,wb_pct,-1.6266703276588004
+62206,Burgau,Nein,fp_pct,18.381112984822934
+62206,Burgau,Nein,wb_pct,-4.206699698405856
+62209,Ebersdorf,Nein,fp_pct,22.419862886788955
+62209,Ebersdorf,Nein,wb_pct,-0.33964019851116234
+62211,Friedberg,Nein,fp_pct,12.774398627832076
+62211,Friedberg,Nein,wb_pct,-4.962006348905689
+62214,Greinbach,Nein,fp_pct,25.42293506040892
+62214,Greinbach,Nein,wb_pct,-3.783860957491939
+62216,Großsteinbach,Nein,fp_pct,21.714704124720086
+62216,Großsteinbach,Nein,wb_pct,-1.6398640521779697
+62219,Hartberg,Nein,fp_pct,12.924422635973288
+62219,Hartberg,Nein,wb_pct,-2.609749859222333
+62220,Hartberg Umgebung,Nein,fp_pct,15.776384169631681
+62220,Hartberg Umgebung,Nein,wb_pct,-4.089221527949434
+62226,Lafnitz,Nein,fp_pct,17.04542907729891
+62226,Lafnitz,Nein,wb_pct,-1.663902169317339
+62232,Ottendorf an der Rittschein,Nein,fp_pct,20.42329134833781
+62232,Ottendorf an der Rittschein,Nein,wb_pct,-3.4270876055600326
+62233,Pinggau,Nein,fp_pct,12.359056348523104
+62233,Pinggau,Nein,wb_pct,-5.240516604547523
+62235,Pöllauberg,Nein,fp_pct,19.30602150649839
+62235,Pöllauberg,Nein,wb_pct,-0.5359724015649476
+62242,Sankt Jakob im Walde,Nein,fp_pct,11.002919212157313
+62242,Sankt Jakob im Walde,Nein,wb_pct,-0.008314855875838134
+62244,Sankt Johann in der Haide,Nein,fp_pct,21.26873081783716
+62244,Sankt Johann in der Haide,Nein,wb_pct,-4.662210982658962
+62245,Sankt Lorenzen am Wechsel,Nein,fp_pct,17.474659662622077
+62245,Sankt Lorenzen am Wechsel,Nein,wb_pct,-6.52039733316083
+62247,Schäffern,Nein,fp_pct,15.474767734641446
+62247,Schäffern,Nein,wb_pct,-2.729765050034729
+62252,Söchau,Nein,fp_pct,22.206823975810753
+62252,Söchau,Nein,wb_pct,2.4321233000114546
+62256,Stubenberg,Nein,fp_pct,16.793795210804323
+62256,Stubenberg,Nein,wb_pct,0.34295250566929525
+62262,Wenigzell,Nein,fp_pct,14.648444710242838
+62262,Wenigzell,Nein,wb_pct,0.011641575758261524
+62264,Bad Waltersdorf,Ja,fp_pct,20.373788670025377
+62264,Bad Waltersdorf,Ja,wb_pct,0.6853554633144512
+62265,Dechantskirchen,Ja,fp_pct,11.947563787779979
+62265,Dechantskirchen,Ja,wb_pct,-5.163128510725613
+62266,Feistritztal,Ja,fp_pct,26.46878617654596
+62266,Feistritztal,Ja,wb_pct,-4.5482951730107715
+62267,Fürstenfeld,Ja,fp_pct,16.943479159970238
+62267,Fürstenfeld,Ja,wb_pct,-0.24459582089718168
+62268,Grafendorf bei Hartberg,Ja,fp_pct,14.83929613401714
+62268,Grafendorf bei Hartberg,Ja,wb_pct,-4.885059233072241
+62269,Großwilfersdorf,Ja,fp_pct,15.55884931735627
+62269,Großwilfersdorf,Ja,wb_pct,-0.5460299008686036
+62270,Hartl,Ja,fp_pct,32.40486650166394
+62270,Hartl,Ja,wb_pct,-4.446325591906515
+62271,Ilz,Ja,fp_pct,24.5855963432328
+62271,Ilz,Ja,wb_pct,-1.0577693637607553
+62272,Kaindorf,Ja,fp_pct,25.502978058078867
+62272,Kaindorf,Ja,wb_pct,-5.469466524747048
+62273,Loipersdorf bei Fürstenfeld,Ja,fp_pct,24.107452441539973
+62273,Loipersdorf bei Fürstenfeld,Ja,wb_pct,-0.8556874861916413
+62274,Neudau,Ja,fp_pct,16.56352468480118
+62274,Neudau,Ja,wb_pct,1.4029522868842577
+62275,Pöllau,Ja,fp_pct,20.120304288374978
+62275,Pöllau,Ja,wb_pct,-5.1579907919150685
+62276,Rohr bei Hartberg,Ja,fp_pct,20.030172589245737
+62276,Rohr bei Hartberg,Ja,wb_pct,-3.4050947182260387
+62277,Rohrbach an der Lafnitz,Ja,fp_pct,19.873922936327354
+62277,Rohrbach an der Lafnitz,Ja,wb_pct,-5.309000851469008
+62278,Vorau,Ja,fp_pct,20.704104589692516
+62278,Vorau,Ja,wb_pct,-3.5818324666047943
+62279,Waldbach-Mönichwald,Ja,fp_pct,28.573284823284823
+62279,Waldbach-Mönichwald,Ja,wb_pct,-1.3861161653091187
+62311,Edelsbach bei Feldbach,Nein,fp_pct,18.498347634078748
+62311,Edelsbach bei Feldbach,Nein,wb_pct,1.9006946144172474
+62314,Eichkögl,Nein,fp_pct,24.302350231746914
+62314,Eichkögl,Nein,wb_pct,0.5824767213382387
+62326,Halbenrain,Nein,fp_pct,19.96544649605874
+62326,Halbenrain,Nein,wb_pct,-3.2143283785859467
+62330,Jagerberg,Nein,fp_pct,26.538574499045485
+62330,Jagerberg,Nein,wb_pct,-10.727588409523662
+62332,Kapfenstein,Nein,fp_pct,18.718736287845548
+62332,Kapfenstein,Nein,wb_pct,-4.168174305369433
+62335,Klöch,Nein,fp_pct,16.89735968984264
+62335,Klöch,Nein,wb_pct,-3.182512582576109
+62343,Mettersdorf am Saßbach,Nein,fp_pct,20.294305002713187
+62343,Mettersdorf am Saßbach,Nein,wb_pct,-0.18869485635551086
+62347,Murfeld,Nein,fp_pct,26.33410455080884
+62347,Murfeld,Nein,wb_pct,-4.971303661943637
+62368,Tieschen,Nein,fp_pct,18.33185734989678
+62368,Tieschen,Nein,wb_pct,-2.4293257801037242
+62372,Unterlamm,Nein,fp_pct,20.001075808649503
+62372,Unterlamm,Nein,wb_pct,-1.1750474441815157
+62375,Bad Gleichenberg,Ja,fp_pct,16.353308682070445
+62375,Bad Gleichenberg,Ja,wb_pct,-7.112362056783859
+62376,Bad Radkersburg,Ja,fp_pct,16.6258546856886
+62376,Bad Radkersburg,Ja,wb_pct,-5.77459718419324
+62377,Deutsch Goritz,Ja,fp_pct,19.88305178274156
+62377,Deutsch Goritz,Ja,wb_pct,0.03911316054922054
+62378,Fehring,Ja,fp_pct,18.26185919801265
+62378,Fehring,Ja,wb_pct,-1.9948598454875395
+62379,Feldbach,Ja,fp_pct,16.39887679742723
+62379,Feldbach,Ja,wb_pct,-3.155697703497836
+62380,Gnas,Ja,fp_pct,22.767707244050236
+62380,Gnas,Ja,wb_pct,-5.81258210659189
+62381,Kirchbach-Zerlach,Ja,fp_pct,20.106153066396352
+62381,Kirchbach-Zerlach,Ja,wb_pct,-3.098097122001505
+62382,Kirchberg an der Raab,Ja,fp_pct,20.592187123962457
+62382,Kirchberg an der Raab,Ja,wb_pct,-4.76423139610209
+62383,Mureck,Ja,fp_pct,19.531103002354683
+62383,Mureck,Ja,wb_pct,-2.4218956817449566
+62384,Paldau,Ja,fp_pct,18.66771533972682
+62384,Paldau,Ja,wb_pct,-0.8855045390539544
+62385,Pirching am Traubenberg,Ja,fp_pct,17.02903678103988
+62385,Pirching am Traubenberg,Ja,wb_pct,-5.011173414129232
+62386,Riegersburg,Ja,fp_pct,16.487076179832286
+62386,Riegersburg,Ja,wb_pct,-4.246848247107309
+62387,Sankt Anna am Aigen,Ja,fp_pct,19.874551283281825
+62387,Sankt Anna am Aigen,Ja,wb_pct,1.3481280087450784
+62388,Sankt Peter am Ottersbach,Ja,fp_pct,24.411481378944114
+62388,Sankt Peter am Ottersbach,Ja,wb_pct,-4.689431910737824
+62389,Sankt Stefan im Rosental,Ja,fp_pct,20.174309327062787
+62389,Sankt Stefan im Rosental,Ja,wb_pct,-0.5861165714243981
+62390,Straden,Ja,fp_pct,21.422700253811794
+62390,Straden,Ja,wb_pct,-3.1266323569327596

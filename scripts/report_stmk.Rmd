@@ -69,7 +69,7 @@ plot(plot2)
 
 verwaltungsausgabenprokopf_t_table <- verwaltungsausgabenprokopf_gsrbetr_t %>%
   select(-c(vwausgaben, ew)) %>%
-  mutate(vwausgabenprokopf = round(vwausgabenprokopf, 1)) %>%
+  mutate(vwausgabenprokopf = round(vwausgabenprokopf, 0)) %>%
   rename("Fusionsgemeinden?" = gsrbetr) %>%
 spread(fj, vwausgabenprokopf)
 
