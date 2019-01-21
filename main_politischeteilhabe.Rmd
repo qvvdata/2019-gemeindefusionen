@@ -234,3 +234,35 @@ write_csv(wahlen_bordermanned_wb_fp, path = "interaktiv/teilhabe/wahlen_borderma
 
 ```
 
+```{r}
+#Wie haben sich die Politikerbezüge im Dreijahresdurchschnitt verändert?
+politikerbezüge_bordermanned_einzeln <- politikerbezüge_bordermanned %>%
+  filter(gkz_neu <=70000 & gkz_neu >=60000) %>%
+  left_join(gsr15 %>% select(gkz, gsrbetr), by=c("gkz_neu"="gkz")) %>%
+  left_join(gsrbetr_bev_gemorg  %>% select(gkz_neu, jahr, ew, gsrbetr), by=c("gkz_neu"="gkz_neu", "key"="jahr", "gsrbetr"="gsrbetr")) %>%
+  filter(gsrbetr== "Ja" | gsrbetr=="Nein")%>%
+  mutate(politikerbezüge_pro_kopf = value/ew) %>%
+  select(key, gkz_neu, gsrbetr, politikerbezüge_pro_kopf)%>%
+  spread(key, politikerbezüge_pro_kopf)%>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+
+write_csv(politikerbezüge_bordermanned_einzeln, path = "interaktiv/karte-verwaltung/politikerbezüge_bordermanned_einzeln.csv")
+
+print(politikerbezüge_summary <- politikerbezüge_bordermanned_einzeln %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+    filter(gkz_neu!="62274") %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))
+  
+  
+  
+test <- energiekostenprokopf %>% left_join(politikerbezüge_bordermanned_einzeln, by=c("gkz_neu"="gkz_neu"))
+```
+
+```{r}
+
+```
+

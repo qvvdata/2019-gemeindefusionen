@@ -43,13 +43,14 @@ data <- bind_rows(fj10,fj11,fj12,fj13,fj14,fj15,fj16, fj17) %>%
  # data_bordermanned <- data %>%
  #    group_by(FJ,HH, ans2, post3) %>%
  #     do((borderman(.[,c('gkz','SOLL')])))
- # 
- # saveRDS(data_bordermanned, "output/data_bordermanned.rds")
-data_bordermanned <- readRDS("output/data_bordermanned.rds") %>% filter(gkz_neu %not in% teilungen_exkl)
+
+#  saveRDS(data_bordermanned, "output/data_bordermanned_2.rds")
+data_bordermanned <- readRDS("output/data_bordermanned_2.rds") 
 
 
 data <- data_bordermanned %>%
   filter(SOLL !=0)%>%
+  filter(gkz_neu %not in% teilungen_exkl) %>%
   filter(SOLL >0)%>% # Überträge aus dem Vorjahr weg
   mutate(fj = as.numeric(FJ), 
          gkz_neu = as.numeric(gkz_neu), 
@@ -105,17 +106,17 @@ ansatz2017 <- read_excel("input/bessereheader/Ansatz2017.xlsx", trim_ws = TRUE) 
           soll = SOLL) %>%
    select(-c(FJ, gem))
 
- # ansaetze_data <- bind_rows(ansatz2017, ansatz)
- # 
- #  ansaetze_data_bordermanned <- ansaetze_data %>%
- #     group_by(fj,hh,ans3) %>%
- #     do(borderman(.[,c('gkz','soll')]))
- # 
- #  ansaetze_data <- ansaetze_data_bordermanned %>%
- #  filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
+ ansaetze_data <- bind_rows(ansatz2017, ansatz)
+
+  ansaetze_data_bordermanned <- ansaetze_data %>%
+     group_by(fj,hh,ans3) %>%
+     do(borderman(.[,c('gkz','soll')]))
+
+  ansaetze_data <- ansaetze_data_bordermanned %>%
+  filter(soll!=0) # Entfernen neu hinzugefügter Nullmeldungen für nicht existente Kostenstellen
  # 
  # saveRDS(ansaetze_data, "output/ansaetze_data.rds")
-ansaetze_data <- readRDS("output/ansaetze_data.RDS")
+#ansaetze_data <- readRDS("output/ansaetze_data.RDS")
  
 # Laden der Bevölkerungsdaten und Zuteilung der Gemeindegrößenklassen
 mylabels <- c("Bis 500","501- 1.000","1.001- 1.500","1.501- 2.000","2.001- 2.500","2.501- 3.000" ,  
@@ -268,7 +269,8 @@ ggsave("output/ignore/map_2014.pdf", device="pdf")
 #####################################
 
  
-
+test12 <- filter(ansaetze_data, gkz_neu=="62274")
+ 
  posten_data <- data_tt %>%
    mutate(gruppe1 = ifelse(posten_bez %in% personal, "Personal", 
                            ifelse(posten_bez %in% energie, "Energie", "nope")), 

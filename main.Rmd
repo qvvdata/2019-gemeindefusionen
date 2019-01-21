@@ -82,7 +82,6 @@ cat("
 library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
 library(rlang)
 library(magrittr) # pipes
-library(stringr) # string manipulation
 library(readxl) # excel
 library(jsonlite) # json
 library(forcats) # easier factor handling,
@@ -266,7 +265,10 @@ personalkostenprokopf_nfus <- personalkostenprokopf %>%
 personalkostenprokopf_summary <- personalkostenprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
-  summarise(count = n())
+  summarise(count = n()) %>%
+  spread(avg_diff_posneg, count) %>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 personalkostenprokopf_map <- bind_rows(personalkostenprokopf_fus, personalkostenprokopf_nfus) %>% select(-c(trend, pvalue, sig, posneg))
   
@@ -308,7 +310,7 @@ print(plot_1)
 add_save(add_theme(plot_1 + labs(title=NULL, caption=NULL)),'personalkostenprokopf')
 
 
-# Ansätze nicht zusammenwerfen für Dechantskirchen, also wo sind die Personalkosten warum gestiegen 
+# Ansätze nicht zusammenwerfen, also wo sind die Personalkosten warum gestiegen 
 personalkostenprokopf_mitansaetzen <- posten_data %>%
   filter(gruppe=="Personal") %>%
   filter (hh=="1") %>%
@@ -337,15 +339,24 @@ In sieben von 119 von der Gemeindestrukturreform betroffenen Gemeinden sind die 
 personalausgaben_absolut <- posten_data %>%
   filter(gruppe=="Personal") %>% # auf welchen Ansatz/Haushalt muss hier gefiltert werden? --> Gabriel fragen! Aktuell keine Filterung
   filter (hh=="1") %>%
-  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  group_by(fj, gsrbetr) %>%
   summarise(personalausgaben = sum(soll)) %>%
   #mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
-  select(fj, gkz_neu, name, personalausgaben, gsrbetr) %>%
-  #ungroup() %>%
-  spread(fj, personalausgaben) %>%
-  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
-         avg15_17 = (`2015`+`2016`+`2017`)/3, 
-         avg_diff = (avg15_17/avg12_14-1)*100)
+  select(fj, personalausgaben, gsrbetr) #%>%
+  ungroup() %>%
+  #spread(fj, personalausgaben) %>%
+  #mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+    #     avg15_17 = (`2015`+`2016`+`2017`)/3, 
+    #     avg_diff = (avg15_17/avg12_14-1)*100)
+
+personalausgaben_absolut_gsrbetr_t <- personalausgaben_absolut %>%
+  left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
+  mutate(personalausgabeew = personalausgaben/ew)%>%
+    select(fj, gsrbetr, personalausgabeew) %>%
+    spread(gsrbetr, personalausgabeew)
+ 
+  write.xlsx(personalausgaben_absolut_gsrbetr_t, "output/ignore/personalausgaben_absolut_gsrbetr_t.xlsx")
   
 # Filter auf steirische Gemeinden, die von GSR betroffen waren 
 personalausgaben_absolut_fus <- personalausgaben_absolut %>%
@@ -429,7 +440,10 @@ print(energiekostenprokopf_summary <- energiekostenprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
+
 
 ```
 
@@ -464,7 +478,9 @@ print(referateprokopf_summary <- referateprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 ```
 89/127 gestiegene Kosten für Referate pro Kopf (67 %) bei fusionierten
@@ -498,7 +514,9 @@ print(feuerwehrenprokopf_summary <- feuerwehrenprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 ```
 
 69/127 (50 %) gestiegene Kosten pro Kopf für Feuerwehren in fusionierten Gemeinden
@@ -531,7 +549,9 @@ print(gemeindeorganeprokopf_summary <- gemeindeorganeprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 # Testen warum Beträge höher als in Gabriels Dokument
 gemeindeorgane_check <- ansaetze_data %>%
@@ -578,6 +598,8 @@ ggsave("output/ignore/plot21.pdf", device="pdf")
 gemeindeorganeprokopf_line_gsrbetr_t_exp <- gemeindeorganeprokopf_line_gsrbetr_t %>%
   select(-c(ew, gemeindeorgane)) %>%
   spread(fj, gemeindeorganeprokopf)
+
+
 
 # Gemeindeorgane insgesamt 
 gemeindeorgane_absolut_gsrbetr <- ansaetze_data %>%
@@ -676,7 +698,9 @@ print(bauhofprokopf_summary <- bauhofprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 ```
 
@@ -709,7 +733,9 @@ print(fuhrparkprokopf_summary <- fuhrparkprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
   summarise(count = n()) %>%
-    spread(avg_diff_posneg, count))
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 ```
 44/70  (63 %) gestiegene Kosten pro Kopf bei Fuhrpark in fusionierten Gemeinden
 34/65  (52 %) gestiegene Kosten pro Kopf bei Fuhrpark in nicht fusionierten Gemeinden
@@ -921,12 +947,18 @@ verwaltungsausgabenprokopf <- verwaltungsausgaben %>%
   spread(fj, vwausgabenprokopf) %>%
   mutate(avg12_14 = round((((`2012`+`2013`+`2014`)/3)),1),
          avg15_17 = round((((`2015`+`2016`+`2017`)/3)),1), 
-         avg_diff = round((((avg15_17/avg12_14-1)*100)),1))
+         avg_diff = round((((avg15_17/avg12_14-1)*100)),1), 
+         avg11_12 = round((((`2012`+`2011`)/2)),1), 
+         avg16_17 = round((((`2016`+`2017`)/2)),1), 
+         avg_diff_12_17 = round((((avg16_17/avg11_12-1)*100)),1))
 
 verwaltungsausgabenprokopf_summary <- verwaltungsausgabenprokopf %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
-  summarise(count = n())
+  summarise(count = n()) %>%
+  spread(avg_diff_posneg, count) %>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 # Herausschreiben für die interaktive Karte
 #write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
@@ -1082,7 +1114,13 @@ plot29 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t, aes(fj, vwausgabenprokopf
 plot(plot29) 
  
 ggsave("output/ignore/plot29.pdf", device="pdf")
-  
+
+verwaltungsausgabenprokopf_gsrbetr_t_dw <- verwaltungsausgabenprokopf_gsrbetr_t %>%
+  select(fj, gsrbetr, vwausgabenprokopf) %>%
+  mutate(vwausgabenprokopf = round(vwausgabenprokopf, 0)) %>%
+  spread(gsrbetr, vwausgabenprokopf)
+
+write.xlsx(verwaltungsausgabenprokopf_gsrbetr_t_dw, "output/ignore/verwaltungsausgabenprokopf_gsrbetr_t_dw.xlsx", sheetName = "vw")
 
 # Personenzahl nach Gemeindegrößenklasse und gsr-betr
 gsrbetr_bev_gemgr <- verwaltungsausgaben %>%
