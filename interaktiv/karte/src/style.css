@@ -196,3 +196,43 @@ table td, table th{
 #bundesland_message img {
   width: 100px;
 }
+
+div.chart {
+    position: relative;
+}
+div.tooltip {
+    position: absolute;
+    pointer-events: none;
+    font-size: 10px;
+    /*background: rgba(255,255,255,0.8); */
+}
+
+.linechart path {
+    stroke: lightgrey;
+    stroke-width: 1px;
+    opacity: 0.5;
+    fill: none;
+}
+
+
+path.xzero, path.yzero {
+    stroke: #ccc;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.axis {
+    pointer-events: none;
+}
+
+.axis path, .axis line {
+    stroke: #ccc;
+    shape-rendering: crispEdges;
+}
+.axis .domain {
+    opacity: 0;
+}
+
+.axis text {
+//    font-size: 12px;
+}

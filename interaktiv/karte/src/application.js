@@ -81,6 +81,9 @@ queue.queue()
         smoothFactor: L.Browser.retina?0.5:1,
         style: function(feature) {
           feature.data = data.filter((x) => (x.gkz||x.gkz_neu)==feature.properties.GKZ)[0];
+          if(feature.data && !feature.properties.name && MAP.feature_name_override) {
+              feature.properties.name = feature.data[MAP.feature_name_override];
+          }
           var r = {
               color: 'white',
               weight: L.Browser.retina?0.25:0.5,
@@ -146,6 +149,8 @@ queue.queue()
     var popup_line = null;
 
     map.on('popupopen', function(e) {
+      var tooltip_elem = e.popup._container;
+      console.log(e.popup);
       if(popup_highlight) {
         map.removeLayer(popup_highlight);
         popup_highlight=null;
@@ -155,13 +160,14 @@ queue.queue()
         popup_line=null;
       }
       if(map._container.clientWidth<500) {
+        tooltip_elem = document.getElementById('info');
         document.getElementById('info').innerHTML = e.popup._content;
         document.getElementById('info').style.maxHeight = 999+'px';
         map.closePopup();
         var t = map.containerPointToLatLng([map._size.x/2, 0]);
         popup_line = L.polyline([[e.popup._latlng.lat,e.popup._latlng.lng],
           t], {color: '#f1f1f1',weight: 2, opacity: 0.7}).addTo(map);
-        document.querySelector('a.button').scrollIntoView();
+        document.querySelector('a.button').scrollIntoView()
         pymChild.scrollParentToChildPos(
           document.getElementById('info').getBoundingClientRect().top + window.pageYOffset - 125
         );
@@ -172,6 +178,12 @@ queue.queue()
       popup_highlight = L.geoJson(
         e.popup._source.feature.layer.toGeoJSON(),
         {style: {weight: 1.75, color: 'white', fillColor: 'transparent'}}).addTo(map);
+        console.log(tooltip_elem);
+
+      if(MAP.post_draw_tooltip) {
+          console.log(tooltip_elem);
+          MAP.post_draw_tooltip(tooltip_elem, e.popup._source.feature, numfmt);
+      }
     });
     map.on('popupclose', function(e) {
       if(map._container.clientWidth<500){
