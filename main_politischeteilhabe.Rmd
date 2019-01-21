@@ -107,7 +107,7 @@ wahlen_bordermanned_wb_long <- wahlen_bordermanned_wb %>%
   filter(key=="wahleinfluss")
 
 # herausschreiben für karte
-write_csv(wahlen_bordermanned_wb_long, path = "interaktiv/teilhabe/wahlen_bordermanned_wb_long.csv")
+write_csv(wahlen_bordermanned_wb_long, path = "interaktiv/karte/dist/wahlen_bordermanned_wb_long.csv")
 
 
 # karte mit den Wertverlusten
@@ -228,7 +228,7 @@ wahlen_bordermanned_wb_fp <- wahlen_bordermanned %>%
   ungroup() %>%
   select(gkz, name, gsrbetr, key, value) 
 
-write_csv(wahlen_bordermanned_wb_fp, path = "interaktiv/teilhabe/wahlen_bordermanned_wb_fp.csv")
+write_csv(wahlen_bordermanned_wb_fp, path = "interaktiv/karte/dist/wahlen_bordermanned_wb_fp.csv")
 
 
 

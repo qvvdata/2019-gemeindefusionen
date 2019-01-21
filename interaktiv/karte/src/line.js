@@ -9,7 +9,7 @@ export function redraw(data, container, settings, first) {
   settings.xlabel = settings.xlabel || '';
   settings.ylabel = settings.ylabel || '';
   settings.yline = settings.yline || undefined;
-  var margin = {top: 0, right: 20, bottom: 24, left: 30};
+  var margin = {top: 2, right: 20, bottom: 24, left: 30};
 
   var width = container.node().clientWidth - margin.left - margin.right;
   var height = 125 - margin.top - margin.bottom;
@@ -132,7 +132,7 @@ export function redraw(data, container, settings, first) {
       .attr("class", (d) => `dot ${d.title}`)
       .transition()
       .duration(time)
-      .attr('opacity', 0)
+      .attr('opacity', 1)
       .attr("r", (d) => 1.5)
       .attr("cx", xMap)
       .attr("cy", yMap);
@@ -167,6 +167,16 @@ export function redraw(data, container, settings, first) {
         .attr('class', 'yline')
         .transition()
         .attr('d', d3.line().x((x) => xScale(x)).y((x,i) => yScale.range()[i]));
+
+    var ylinelbl = svg.selectAll(".ylinelbl")
+        .data(settings.ylinelbl!==undefined ? [settings.ylinelbl] : []);
+    ylinelbl.exit().remove();
+    ylinelbl.enter().append('text')
+        .merge(ylinelbl)
+        .attr('class', 'ylinelbl')
+        .attr('x', (d,i) => xScale(settings.yline)+2)
+        .attr('y', (d,i) => yScale(0)-2)
+        .text(d => d);
 
   var check_overlap = function(e1,e2) {
     try {
@@ -210,7 +220,7 @@ export function redraw(data, container, settings, first) {
   set_highlight(null);
 
 
-  var ttu = tooltip_update.bind(this,margin,svg,container,tooltip,all_datapoints,xScale,xValue,yScale,yValue,(x) => 5,width,height,
+  var ttu = tooltip_update.bind(this,margin,svg,container,tooltip,all_datapoints,xScale,xValue,yScale,yValue,(x) => 2,width,height,
     set_highlight);
   svg.on('mousemove', ttu);
   svg.on('click', ttu);

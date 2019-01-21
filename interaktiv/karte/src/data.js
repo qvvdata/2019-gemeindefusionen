@@ -43,12 +43,12 @@ maps['verwaltungsausgabenprokopf'] = {
   tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
       return `${
           d.gsrbetr=='Ja'?`
-            In den drei Jahren nach der Reform lagen die durchschnittlichen Verwaltungsausgaben in ${d.name} pro Kopf ${changepctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'} den Ausgaben davor.
+            In den drei Jahren nach der Reform lagen die durchschnittlichen Verwaltungsausgaben in <strong>${d.name}</strong> pro Kopf <strong>${changepctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'}</strong> den Ausgaben davor.
             `:`
-            ${d.name} war nicht von der Gemeindestrukturreform 2015 betroffen.`
+            <strong>${d.name}</strong> war nicht von der Gemeindestrukturreform 2015 betroffen.`
       }
 
-      <div class="chart" style="height: 150px"></div>`;
+      <div class="chart" style="height: 125px"></div>`;
   },
   bundesland_message: ``,
   post_draw_tooltip: function(elem, source_feature, fmt) {
@@ -67,7 +67,8 @@ maps['verwaltungsausgabenprokopf'] = {
             d3.select(elem).selectAppend('div.chart'), {
             xfmt: (x) => x,
             ylabel: '',
-            yline: 2015
+            yline: data.gsrbetr=='Ja'?2014.5:undefined,
+            ylinelbl: data.gsrbetr=='Ja'?'Fusion':undefined
         }, true);
       }, 100)
   }
@@ -85,7 +86,7 @@ maps['wahlbeteiligung'] = {
   feature_name_override: 'name',
   colorschemes: ['#516d87', '#f1f1f1','#a54657'].reverse(),
   colorscheme_null: 'lightyellow',
-  categories: [-50,0,5],
+  categories: [-50,0,50],
   value: (d) => [true, d.diff_pct],
   tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
       return `<h4>${d.name}</h4>Änderung des Stimmeineinflusses: ${changepctfmt(d.diff_pct)}%<br />${d.gsrbetr=='Ja'?' ':'keine '}Fusionsgemeinde<br />`;

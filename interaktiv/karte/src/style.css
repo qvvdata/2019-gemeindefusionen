@@ -221,6 +221,19 @@ path.xzero, path.yzero {
     shape-rendering: crispEdges;
 }
 
+path.yline {
+    stroke-width: 2;
+    shape-rendering: crispEdges;
+    opacity: 1;
+}
+text.ylinelbl {
+    font-size: 10px;
+}
+circle.dot {
+    fill: grey;
+    stroke: grey;
+}
+
 .axis {
     pointer-events: none;
 }

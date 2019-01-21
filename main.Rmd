@@ -343,21 +343,13 @@ personalausgaben_absolut <- posten_data %>%
   group_by(fj, gsrbetr) %>%
   summarise(personalausgaben = sum(soll)) %>%
   #mutate(personalausgabenprokopf = round(personalausgaben/ew,2)) %>%
-  select(fj, personalausgaben, gsrbetr) #%>%
-  ungroup() %>%
+  select(fj, personalausgaben, gsrbetr) %>%
+  ungroup()
   #spread(fj, personalausgaben) %>%
   #mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
     #     avg15_17 = (`2015`+`2016`+`2017`)/3, 
     #     avg_diff = (avg15_17/avg12_14-1)*100)
 
-personalausgaben_absolut_gsrbetr_t <- personalausgaben_absolut %>%
-  left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
-  mutate(personalausgabeew = personalausgaben/ew)%>%
-    select(fj, gsrbetr, personalausgabeew) %>%
-    spread(gsrbetr, personalausgabeew)
- 
-  write.xlsx(personalausgaben_absolut_gsrbetr_t, "output/ignore/personalausgaben_absolut_gsrbetr_t.xlsx")
-  
 # Filter auf steirische Gemeinden, die von GSR betroffen waren 
 personalausgaben_absolut_fus <- personalausgaben_absolut %>%
   filter(gsrbetr=="Ja")
@@ -961,8 +953,8 @@ verwaltungsausgabenprokopf_summary <- verwaltungsausgabenprokopf %>%
          steigen_pct = round((steigen/gesamt*100),0))
 
 # Herausschreiben für die interaktive Karte
-#write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
-#write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
+#write_sf(gde_18_2_splitter, "interaktiv/karte/dist/gemeindegrenzen_2018_splitter.geojson", quiet = TRUE)
+write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte/dist/verwaltungsausgabenprokopf.csv")
 
 
 vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%
@@ -1146,6 +1138,18 @@ p <- ggplot(verwaltungsausgabenprokopf_gemgrklas, aes(x = fj, y = vwausgabenprok
   theme_minimal()
 plot(p)
 
+```
+
+```{r}
+
+personalausgaben_absolut_gsrbetr_t <- personalausgaben_absolut %>%
+  left_join(gsrbetr_bev_t, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
+  mutate(personalausgabeew = personalausgaben/ew)%>%
+    select(fj, gsrbetr, personalausgabeew) %>%
+    spread(gsrbetr, personalausgabeew)
+ 
+  write.xlsx(personalausgaben_absolut_gsrbetr_t, "output/ignore/personalausgaben_absolut_gsrbetr_t.xlsx")
+  
 ```
 
 ```{r message=FALSE, warning=FALSE}

@@ -82,4 +82,3 @@ export function tooltip_update(margin,svg,container,tooltip,data,
 
     return tooltip_render(margin,svg,container,tooltip,a,xScale,xValue,yScale,yValue,rscale,width,height,callback);
 };
-
