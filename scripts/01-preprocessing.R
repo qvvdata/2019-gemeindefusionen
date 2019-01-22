@@ -384,3 +384,4 @@ politikerbezüge_bordermanned <- readRDS("output/politikerbezüge.rds") %>% ungr
 
 #rm(fj10, fj11, fj12, fj13, fj14, fj15, fj16, fj17, ansaetze_data_bordermanned, ansaetze_data_ttt, ansaetze_data_tt, data_tt, data_bordermanned, gemeindeorgane_check, nrw2017)
 
+
