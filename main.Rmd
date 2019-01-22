@@ -962,7 +962,7 @@ verwaltungsausgabenprokopf_summary <- verwaltungsausgabenprokopf %>%
 
 # Herausschreiben für die interaktive Karte
 #write_sf(gde_18_2_splitter, "interaktiv/karte-verwaltung/gde_18_2_splitter.geojson", quiet = TRUE)
-#write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
+write_csv(verwaltungsausgabenprokopf, path = "interaktiv/karte-verwaltung/verwaltungsausgabenprokopf.csv")
 
 
 vwkostenprokopf_fus <- verwaltungsausgabenprokopf %>%

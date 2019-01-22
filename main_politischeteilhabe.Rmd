@@ -115,10 +115,6 @@ write_csv(wahlen_bordermanned_wb_long, path = "interaktiv/teilhabe/wahlen_border
 map_data_wählerwert <- wahlen_bordermanned_wb_long %>% 
   left_join(gde_18_2_splitter, by = c("gkz" = "GKZ")) %>%
   filter(gsrbetr=="Ja")
-  
-
-
-
 
 #vew pro Kopf Erhöhung zeichnen zeichnen
 stimmenwertverlustmap <- ggplot() +
@@ -247,6 +243,14 @@ politikerbezüge_bordermanned_einzeln <- politikerbezüge_bordermanned %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
+
+print(politikerbezüge_bordermanned_einzeln_summary <- politikerbezüge_bordermanned_einzeln %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
 
 write_csv(politikerbezüge_bordermanned_einzeln, path = "interaktiv/karte-verwaltung/politikerbezüge_bordermanned_einzeln.csv")
 
