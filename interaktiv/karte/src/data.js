@@ -10,6 +10,7 @@ maps['parteienfoerderungen_gemeinden_2017'] = {
   Farben: <span class="scalevalue">unterdurchschnittlich</span>, <span class="scalevalue">durchschnittlich</span>, <span class="scalevalue">überdurchschnittlich</span>`,
   data: 'parteienfoerderungen_gemeinden_2017.csv',
   source: 'Statistik Austria',
+
   scale: 'category-multi',
   search: true,
   colorschemes: [['#f1f1f1', '#62a87c', '#9B9B9B','#af3b6e']],
@@ -43,7 +44,7 @@ maps['verwaltungsausgabenprokopf'] = {
   tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
       return `${
           d.gsrbetr=='Ja'?`
-            In den drei Jahren nach der Reform lagen die durchschnittlichen Verwaltungsausgaben in <strong>${d.name}</strong> pro Kopf <strong>${changepctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'}</strong> den Ausgaben davor.
+            In den drei Jahren nach der Reform lagen die durchschnittlichen Verwaltungsausgaben in <strong>${d.name}</strong> pro Kopf <strong>${pctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'}</strong> den Ausgaben davor.
             `:`
             <strong>${d.name}</strong> war nicht von der Gemeindestrukturreform 2015 betroffen.`
       }
@@ -74,6 +75,51 @@ maps['verwaltungsausgabenprokopf'] = {
   }
 };
 
+maps['politikerbezuege'] = {
+  title: 'Politikerbezüge stiegen in Nichtfusionsgemeinden, sanken in Fusionsgemeinden',
+  description: `Vergleich des Drei-Jahres-Durchschnitts für Politikerbezüge pro Kopf vor und nach der Reform.`,
+  data: 'politikerbezüge_bordermanned_einzeln.csv',
+  topojson: 'gemeindegrenzen_2018_splitter_topo.json',
+  source: '',
+  scale: 'linear_or_null',
+  search: true,
+  feature_name_override: 'name',
+  colorschemes: ['#516d87', '#f1f1f1','#a54657'],
+  colorscheme_null: 'lightyellow',
+  categories: [-25,0,25],
+  value: (d) => [true, d.avg_diff],
+  tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
+      return `
+            In den drei Jahren nach der Reform lagen die durchschnittlichen Ausgaben für Politikerbezüge in <strong>${d.name}</strong> pro Kopf <strong>${pctfmt(Math.abs(d.avg_diff))} % ${d.avg_diff<0?'unter':'über'}</strong> den Ausgaben davor.
+            ${d.gsrbetr=='Ja'?``:`<br />
+            <strong>${d.name}</strong> war nicht von der Gemeindestrukturreform 2015 betroffen.`
+      }
+
+      <div class="chart" style="height: 125px"></div>`;
+  },
+  bundesland_message: ``,
+  post_draw_tooltip: function(elem, source_feature, fmt) {
+      setTimeout(() => {
+          var data = source_feature.data;
+          var jahre = Object.keys(data).filter(x => !isNaN(+x)).sort().map(x => +x);
+          var line = jahre.map((j) => {return {'xvalue': j, 'yvalue': data[j], 'title': '',
+            active: true,
+            label: ``,
+            text: `${j}: ${fmt(data[j])} €`,
+            radius: 1 }});
+
+          redraw([
+            line
+          ],
+            d3.select(elem).selectAppend('div.chart'), {
+            xfmt: (x) => x,
+            ylabel: '',
+            yline: data.gsrbetr=='Ja'?2014.5:undefined,
+            ylinelbl: data.gsrbetr=='Ja'?'Fusion':undefined
+        }, true);
+      }, 100)
+  }
+};
 
 maps['wahlbeteiligung'] = {
   title: 'Wie viel Wert Ihre Stimme bei Landtagswahlen verloren hat',

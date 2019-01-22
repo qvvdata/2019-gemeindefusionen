@@ -248,7 +248,7 @@ politikerbezüge_bordermanned_einzeln <- politikerbezüge_bordermanned %>%
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
 
-write_csv(politikerbezüge_bordermanned_einzeln, path = "interaktiv/karte-verwaltung/politikerbezüge_bordermanned_einzeln.csv")
+write_csv(politikerbezüge_bordermanned_einzeln %>% left_join(posten_data %>% select(gkz_neu, name) %>% distinct()) %>% select(-`2010`,-`2011`), path = "interaktiv/karte/dist/politikerbezüge_bordermanned_einzeln.csv")
 
 print(politikerbezüge_summary <- politikerbezüge_bordermanned_einzeln %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%

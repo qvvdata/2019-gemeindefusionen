@@ -23,7 +23,7 @@ export function redraw(data, container, settings, first) {
   var xValue = (d) => { return d.xvalue;}, // data -> value
       xScale = d3.scaleLinear().range([0, width]), // value -> display
       xMap = (d) => { return xScale(xValue(d));}, // data -> display
-      xAxis = d3.axisBottom().scale(xScale).ticks(8);
+      xAxis = d3.axisBottom().scale(xScale);
 
   if(settings.xfmt) {
     xAxis.tickFormat(settings.xfmt);
@@ -62,6 +62,9 @@ export function redraw(data, container, settings, first) {
 
   // don't want dots overlapping axis, so add in buffer to data domain
   xScale.domain([d3.min(all_datapoints, xValue), d3.max(all_datapoints, xValue)]);
+  var numxvalues = d3.map(all_datapoints, xValue).keys().length;
+  console.log('nx', numxvalues);
+  xAxis.ticks(numxvalues>7?6:numxvalues); // ensure no weird float ticks
 
   var all_yvalues = all_datapoints.map(yValue);
   all_yvalues.sort((a,b) => a-b);
