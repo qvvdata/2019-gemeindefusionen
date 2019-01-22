@@ -42,6 +42,7 @@
     "d3-scale": "^1.0.7",
     "fuse.js": "^3.2.0",
     "leaflet": "=1.2.0",
+    "leaflet-gesture-handling": "git+https://github.com/elmarquis/Leaflet.GestureHandling.git",
     "leaflet-responsive-popup": "^0.2.0",
     "leaflet-sleep": "^0.5.1",
     "react": "^0.14.2",

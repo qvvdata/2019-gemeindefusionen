@@ -71,7 +71,7 @@ maps['verwaltungsausgabenprokopf'] = {
             yline: data.gsrbetr=='Ja'?2014.5:undefined,
             ylinelbl: data.gsrbetr=='Ja'?'Fusion':undefined
         }, true);
-      }, 100)
+    }, 100);
   }
 };
 
@@ -122,7 +122,7 @@ maps['politikerbezuege'] = {
 };
 
 maps['wahlbeteiligung'] = {
-  title: 'Wie viel Wert Ihre Stimme bei Landtagswahlen verloren hat',
+  title: 'Wie viel Wert Ihre Stimme bei Gemeinderatswahlen verloren hat',
   description: `Vergleich des potentiellen Einflusses einer Wählerstimme auf die Zusammensetzung des Gemeinderates vor und nach der Gemeindestrukturreform.`,
   data: 'wahlen_bordermanned_wb_long.csv',
   topojson: 'gemeindegrenzen_2018_splitter_topo.json',
@@ -135,7 +135,11 @@ maps['wahlbeteiligung'] = {
   categories: [-50,0,50],
   value: (d) => [true, d.diff_pct],
   tooltip: function(d,p,pctfmt,numfmt,changepctfmt,changefmt) {
-      return `<h4>${d.name}</h4>Änderung des Stimmeineinflusses: ${changepctfmt(d.diff_pct)}%<br />${d.gsrbetr=='Ja'?' ':'keine '}Fusionsgemeinde<br />`;
+      return `<strong>${d.name}</strong> war ${d.gsrbetr=='Ja'?'':'nicht '}von der Gemeindestrukturreform betroffen<br />
+      Änderung des Stimmeineinflusses: ${changepctfmt(d.diff_pct)}%<br />
+      Gemeinderäte 2010: ${numfmt(d.gemraete_2010)}
+      <br />
+      Gemeinderäte 2015: ${numfmt(d.gemraete_2015)}`;
       //`<div class="chart" style="height: 150px"></div>`;
   },
   bundesland_message: ``,

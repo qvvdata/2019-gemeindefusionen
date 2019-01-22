@@ -107,7 +107,8 @@ wahlen_bordermanned_wb_long <- wahlen_bordermanned_wb %>%
   filter(key=="wahleinfluss")
 
 # herausschreiben für karte
-write_csv(wahlen_bordermanned_wb_long, path = "interaktiv/karte/dist/wahlen_bordermanned_wb_long.csv")
+write_csv(wahlen_bordermanned_wb_long %>% left_join(gemraete_2010_2015 %>% mutate(jahr=paste0("gemraete_",jahr)) %>% spread(jahr, gemraete) %>% rename(gkz=gkz_neu)),
+          path = "interaktiv/karte/dist/wahlen_bordermanned_wb_long.csv")
 
 
 # karte mit den Wertverlusten

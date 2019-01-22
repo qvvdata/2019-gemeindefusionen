@@ -3,6 +3,7 @@ require('./qvv.css');
 require('./leaflet.fusesearch.09e7508.css');
 require('./style.css');
 require('leaflet-responsive-popup/leaflet.responsive.popup.css')
+require('leaflet-gesture-handling/dist/leaflet-gesture-handling.css')
 
 
 
@@ -10,7 +11,6 @@ import {getEmbed} from './pymembed';
 window.getEmbed = getEmbed;
 
 import L from 'leaflet';
-import LS from 'leaflet-sleep';
 import URI from 'urijs';
 import * as request from 'd3-request/index';
 import * as format from 'd3-format/index';
@@ -20,6 +20,8 @@ import * as topojson  from 'topojson/index';
 import './leaflet.fusesearch.09e7508';
 import './leaflet.pattern.d543c9f';
 import 'leaflet-responsive-popup';
+import { GestureHandling } from "leaflet-gesture-handling";
+
 
 import {maps} from './data';
 
@@ -39,13 +41,18 @@ var pctfmt = format.format(',.1f');
 var changefmt = (d) => (d>0?'+':'')+numfmt(d);
 var changepctfmt = (d) => (d>0?'+':'')+pctfmt(d);
 
+L.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 var map = L.map('graph',
   {
-    wakeMessage: 'Karte mit Klick aktivieren',
-    wakeMessageTouch: 'Karte mit Berührung aktivieren',
-    sleepOpacity: .95,
-    hoverToWake: false,
-    zoomSnap: 0.25
+    zoomSnap: 0.25,
+    gestureHandling: true,
+    gestureHandlingOptions: {
+        text: {
+            touch: "Verwenden Sie zwei Finger, um die Karte zu zoomen.",
+            scroll: "Verwenden Sie Ctrl + Scrollen, um die Karte zu zoomen.",
+            scrollMac: "Verwenden Sie \u2318 + Scrollen, um die Karte zu zoomen."
+        },
+    }
   });
 
 map.createPane('popup2',map._container);
