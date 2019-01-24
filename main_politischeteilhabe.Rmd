@@ -71,11 +71,12 @@ bev_stmk2008 <- read_excel("input/bessereheader/bev_stmk_2008.xlsx") %>% # Diese
   filter(partei=="gültig" | partei =="ungültig" | partei=="Wahlberechtigte")%>%
   filter(wahl=="ltw" & jahr =="2015" | jahr=="2010") %>%
   spread(partei, count) %>%
-  mutate(beteiligte = gültig+ungültig)%>%
+  mutate(beteiligte = gültig+ungültig) %>%
   group_by(jahr, wahl, gsrbetr) %>%
   select(jahr, wahl, gkz, name, gsrbetr, gültig, ungültig, Wahlberechtigte, beteiligte) %>%
    left_join(gemraete_2010_2015, by=c("jahr"="jahr", "gkz"="gkz_neu")) %>%
-   filter(gkz !=60101) %>%# Graz rausnehmen, weil Staturstadt
+   filter(gkz !=60101) %>%# Graz rausnehmen, weil Staturstadt 
+   drop_na() %>% # keine gemraete für 2010 bei 61055. Sankt Georgen an der St…, 61059. Wildon, 62264. Bad Waltersdorf, 62265. Dechantskirchen, 62274. Neudau,  62277. Rohrbach an der Lafnitz
   mutate(wahleinfluss= gemraete/Wahlberechtigte)
  
  test <- wahlen_bordermanned_wb %>% 
@@ -245,7 +246,6 @@ politikerbezüge_bordermanned_einzeln <- politikerbezüge_bordermanned %>%
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
 
-<<<<<<< HEAD
 print(politikerbezüge_bordermanned_einzeln_summary <- politikerbezüge_bordermanned_einzeln %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
   group_by(gsrbetr, avg_diff_posneg) %>%
@@ -255,9 +255,7 @@ print(politikerbezüge_bordermanned_einzeln_summary <- politikerbezüge_borderma
          steigen_pct = round((steigen/gesamt*100),0))
 
 write_csv(politikerbezüge_bordermanned_einzeln, path = "interaktiv/karte-verwaltung/politikerbezüge_bordermanned_einzeln.csv")
-=======
 write_csv(politikerbezüge_bordermanned_einzeln %>% left_join(posten_data %>% select(gkz_neu, name) %>% distinct()) %>% select(-`2010`,-`2011`), path = "interaktiv/karte/dist/politikerbezüge_bordermanned_einzeln.csv")
->>>>>>> c36477850c926d3400edc4f9ae43275305ccf8b1
 
 print(politikerbezüge_summary <- politikerbezüge_bordermanned_einzeln %>%
   mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%

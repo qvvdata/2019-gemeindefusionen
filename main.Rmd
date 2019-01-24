@@ -1114,6 +1114,11 @@ verwaltungsausgabenprokopf_gsrbetr_t_dw <- verwaltungsausgabenprokopf_gsrbetr_t 
   mutate(vwausgabenprokopf = round(vwausgabenprokopf, 0)) %>%
   spread(gsrbetr, vwausgabenprokopf)
 
+verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded <- verwaltungsausgabenprokopf_gsrbetr_t %>%
+  select(fj, gsrbetr, vwausgabenprokopf) %>%
+  mutate(vwausgabenprokopf = vwausgabenprokopf) %>%
+  spread(gsrbetr, vwausgabenprokopf)
+
 write.xlsx(verwaltungsausgabenprokopf_gsrbetr_t_dw, "output/ignore/verwaltungsausgabenprokopf_gsrbetr_t_dw.xlsx", sheetName = "vw")
 
 # Personenzahl nach Gemeindegrößenklasse und gsr-betr
@@ -1220,6 +1225,14 @@ vw_pers_erhöhung <- verwaltungsausgabenprokopf %>%
          diff_pers = `avg_diff.y`) %>%
   mutate(erh_index = (diff_vw+diff_pers)/2)
   
+
+```
+
+
+```{r}
+# Check: Verwaltungsausgaben pro Kopf
+
+verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded %>% left_join(verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded %>% mutate(fjl=fj+1), by=c('fj'='fjl')) %>% mutate(steiegerungja=round((Ja.x/Ja.y-1)*100,1), steigerungnein=round((Nein.x/Nein.y-1)*100,1)) %>% mutate(Ja.x=round(Ja.x,0), Nein.x=round(Nein.x,0)) %>% select(-Ja.y,-Nein.y)
 
 ```
 
