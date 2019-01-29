@@ -1,15 +1,19 @@
 ---
 title: "Auswertungen für Fragebogen LHS"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
-## Aussage 1:
+#### Aussage 1:
 Die Verwaltungsausgaben von fusionierten Gemeinden sind pro Kopf in den ersten drei Jahren nach der Zusammenlegung deutlich gestiegen.
-### Frage:
+
+#### Frage:
 Gilt diese Aussage noch immer, wenn man die Einwohnerzahl im Jahr 2010 fixiert? Welche Veränderungen ergeben sich durch die neuen Annahmen.
 
-```{r}
+```{r echo=F, warning=F}
 
+library(knitr)
 library(kableExtra)
 
 verwaltungsausgaben_einwohner2010 <- verwaltungsausgaben %>%
@@ -22,9 +26,9 @@ verwaltungsausgaben_einwohner2010 <- verwaltungsausgaben %>%
             by='gkz_neu') %>%
   select(gkz_neu, fj, ew, ew2010, everything())
 
-verwaltungsausgaben_einwohner2010_progemeinde <- verwaltungsausgabenprokopf_einwohner2010 %>%
+verwaltungsausgaben_einwohner2010_progemeinde <- verwaltungsausgaben_einwohner2010 %>%
   group_by(fj, gsrbetr, gkz_neu) %>% 
-  summarise(vwausgaben=sum(vwausgaben), ew2010=first(ew2010))
+  summarise(vwausgaben=sum(soll), ew2010=first(ew2010))
 
 verwaltungsausgaben_einwohner2010_gesamt <- verwaltungsausgaben_einwohner2010_progemeinde %>%
   group_by(fj,gsrbetr) %>%
@@ -56,12 +60,15 @@ plot(plot_einwohner2010_ohnegraz)
 
 Antwort: eine deutliche Steigerung der Verwaltungsausgaben pro Kopf ist auch zu sehen, wenn die Einwohnerzahlen auf Stand 2010 fixiert werden.
 
-## Aussage 2:
+---
+
+#### Aussage 2:
 Im Detail sprangen die Verwaltungsausgaben pro Kopf vom Jahr 2014 auf 2015 von 537 Euro auf 603. Das sind um 12 Prozent mehr.
-### Frage:
+
+#### Frage:
 Welche Verwaltungsausgaben der fusionierten Gemeinden ergeben sich pro Kopf für die einzelnen Jahre, wenn man die Einwohnerzahl im Jahr 2010 fixiert?
 
-```{r}
+```{r echo=F, warning=F}
 verwaltungsausgaben_einwohner2010_gesamt %>%
   ungroup() %>%
   spread(fj, vwausgabenprokopf) %>%
@@ -80,18 +87,22 @@ verwaltungsausgaben_einwohner2010_gesamt %>%
   ) %>%
   kable(caption="Verwaltungsausgaben/Kopf Einwohner2010",
         digits=1,
-        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
-  kable_styling()
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = "."))
 ```
 
-## Aussage 3:
+---
+
+#### Aussage 3:
 Im gleichen Jahr (2015) sind die Kosten bei nicht-fusionierten Gemeinden um 1,6 Prozent gefallen: auf 556 Euro.
-## Aussage 4:
+
+#### Aussage 4:
 Auch vom Jahr 2016 auf 2017 sind die Verwaltungsausgaben pro Kopf in fusionierten Gemeinden stärker gestiegen (+1,5 %) als in nicht fusionierten (+0,8 %).
-### Frage:
+
+#### Frage:
 Wie stellen sich diese Zahlen dar, wenn man die „nicht-fusionierten Gemeinden“ ohne Graz rechnet und wie, wenn man zusätzlich noch die Zahlen im Jahr 2010 „fixiert“?
 
-```{r}
+```{r echo=F, warning=F}
 verwaltungsausgaben_einwohner2010_gesamt_ohnegraz %>%
   ungroup() %>%
   spread(fj, vwausgabenprokopf) %>%
@@ -110,23 +121,29 @@ verwaltungsausgaben_einwohner2010_gesamt_ohnegraz %>%
   ) %>%
   kable(caption="Verwaltungsausgaben/Kopf Einwohner2010 ohne Graz",
         digits=1,
-        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
-  kable_styling()
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = "."))
 ```
 
 Hier ändert sich eine Aussage leicht: bei Nichtbeachtung von Graz liegt die Steigerung der Verwaltungskosten 2017 bei fusionierten und nichtfusionierten auf dem gleichen Niveau (+1,7% vs +1,9%).
 
-## Diagramm: „Verwaltungsausgaben in fusionierten Gemeinden über dem Niveau der Reform“
-### Frage:
+---
+
+#### Diagramm: „Verwaltungsausgaben in fusionierten Gemeinden über dem Niveau der Reform“
+
+#### Frage:
 Wie würde sich das Diagramm ändern, wenn man die Zahlen für Graz aus der Berechnung herausnimmt und die Einwohnerzahlen auf dem Niveau des Jahres 2010 fixiert?
 
 _Siehe Antwort auf Frage 1_
- 
-## Diagramm: „Bei welchen Kostenstellen die Ausgaben gestiegen sind“
-### Frage:
+
+---
+
+#### Diagramm: „Bei welchen Kostenstellen die Ausgaben gestiegen sind“
+
+#### Frage:
 Wie würden sich die Zahlen in diesem Diagramm ändern, wenn man die Zahlen für Graz aus der Berechnung herausnimmt und die Einwohnerzahlen auf dem Niveau des Jahres 2010 fixiert?
 
-```{r}
+```{r echo=F, warning=F}
 posten_data_ew2010 <- posten_data %>%
   left_join(posten_data %>%
               filter(fj==2010) %>%
@@ -203,14 +220,17 @@ bind_rows(ansaetze_gemeinden_gruppen_ew2010, posten_gemeinden_gruppen_ew2010) %>
   select(-sparen,-steigen) %>%
   spread(gsrbetr, pct)
 ```
- 
-## Diagramm: Gestiegene Verwaltungsausgaben in fast allen fusionierten Gemeinden
+
+---
+
+#### Diagramm: Gestiegene Verwaltungsausgaben in fast allen fusionierten Gemeinden
 Vergleich des Drei-Jahres-Durchschnitts für Verwaltungsausgaben pro Kopf vor und nach der Reform.
-### Frage:
+
+#### Frage:
 Wie würde sich dieses Diagramm ändern, wenn man die Einwohnerzahlen auf dem Niveau von 2010 fixiert?
  
  
-```{r}
+```{r echo=F, warning=F}
 verwaltungsausgabenprokopf_2010_ohnegraz <- verwaltungsausgaben_einwohner2010_progemeinde %>%
   mutate(vwausgabenprokopf=vwausgaben/ew2010) %>%
   filter(gkz_neu!=60101) %>%
@@ -239,6 +259,177 @@ plot_vwausgabenohnegrazmap <- ggplot() +
   labs(x = NULL, y = NULL, title = "Verwaltungskosten pro Kopf (EW 2010): Erhöhung oder Ersparnis?", caption = "Quelle: Statistik Austria, BEV.") +
   theme_map() +
   theme(panel.grid.major = element_line(colour = "white"))
-
 plot(plot_vwausgabenohnegrazmap)
+```
+
+
+
+
+
+
+#### Posten 729, Ansatz 9005
+Ausgehend von der Textdatei „Verwaltungsausgaben_ansätze_posten.txt“ ist uns aufgefallen, dass unter die Verwaltungskosten auch der Ansatz 900 und die Post 729 verwendet wurde. Dies ist falsch, da diese Buchung im Leitfaden zur GSR als Möglichkeit der Übernahme der schließlichen Reste aus den Altgemeinden in die neue Gemeinde von uns angegeben wurde:
+
+Die schließlichen Reste sind bei der neuen Gemeinde einzeln im „Soll“ einzubuchen.
+In der neuen Gemeinde ist der Ansatz „9005“ zu verwenden.
+
+Schließliche Reste entstehen aus Differenzen aus Soll und Ist! Im Wesentlichen stellen diese bei den Ausgaben die Verbindlichkeiten der Altgemeinden dar, die von den neuen Gemeinden zu übernehmen waren. 
+
+
+```{r echo=F, warning=F}
+
+vwohne729_90 <- verwaltungsausgaben %>%
+  filter(post3!='729', ans2!='90') 
+
+vwmit729_90 <- verwaltungsausgaben %>% group_by(gsrbetr, fj) %>% summarise(soll=sum(soll))
+vwmit729_90 %>% spread(fj, soll) %>%
+  kable(caption="Verwaltungsausgaben absolut mit 729/90*",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
+
+
+vwohne729_90_ <- vwohne729_90 %>% group_by(gsrbetr, fj) %>% summarise(soll=sum(soll))
+vwohne729_90_ %>% spread(fj, soll) %>%
+  kable(caption="Verwaltungsausgaben absolut ohne 729/90*",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
+
+
+ggplot(vwmit729_90, aes(fj, soll, color = gsrbetr)) +
+  geom_line() +
+  ggtitle("Verwaltungsausgaben absolut mit 729/90*") +
+  theme_addendum()
+
+
+ggplot(vwohne729_90_, aes(fj, soll, color = gsrbetr)) +
+  geom_line() +
+  ggtitle("Verwaltungsausgaben absolut ohne 729/90*") +
+  theme_addendum()
+```
+
+
+```{r echo=F, warning=F}
+
+vwohne729_90_einwohnerrichtig_progemeinde <- vwohne729_90 %>%
+  group_by(fj, gsrbetr, gkz_neu) %>%
+  summarise(vwausgaben=sum(soll), ew=first(ew))
+
+
+vwohne729_90_einwohner2010 <- vwohne729_90 %>%
+  left_join(vwohne729_90 %>%
+              filter(fj==2010) %>%
+              select(gkz_neu, ew) %>%
+              rename(ew2010=ew) %>%
+              group_by(gkz_neu) %>%
+              filter(row_number()==1),
+            by='gkz_neu') %>%
+  select(gkz_neu, fj, ew, ew2010, everything())
+
+vwohne729_90_einwohner2010_progemeinde <- vwohne729_90_einwohner2010 %>%
+  group_by(fj, gsrbetr, gkz_neu) %>% 
+  summarise(vwausgaben=sum(soll), ew2010=first(ew2010))
+
+vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz <- vwohne729_90_einwohner2010_progemeinde %>%
+  filter(gkz_neu!=60101) %>%
+  group_by(fj,gsrbetr) %>%
+  summarise(vwausgabenprokopf=sum(vwausgaben)/sum(ew2010))
+
+
+plot_einwohner2010_ohnegraz_vwohne729_90 <- ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum() +
+  ggtitle("VWA/Kopf Einwohnerzahl fix 2010 ohne Graz")
+  #theme(legend.position="none")+
+  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+plot(plot7)
+
+plot(plot_einwohner2010_ohnegraz_vwohne729_90)
+
+
+vwohne729_90_einwohner2010_progemeinde_long <- vwohne729_90_einwohner2010_progemeinde %>%
+  filter(gkz_neu!=60101) %>%
+  group_by(fj, gkz_neu, gsrbetr) %>%
+  mutate(vwausgabenprokopf=sum(vwausgaben)/sum(ew2010))
+
+
+vwohne729_90_einwohner2010_progemeinde_data <- vwohne729_90_einwohner2010_progemeinde_long %>%
+  select(-ew2010,-vwausgaben) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avg_vor=(`2012`+`2013`+`2014`)/3,
+         avg_nach=(`2015`+`2016`+`2017`)/3,
+         avg_diff=avg_nach/avg_vor-1) %>%
+  mutate(mehrweniger=case_when(avg_diff>0 ~ 'mehr', TRUE ~ 'weniger'))
+
+vwohne729_90_einwohner2010_progemeinde_data %>%
+  group_by(gsrbetr, mehrweniger) %>%
+  summarise(n=n()) %>%
+  spread(mehrweniger, n) %>%
+  mutate(pct=mehr/(mehr+weniger)*100) %>%
+  kable(caption="Verwaltungskostensteigerungen/EW ohne 729/90 mit Einwohnerzahlen 2010, ohne Graz",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
+
+
+
+
+vwohne729_90_einwohnerrichtig_progemeinde_data <- vwohne729_90_einwohnerrichtig_progemeinde %>%
+#  filter(gkz_neu!=60101) %>%
+  group_by(fj, gkz_neu, gsrbetr) %>%
+  mutate(vwausgabenprokopf=sum(vwausgaben)/sum(ew)) %>%
+  select(-ew,-vwausgaben) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avg_vor=(`2012`+`2013`+`2014`)/3,
+         avg_nach=(`2015`+`2016`+`2017`)/3,
+         avg_diff=avg_nach/avg_vor-1) %>%
+  mutate(mehrweniger=case_when(avg_diff>0 ~ 'mehr', TRUE ~ 'weniger'))
+
+vwohne729_90_einwohnerrichtig_progemeinde_data %>%
+  group_by(gsrbetr, mehrweniger) %>%
+  summarise(n=n()) %>%
+  spread(mehrweniger, n) %>%
+  mutate(pct=mehr/(mehr+weniger)*100) %>%
+  kable(caption="Verwaltungskostensteigerungen/EW ohne 729/90 mit echten Einwohnerzahlen und Graz",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
+```
+
+
+```{r echo=F, warning=F}
+vwohne729_90_einwohner2010_progemeinde_gesamt <- vwohne729_90_einwohner2010_progemeinde_long %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgabenprokopf=sum(vwausgaben)/sum(ew2010))
+
+
+vwohne729_90_einwohner2010_progemeinde_gesamt %>%
+  ungroup() %>%
+  spread(fj, vwausgabenprokopf) %>%
+  bind_rows(
+    vwohne729_90_einwohner2010_progemeinde_gesamt %>% ungroup() %>% left_join(vwohne729_90_einwohner2010_progemeinde_gesamt %>%
+                                                                           ungroup() %>%
+                                                             mutate(fjnext=fj+1) %>%
+                                                             rename(vwausgabenprokopflast=vwausgabenprokopf) %>%
+                                                             select(-fj),
+                                                           by=c('fj'='fjnext', 'gsrbetr'='gsrbetr')
+                                                           ) %>%
+      mutate(steigerung=(vwausgabenprokopf/vwausgabenprokopflast-1)*100) %>%
+      mutate(gsrbetr = paste(gsrbetr, "Steigerung")) %>%
+      select(-vwausgabenprokopf,-vwausgabenprokopflast) %>%
+      spread(fj,steigerung)
+  ) %>%
+  kable(caption="Verwaltungsausgaben/Kopf Einwohner2010",
+        digits=1,
+        format.args = list(decimal.mark = ',', big.mark = "."),
+        format = "html") %>%
+  kable_styling()
+
+
+ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt, aes(fj, vwausgabenprokopf, color=gsrbetr)) +
+  geom_line()
 ```

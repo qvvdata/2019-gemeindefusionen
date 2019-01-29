@@ -624,8 +624,8 @@ gemeindeorgane_absolut_gsrbetr_table <- gemeindeorgane_absolut_gsrbetr %>%
          `Differenz vorher/nachher in %` = avg_diff) %>%
   select(-gruppe)
 options(knitr.table.format = "html")
-needs(knitr)
-needs(kableExtra)
+library(knitr)
+library(kableExtra)
 gemeindeorgane_absolut_gsrbetr_table %>% 
   kable(caption = "Ausgaben für gewählte Gemeindeorgane absolut in Euro") %>%
   kable_styling()
@@ -1490,6 +1490,12 @@ ewminimal_steigpct %>% left_join(ewminimal_steigpct_ohneausnahmejahre) %>%
   mutate(gsrbetr=case_when(gsrbetr == "Ja" ~ "Fusionsgemeinden", TRUE ~ "Nichtfusionsgemeinden"))
 ```
 
+
+
+```{r}
+    env=new.env() #create a new empty environment, it inherits objects from the current environment.
+    rmarkdown::render('main_fragebogen_lhs.Rmd', output_file="fragebogen_lhs.html", envir = env, output_dir="output/generated")
+```
 
 ## Linting
 
