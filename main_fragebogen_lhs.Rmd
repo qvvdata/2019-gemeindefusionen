@@ -16,6 +16,8 @@ Gilt diese Aussage noch immer, wenn man die Einwohnerzahl im Jahr 2010 fixiert? 
 library(knitr)
 library(kableExtra)
 
+options(scipen = 999)
+
 verwaltungsausgaben_einwohner2010 <- verwaltungsausgaben %>%
   left_join(verwaltungsausgaben %>%
               filter(fj==2010) %>%
@@ -267,6 +269,9 @@ plot(plot_vwausgabenohnegrazmap)
 
 
 
+---
+---
+
 #### Posten 729, Ansatz 9005
 Ausgehend von der Textdatei „Verwaltungsausgaben_ansätze_posten.txt“ ist uns aufgefallen, dass unter die Verwaltungskosten auch der Ansatz 900 und die Post 729 verwendet wurde. Dies ist falsch, da diese Buchung im Leitfaden zur GSR als Möglichkeit der Übernahme der schließlichen Reste aus den Altgemeinden in die neue Gemeinde von uns angegeben wurde:
 
@@ -298,17 +303,16 @@ vwohne729_90_ %>% spread(fj, soll) %>%
         format.args = list(decimal.mark = ',', big.mark = ".")) %>%
   kable_styling()
 
-
-ggplot(vwmit729_90, aes(fj, soll, color = gsrbetr)) +
+ggplot(vwmit729_90 %>%
+  mutate(analyse="mit729/90") %>%
+  bind_rows(vwohne729_90_ %>%
+              mutate(analyse="ohne729/90")),
+  aes(fj, soll, color = gsrbetr)) +
   geom_line() +
-  ggtitle("Verwaltungsausgaben absolut mit 729/90*") +
+  facet_wrap(~ analyse) +
+  ggtitle("Verwaltungsausgaben absolut") +
   theme_addendum()
 
-
-ggplot(vwohne729_90_, aes(fj, soll, color = gsrbetr)) +
-  geom_line() +
-  ggtitle("Verwaltungsausgaben absolut ohne 729/90*") +
-  theme_addendum()
 ```
 
 
@@ -337,8 +341,11 @@ vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz <- vwohne729_90_einwohner
   filter(gkz_neu!=60101) %>%
   group_by(fj,gsrbetr) %>%
   summarise(vwausgabenprokopf=sum(vwausgaben)/sum(ew2010))
+```
 
+#### Pro Kopf?
 
+```{r warnings=F, echo=F}
 plot_einwohner2010_ohnegraz_vwohne729_90 <- ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum() +
@@ -432,5 +439,8 @@ vwohne729_90_einwohner2010_progemeinde_gesamt %>%
 
 ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt, aes(fj, vwausgabenprokopf, color=gsrbetr)) +
   geom_line() +
-  ggtitle("Verwaltungsausgaben/Kopf Einwohner2010 ohne 729/90")
+  ggtitle("Verwaltungsausgaben/Kopf Einwohner2010 ohne 729/90 und Graz")
 ```
+
+
+

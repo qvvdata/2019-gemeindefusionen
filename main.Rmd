@@ -1402,18 +1402,18 @@ print(energiekoste_abs_ls_summary_ls <- energiekoste_abs_ls %>%
 
 energiekostenprokopf_ls_abs <- posten_data %>%
   filter(gruppe=="Energie") %>% 
-  filter (hh=="1") %>%
+  filter(hh=="1") %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
-  group_by(fj, gsrbetr, gruppe) %>%
+  group_by(fj, gkz_neu, gsrbetr, gruppe) %>%
   summarise(energieausgaben = sum(soll)) %>%
-  select(fj, gkz_neu, name, gsrbetr, energieausgaben) %>%
+  select(fj, gsrbetr, energieausgaben) %>%
   ungroup() %>%
   spread(fj, energieausgaben) %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
 
-=======
+```
 
 ## Verwaltungsausgaben pro Kopf, mit konstanter Einwohnerzahl (Stand 2010)
 
