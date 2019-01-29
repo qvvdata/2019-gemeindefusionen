@@ -1,4 +1,9 @@
 'use strict';
+
+
+import {maps} from './data';
+
+
 require('./qvv.css');
 require('./leaflet.fusesearch.09e7508.css');
 require('./style.css');
@@ -22,17 +27,23 @@ import './leaflet.pattern.d543c9f';
 import 'leaflet-responsive-popup';
 import { GestureHandling } from "leaflet-gesture-handling";
 
-
-import {maps} from './data';
-
 import {legend} from './legend';
 
 var PARAMS = URI.parseQuery(document.location.search)
 
 var MAP = maps[PARAMS.map];
-var colorlegend = legend[MAP.scale](MAP);
 
-var pymChild = new pym.Child();
+// set texts
+document.getElementsByTagName('h1')[0].innerHTML = PARAMS.bundesland && MAP.bundesland_title ? MAP.bundesland_title : MAP.title;
+document.querySelector('footer .actual_source').innerHTML = MAP.source;
+document.querySelector('p.detail').innerHTML = MAP.detail || '';
+document.querySelector('body p').innerHTML = MAP.description || '';
+
+
+
+
+var colorlegend = legend[MAP.scale](MAP);
+var pymChild = window.pym?new pym.Child():undefined;
 
 
 format.formatDefaultLocale({decimal: ",", thousands: ".", grouping: [3], currency: ['€ ','']})
@@ -60,12 +71,6 @@ map.on('move', function() {
   map._panes['popup2'].style.transform = map._mapPane.style.transform;
 
 });
-
-
-document.getElementsByTagName('h1')[0].innerHTML = PARAMS.bundesland && MAP.bundesland_title ? MAP.bundesland_title : MAP.title;
-document.querySelector('footer .actual_source').innerHTML = MAP.source;
-document.querySelector('p.detail').innerHTML = MAP.detail || '';
-document.querySelector('body p').innerHTML = MAP.description || '';
 
 
 if(PARAMS.force_message || (PARAMS.bundesland && MAP.bundesland_message)) {
@@ -189,8 +194,9 @@ queue.queue()
 
       if(MAP.post_draw_tooltip) {
           console.log(tooltip_elem);
-          MAP.post_draw_tooltip(tooltip_elem, e.popup._source.feature, numfmt);
+          MAP.post_draw_tooltip(tooltip_elem, pymChild, e.popup._source.feature, numfmt);
       }
+      pymChild.sendHeight();
     });
     map.on('popupclose', function(e) {
       if(map._container.clientWidth<500){
@@ -231,3 +237,11 @@ queue.queue()
       pymChild.sendHeight();
     })
 });
+
+if(PARAMS['3rdparty']!==undefined) {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-105776412-3');
+}

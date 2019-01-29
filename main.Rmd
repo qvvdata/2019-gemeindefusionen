@@ -623,8 +623,8 @@ gemeindeorgane_absolut_gsrbetr_table <- gemeindeorgane_absolut_gsrbetr %>%
          `Differenz vorher/nachher in %` = avg_diff) %>%
   select(-gruppe)
 options(knitr.table.format = "html")
-needs(knitr)
-needs(kableExtra)
+library(knitr)
+library(kableExtra)
 gemeindeorgane_absolut_gsrbetr_table %>% 
   kable(caption = "Ausgaben für gewählte Gemeindeorgane absolut in Euro") %>%
   kable_styling()
@@ -1375,6 +1375,7 @@ verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded %>% left_join(verwaltungsausga
 
 ```
 
+
 ```{r}
 # Herausrechnen der Energiekosten für LH-Sprecher 
 energiekoste_abs_ls <- posten_data %>%
@@ -1411,6 +1412,140 @@ energiekostenprokopf_ls_abs <- posten_data %>%
   mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
          avg15_17 = (`2015`+`2016`+`2017`)/3, 
          avg_diff = (avg15_17/avg12_14-1)*100)
+
+=======
+
+## Verwaltungsausgaben pro Kopf, mit konstanter Einwohnerzahl (Stand 2010)
+
+```{r}
+# Verwaltungsausgaben pro Kopf, aber bei schrumpfenden Gemeinden mit gleichbleibender Einwohnerzahl.
+# Wie: Einwohnerzahl wird mindestens am Niveau von 2010 belassen.
+
+verwaltungsausgaben_einwohner2010 <- verwaltungsausgaben %>%
+  left_join(verwaltungsausgaben %>% filter(fj==2010) %>% select(gkz_neu, ew) %>% rename(ew2010=ew) %>% group_by(gkz_neu) %>% filter(row_number()==1), by='gkz_neu') %>%
+  select(gkz_neu, fj, ew, ew2010, everything())
+
+verwaltungsausgabenprokopf_einwohner2010 <- verwaltungsausgaben_einwohner2010 %>%
+  group_by(fj, gkz_neu, name, gsrbetr, ew2010) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ew2010,2))
+
+
+plot_einwohner2010 <- ggplot(verwaltungsausgabenprokopf_einwohner2010 %>% group_by(fj, gsrbetr, gkz_neu) %>% summarise(vwausgaben=sum(vwausgaben), ew2010=first(ew2010)) %>% group_by(fj,gsrbetr) %>% summarise(vwausgabenprokopf=sum(vwausgaben)/sum(ew2010)), aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum() +
+  ggtitle("VWA/Kopf Einwohnerzahl fix 2010")
+  #theme(legend.position="none")+
+  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+plot(plot7)
+
+plot(plot_einwohner2010)
+
+verwaltungsausgaben_einwohner2010_diffs <- verwaltungsausgaben_einwohner2010 %>%
+  group_by(fj, gkz_neu, name, gsrbetr, ew2010) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ew2010,2)) %>%
+  select(fj, gkz_neu, name, vwausgabenprokopf, gsrbetr) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avg12_14 = round((((`2012`+`2013`+`2014`)/3)),1),
+         avg15_17 = round((((`2015`+`2016`+`2017`)/3)),1), 
+         avg_diff = round((((avg15_17/avg12_14-1)*100)),1), 
+         avg11_12 = round((((`2012`+`2011`)/2)),1), 
+         avg16_17 = round((((`2016`+`2017`)/2)),1), 
+         avg_diff_12_17 = round((((avg16_17/avg11_12-1)*100)),1))
+
+ew2010_steigpct <- verwaltungsausgaben_einwohner2010_diffs %>%
+  mutate(steigfall=case_when(avg_diff<=0 ~ 'fall', TRUE ~ 'steig')) %>%
+  group_by(gsrbetr, steigfall) %>%
+  summarise(n=n()) %>%
+  spread(steigfall, n) %>%
+  mutate(`Prozent Kostensteigerung` = steig/(fall+steig)*100) %>%
+  select(-fall,-steig)
+
+
+ew2010_steigpct_ohneausnahmejahre <- verwaltungsausgaben_einwohner2010_diffs %>%
+  mutate(steigfall=case_when(avg_diff_12_17<=0 ~ 'fall', TRUE ~ 'steig')) %>%
+  group_by(gsrbetr, steigfall) %>%
+  summarise(n=n()) %>%
+  spread(steigfall, n) %>%
+  mutate(`Prozent Kostensteigerung ohne Ausnahmejahre` = steig/(fall+steig)*100) %>%
+  select(-fall,-steig)
+
+ew2010_steigpct %>% left_join(ew2010_steigpct_ohneausnahmejahre) %>%
+  ungroup() %>%
+  mutate(gsrbetr=case_when(gsrbetr == "Ja" ~ "Fusionsgemeinden", TRUE ~ "Nichtfusionsgemeinden"))
+```
+
+
+## Verwaltungsausgaben pro Kopf, mit bestmöglicher Einwohnerzahl für schrumpfende Gemeinden
+Methodik: die Einwohnerzahl jeder Gemeinde wurde nach unten mit der Einwohnerzahl 2010 beschränkt
+
+```{r}
+# Verwaltungsausgaben pro Kopf, aber bei schrumpfenden Gemeinden mit gleichbleibender Einwohnerzahl.
+# Wie: Einwohnerzahl wird mindestens am Niveau von 2010 belassen.
+
+verwaltungsausgaben_einwohnerminimal <- verwaltungsausgaben %>%
+  left_join(verwaltungsausgaben %>% filter(fj==2010) %>% select(gkz_neu, ew) %>% rename(ew2010=ew) %>% group_by(gkz_neu) %>% filter(row_number()==1), by='gkz_neu') %>%
+  select(gkz_neu, fj, ew, ew2010, everything()) %>%
+  mutate(ewmin=pmax(ew,ew2010)) %>%
+  select(gkz_neu, fj, ew, ew2010, ewmin, everything()) %>%
+  arrange(gkz_neu, fj, ew, ew2010, ewmin)
+
+verwaltungsausgabenprokopf_einwohnerminimal <- verwaltungsausgaben_einwohnerminimal %>%
+  group_by(fj, gkz_neu, name, gsrbetr, ew, ew2010, ewmin) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ewmin,2))
+
+
+plot_einwohnerminimal <- ggplot(verwaltungsausgabenprokopf_einwohnerminimal %>% group_by(fj, gsrbetr, gkz_neu) %>% summarise(vwausgaben=sum(vwausgaben), ewmin=first(ewmin)) %>% group_by(fj,gsrbetr) %>% summarise(vwausgabenprokopf=sum(vwausgaben)/sum(ewmin)), aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum() +
+  ggtitle("VWA/Kopf Einwohnerzahl mindestens 2010")
+
+  #theme(legend.position="none")+
+  #geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+plot(plot_einwohnerminimal)
+
+
+verwaltungsausgaben_einwohnerminimal_diffs <- verwaltungsausgaben_einwohnerminimal %>%
+  group_by(fj, gkz_neu, name, gsrbetr, ewmin) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  mutate(vwausgabenprokopf = round(vwausgaben/ewmin,2)) %>%
+  select(fj, gkz_neu, name, vwausgabenprokopf, gsrbetr) %>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avg12_14 = round((((`2012`+`2013`+`2014`)/3)),1),
+         avg15_17 = round((((`2015`+`2016`+`2017`)/3)),1), 
+         avg_diff = round((((avg15_17/avg12_14-1)*100)),1), 
+         avg11_12 = round((((`2012`+`2011`)/2)),1), 
+         avg16_17 = round((((`2016`+`2017`)/2)),1), 
+         avg_diff_12_17 = round((((avg16_17/avg11_12-1)*100)),1))
+
+ewminimal_steigpct <- verwaltungsausgaben_einwohnerminimal_diffs %>%
+  mutate(steigfall=case_when(avg_diff<=0 ~ 'fall', TRUE ~ 'steig')) %>%
+  group_by(gsrbetr, steigfall) %>%
+  summarise(n=n()) %>% spread(steigfall, n) %>%
+  mutate(`Prozent Kostensteigerung` = steig/(fall+steig)*100) %>%
+  select(-fall,-steig)
+
+
+
+ewminimal_steigpct_ohneausnahmejahre <- verwaltungsausgaben_einwohnerminimal_diffs %>%
+  mutate(steigfall=case_when(avg_diff_12_17<=0 ~ 'fall', TRUE ~ 'steig')) %>%
+  group_by(gsrbetr, steigfall) %>%
+  summarise(n=n()) %>%
+  spread(steigfall, n) %>%
+  mutate(`Prozent Kostensteigerung ohne Ausnahmejahre`=steig/(fall+steig)*100) %>%
+  select(-fall,-steig)
+
+ewminimal_steigpct %>% left_join(ewminimal_steigpct_ohneausnahmejahre) %>%
+  ungroup() %>%
+  mutate(gsrbetr=case_when(gsrbetr == "Ja" ~ "Fusionsgemeinden", TRUE ~ "Nichtfusionsgemeinden"))
+```
+
+
+
+```{r}
+    env=new.env() #create a new empty environment, it inherits objects from the current environment.
+    rmarkdown::render('main_fragebogen_lhs.Rmd', output_file="fragebogen_lhs.html", envir = env, output_dir="output/generated")
 
 ```
 
