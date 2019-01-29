@@ -1,8 +1,8 @@
-### Was bringen Gemeindefusionen?
+# Was bringen Gemeindefusionen?
 
 Addendum hat Ende Jänner 2019 in Kooperation mit der Kleinen Zeitung eine Zwischenbilanz zur steirischen Gemeindestrukturreform gezogen. Dabei wurde die Zahl der Gemeinden im Jahr 2015 fast halbiert. Die Analyse versucht die ausgabenseitigen Effekte dieser Reform zu vermessen. Ein Fokus lag auf der Analyse der Verwaltungsausgaben. 
 
-#### Wie ist die Analyse strukturiert? 
+## Wie ist die Analyse strukturiert? 
 1. 'main.Rmd' enthält das Analyse-Skript - es beinhaltet alle wesentlichen Berechnungen
 2. '/input/' bessereheader fasst alle Rohdaten, die für die Analyse benötigt werden, zusammen - das sind Bevölkerungszahlen, Ausgaben nach Posten und Ansatz der Rechnungsabschlüsse der Gemeinden, Gemeindebezüge der Organe, Landtagswahlergebnisse, usw.
 3. /output ist relevant, weil der Datenbereinigungsschritt nicht jedes Mal ausgeführt wird und von dort die notwendigen Daten geladen werden. /generated beinhaltet Reports, die den Regionalredaktionen der Kleinen Zeitung zur Verfügung gestellt wurden
