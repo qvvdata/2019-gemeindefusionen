@@ -437,10 +437,9 @@ print(energiekostenprokopf_summary <- energiekostenprokopf %>%
          steigen_pct = round((steigen/gesamt*100),0))
 
 
-```
 
-69/127 von fusionierten Gemeinden gestiegen 54 %
-57/158 von nicht_gsrbetr Gemeinden gestiegen 36 %
+
+```
 
 
 #Berechnungen nach den Ansätzen/Kostenstellen ohne Posten für Gemeindereferate ("Standesamt", "Bauamt", "Amt für Raumordnung und Raumplanung", "Sozialamt", "Zentralamt")
@@ -1242,9 +1241,8 @@ write.xlsx(kathrein, "output/ignore/kathrein.xlsx")
 
 ```{r}
 # Land Steiermark zweifelt die Ergebnisse an, Graz müsste aus Berechnung raus - wie sähe die Berechnung dann aus?
-
 verwaltungsausgabenprokopf_gsrbetr_ls <-verwaltungsausgaben %>%
-  filter(gkz_neu!="60101") %>%
+  #filter(gkz_neu!="60101") %>%
   group_by(fj, gsrbetr) %>%
   summarise(vwausgaben = sum(soll)) %>%
   ungroup() %>%
@@ -1253,7 +1251,7 @@ verwaltungsausgabenprokopf_gsrbetr_ls <-verwaltungsausgaben %>%
 # Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
 gsrbetr_bev_ls <- gemeinden_reg %>%
   filter(gkz_neu >60000 & gkz_neu < 70000) %>%
-  filter(gkz_neu != "60101") %>% # Graz rauswerfen
+  #filter(gkz_neu != "60101") %>% # Graz rauswerfen
   select(gkz_neu,jahr,ew) %>%
   group_by(gkz_neu, jahr) %>%
   left_join(gsr15, by=c("gkz_neu"="gkz"))
@@ -1292,6 +1290,10 @@ verwaltungsausgaben_aggregat_avg_diff_ls <- verwaltungsausgabenprokopf_gsrbetr_t
   gather(type, value, `2010`:avgdiff_2017) %>%
   separate(type, c("art", "fj"), sep="_") %>%
   na.omit(fj)
+
+#write.xlsx(verwaltungsausgaben_aggregat_avg_diff_ls, "output/ignore/verwaltungsausgaben_aggregat_avg_diff_ls_ohneGraz.xlsx", sheetName = "Verwaltungsausgaben #absolut ohne Graz")
+write.xlsx(verwaltungsausgaben_aggregat_avg_diff_ls, "output/ignore/verwaltungsausgaben_aggregat_avg_diff_ls_mitGraz.xlsx", sheetName = "Verwaltungsausgaben absolut mit Graz")
+
 ```
 
 ```{r}
@@ -1299,7 +1301,7 @@ verwaltungsausgaben_aggregat_avg_diff_ls <- verwaltungsausgabenprokopf_gsrbetr_t
 
 # Gesamtbetrag der Verwaltungsausgaben vor und nach der Fusion ohne Graz berechnen
 verwaltungsausgaben_aggregat_ls <-verwaltungsausgaben %>%
-  filter(gkz_neu!="60101") %>%
+ # filter(gkz_neu!="60101") %>%
   group_by(fj, gsrbetr) %>%
   summarise(vwausgaben = sum(soll)) %>%
   ungroup() %>%
@@ -1340,7 +1342,7 @@ verwaltungsausgaben_aggregat_ls_abs <-verwaltungsausgaben %>%
   select(fj, vwausgaben, gsrbetr, gkz_neu) #%>%
 
 
-# Anhang der Mail an LH-Sprecher, Michael Feiertag
+# Mail an LH-Sprecher, Michael Feiertag
 print(verwaltungsausgaben_aggregat_sums_ls_abs <-verwaltungsausgaben_aggregat_ls_abs %>%
   spread(fj, vwausgaben) %>%
   mutate(vwausgabenvor = `2012`+`2013`+`2014`,
@@ -1352,14 +1354,63 @@ print(verwaltungsausgaben_aggregat_sums_ls_abs <-verwaltungsausgaben_aggregat_ls
   spread(avg_diff_posneg, count) %>%
   mutate(gesamt = sparen+steigen, 
          steigen_pct = round((steigen/gesamt*100),0)))
+
+# # Betrachtung der absoluten Veärnderung je Gemeinde der Verwaltungsausgaben
+verwaltungsausgaben_aggregat_ls_abs_exp <-verwaltungsausgaben %>%
+  group_by(fj, gsrbetr, gkz_neu) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr, gkz_neu) %>%
+  spread(fj, vwausgaben)%>%
+  left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu"))
+write.xlsx(verwaltungsausgaben_aggregat_ls_abs_exp, "output/ignore/verwaltungsausgaben_aggregat_ls_abs_exp.xlsx", sheetName = "Verwaltungsausgaben absolut")
+
 ```
 
 
 
 ```{r}
 # Check: Verwaltungsausgaben pro Kopf
-
 verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded %>% left_join(verwaltungsausgabenprokopf_gsrbetr_t_dw_unrounded %>% mutate(fjl=fj+1), by=c('fj'='fjl')) %>% mutate(steiegerungja=round((Ja.x/Ja.y-1)*100,1), steigerungnein=round((Nein.x/Nein.y-1)*100,1)) %>% mutate(Ja.x=round(Ja.x,0), Nein.x=round(Nein.x,0)) %>% select(-Ja.y,-Nein.y)
+
+```
+
+```{r}
+# Herausrechnen der Energiekosten für LH-Sprecher 
+energiekoste_abs_ls <- posten_data %>%
+  filter(gruppe=="Energie") %>% 
+  filter (hh=="1") %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
+  summarise(energieausgaben = sum(soll)) %>%
+  select(fj, gkz_neu, name, gsrbetr, energieausgaben) %>%
+  ungroup() %>%
+  spread(fj, energieausgaben) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+
+print(energiekoste_abs_ls_summary_ls <- energiekoste_abs_ls %>%
+  mutate(avg_diff_posneg = ifelse(avg_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+    spread(avg_diff_posneg, count))%>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0))
+
+
+energiekostenprokopf_ls_abs <- posten_data %>%
+  filter(gruppe=="Energie") %>% 
+  filter (hh=="1") %>%
+  filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
+  group_by(fj, gsrbetr, gruppe) %>%
+  summarise(energieausgaben = sum(soll)) %>%
+  select(fj, gkz_neu, name, gsrbetr, energieausgaben) %>%
+  ungroup() %>%
+  spread(fj, energieausgaben) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
 
 ```
 
