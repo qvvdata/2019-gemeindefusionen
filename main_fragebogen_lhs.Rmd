@@ -447,7 +447,8 @@ ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt, aes(fj, vwausgabenprokopf,
 verwaltungsausgabenprokopf_ohne729 <- vwohne729_90_einwohnerrichtig_progemeinde_data %>%
   left_join(gemeindenamen18, by=c("gkz_neu"="gkz_neu")) %>%
   rename(avg12_14=avg_vor,
-         avg15_17=avg_nach)
+         avg15_17=avg_nach) %>%
+  mutate(avg_diff=avg_diff*100)
 
 write_csv(verwaltungsausgabenprokopf_ohne729 %>% select(-`2010`,-`2011`)
           , path = "interaktiv/karte/dist/verwaltungsausgabenprokopf_ohne729.csv")
