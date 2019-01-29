@@ -215,6 +215,7 @@ Wie haben sich die Personalausgaben pro Kopf je Gemeinde verändert? Welche Unte
 personalkostenprokopf <- posten_data %>%
   filter(gruppe=="Personal") %>%
   filter (hh=="1") %>%
+  # filter(post3!='729', ans2!='90')  %>% # Hat der Posten 729/ Ansatz 90 Auswirkungen auf Zählung? --> Nein
   filter(gkz_neu >60000 & gkz_neu <70000) %>% 
   group_by(fj, gkz_neu, name, gsrbetr, gruppe, ew) %>%
   summarise(personalausgaben = sum(soll)) %>%
@@ -1294,6 +1295,8 @@ verwaltungsausgaben_aggregat_avg_diff_ls <- verwaltungsausgabenprokopf_gsrbetr_t
 #write.xlsx(verwaltungsausgaben_aggregat_avg_diff_ls, "output/ignore/verwaltungsausgaben_aggregat_avg_diff_ls_ohneGraz.xlsx", sheetName = "Verwaltungsausgaben #absolut ohne Graz")
 write.xlsx(verwaltungsausgaben_aggregat_avg_diff_ls, "output/ignore/verwaltungsausgaben_aggregat_avg_diff_ls_mitGraz.xlsx", sheetName = "Verwaltungsausgaben absolut mit Graz")
 
+
+
 ```
 
 ```{r}
@@ -1548,6 +1551,11 @@ ewminimal_steigpct %>% left_join(ewminimal_steigpct_ohneausnahmejahre) %>%
     rmarkdown::render('main_fragebogen_lhs.Rmd', output_file="fragebogen_lhs.html", envir = env, output_dir="output/generated")
 
 ```
+```{r}
+
+
+```
+
 
 ## Linting
 
