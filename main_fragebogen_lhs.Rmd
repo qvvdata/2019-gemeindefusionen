@@ -452,6 +452,19 @@ verwaltungsausgabenprokopf_ohne729 <- vwohne729_90_einwohnerrichtig_progemeinde_
 write_csv(verwaltungsausgabenprokopf_ohne729 %>% select(-`2010`,-`2011`)
           , path = "interaktiv/karte/dist/verwaltungsausgabenprokopf_ohne729.csv")
 
+# Pro Kopf Entwicklung ohne 729 und mit richtiger Einwohnerzahl aber ohne Graz herausrechnen
+vwohne729_90_einwohnerrichtig_gesamt <- vwohne729_90_einwohnerrichtig_progemeinde %>%
+  filter(gkz_neu!="60101") %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben=sum(vwausgaben), ew=sum(ew)) %>%
+  mutate(vwausgabenprokopf = vwausgaben/ew) %>%
+  select(-c(vwausgaben, ew))
+
+ggplot(vwohne729_90_einwohnerrichtig_gesamt, aes(fj, vwausgabenprokopf, color=gsrbetr)) +
+  geom_line() +
+  ggtitle("Verwaltungsausgaben/Kopf Einwohner richtig ohne 729/90 und Graz")
+
+
 ```
 
 
