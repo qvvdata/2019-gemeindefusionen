@@ -52,7 +52,7 @@ maps['verwaltungsausgabenprokopf'] = {
       <div class="chart" style="height: 125px"></div>`;
   },
   bundesland_message: ``,
-  post_draw_tooltip: function(elem, source_feature, fmt) {
+  post_draw_tooltip: function(elem, pymChild, source_feature, fmt) {
       setTimeout(() => {
           var data = source_feature.data;
           var jahre = Object.keys(data).filter(x => !isNaN(+x)).sort().map(x => +x);
@@ -71,6 +71,7 @@ maps['verwaltungsausgabenprokopf'] = {
             yline: data.gsrbetr=='Ja'?2014.5:undefined,
             ylinelbl: data.gsrbetr=='Ja'?'Fusion':undefined
         }, true);
+        pymChild.sendHeight();
     }, 100);
   }
 };
@@ -98,7 +99,7 @@ maps['politikerbezuege'] = {
       <div class="chart" style="height: 125px"></div>`;
   },
   bundesland_message: ``,
-  post_draw_tooltip: function(elem, source_feature, fmt) {
+  post_draw_tooltip: function(elem, pymChild, source_feature, fmt) {
       setTimeout(() => {
           var data = source_feature.data;
           var jahre = Object.keys(data).filter(x => !isNaN(+x)).sort().map(x => +x);
@@ -117,6 +118,7 @@ maps['politikerbezuege'] = {
             yline: data.gsrbetr=='Ja'?2014.5:undefined,
             ylinelbl: data.gsrbetr=='Ja'?'Fusion':undefined
         }, true);
+        pymChild.sendHeight();
       }, 100)
   }
 };
