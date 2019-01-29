@@ -342,7 +342,7 @@ vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz <- vwohne729_90_einwohner
 plot_einwohner2010_ohnegraz_vwohne729_90 <- ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt_ohnegraz, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
   geom_line() +
   theme_addendum() +
-  ggtitle("VWA/Kopf Einwohnerzahl fix 2010 ohne Graz")
+  ggtitle("VWA/Kopf o.729/90 EWfix2010 ohne Graz")
   #theme(legend.position="none")+
   #geom_dl(aes(label = gsrbetr), method="angled.boxes")+plot(plot7)
 
@@ -431,5 +431,6 @@ vwohne729_90_einwohner2010_progemeinde_gesamt %>%
 
 
 ggplot(vwohne729_90_einwohner2010_progemeinde_gesamt, aes(fj, vwausgabenprokopf, color=gsrbetr)) +
-  geom_line()
+  geom_line() +
+  ggtitle("Verwaltungsausgaben/Kopf Einwohner2010 ohne 729/90")
 ```
