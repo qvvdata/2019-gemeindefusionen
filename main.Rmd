@@ -974,6 +974,7 @@ map_data <- gde_18 %>%
   filter(gkz_neu >= 60000 & gkz_neu <70000) %>%
   left_join(personalkostenprokopf_map, by = c("gkz_neu" = "gkz_neu"))
 
+#
 
 
 #vew pro Kopf Erhöhung zeichnen zeichnen
@@ -1222,6 +1223,131 @@ vw_pers_erhöhung <- verwaltungsausgabenprokopf %>%
   
 
 ```
+
+```{r}
+# Nachfrage von Kathrein-Tragöß
+
+kathrein <- verwaltungsausgaben %>%
+  filter(gkz_neu=="62148")
+
+write.xlsx(kathrein, "output/ignore/kathrein.xlsx")
+
+```
+
+```{r}
+# Land Steiermark zweifelt die Ergebnisse an, Graz müsste aus Berechnung raus - wie sähe die Berechnung dann aus?
+
+verwaltungsausgabenprokopf_gsrbetr_ls <-verwaltungsausgaben %>%
+  filter(gkz_neu!="60101") %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr) 
+
+# Kalkulieren der Bevölkerung für die Ja-Nein-Gsrbetr Gemeinden total 
+gsrbetr_bev_ls <- gemeinden_reg %>%
+  filter(gkz_neu >60000 & gkz_neu < 70000) %>%
+  filter(gkz_neu != "60101") %>% # Graz rauswerfen
+  select(gkz_neu,jahr,ew) %>%
+  group_by(gkz_neu, jahr) %>%
+  left_join(gsr15, by=c("gkz_neu"="gkz"))
+
+# Bevölkerung in fusionierten/ nicht fusionierten berechnen
+gsrbetr_bev_t_ls <- gsrbetr_bev_ls %>%
+  group_by(gsrbetr, jahr) %>%
+  summarise(ew = sum(ew)) 
+
+# Join der Bevölkerung mit den Verwaltungsausgaben ohne Graz
+verwaltungsausgabenprokopf_gsrbetr_t_ls <- verwaltungsausgabenprokopf_gsrbetr_ls %>%
+  left_join(gsrbetr_bev_t_ls, by=c("gsrbetr"="gsrbetr", "fj"="jahr")) %>%
+  mutate(vwausgabenprokopf = vwausgaben/ew)
+
+# Zeichnen der Verwaltungsausgaben ohne Graz
+plot30 <- ggplot(verwaltungsausgabenprokopf_gsrbetr_t_ls, aes(fj, vwausgabenprokopf, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 700)+
+   theme_minimal()
+plot(plot30) 
+
+# Berechnen der prozentuellen Veränderung der pro Kopf Kosten ohne Graz nach fusioniert/ nicht fusioniert
+verwaltungsausgaben_aggregat_avg_diff_ls <- verwaltungsausgabenprokopf_gsrbetr_t_ls %>%
+  select(-c(ew, vwausgaben))%>%
+  spread(fj, vwausgabenprokopf) %>%
+  mutate(avgdiff_2011 = round((((`2011`/`2010`)-1)*100),2), 
+         avgdiff_2012 = round((((`2012`/`2011`)-1)*100),2), 
+         avgdiff_2013 = round((((`2013`/`2012`)-1)*100),2), 
+         avgdiff_2014 = round((((`2014`/`2013`)-1)*100),2), 
+         avgdiff_2015 = round((((`2015`/`2014`)-1)*100),2), 
+         avgdiff_2016 = round((((`2016`/`2015`)-1)*100),2), 
+         avgdiff_2017 = round((((`2017`/`2016`)-1)*100),2)) %>%
+  gather(type, value, `2010`:avgdiff_2017) %>%
+  separate(type, c("art", "fj"), sep="_") %>%
+  na.omit(fj)
+```
+
+```{r}
+# Land Steiermark zweifelt Ergebnisse an wegen Zu- bzw. Abwanderung aus Gemeinden. Berechnung der absoluten #Ausgaben ohne Berücksichtigung der Einwohnerzahl im ersten Schritt, festlegen einer fixen Einwohnerzahl im #zweiten Schritt. 
+
+# Gesamtbetrag der Verwaltungsausgaben vor und nach der Fusion ohne Graz berechnen
+verwaltungsausgaben_aggregat_ls <-verwaltungsausgaben %>%
+  filter(gkz_neu!="60101") %>%
+  group_by(fj, gsrbetr) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr) %>%
+  spread(fj, vwausgaben) %>%
+  mutate(avg12_14 = (`2012`+`2013`+`2014`)/3, 
+         avg15_17 = (`2015`+`2016`+`2017`)/3, 
+         avg_diff = (avg15_17/avg12_14-1)*100)
+
+# verwaltungsausgaben_aggregat_sums_ls <-verwaltungsausgaben_aggregat_ls %>%
+#   spread(fj, vwausgaben) %>%
+#   mutate(vwausgabenvor = `2012`+`2014`+`2013`,
+#          vwausgabendanach = `2015`+`2016`+`2017`, 
+#          vwausgaben_vor_danach_diff = ((vwausgabendanach/vwausgabenvor)-1)*100)
+
+verwaltungsausgaben_aggregat_ls_plot <- verwaltungsausgaben_aggregat_ls %>%
+  select(-c(avg12_14, avg15_17, avg_diff)) %>%
+  gather(fj, vwausgaben, `2010`:`2017`) %>%
+  mutate(fj = as.numeric(fj))
+
+plot100 <- ggplot(verwaltungsausgaben_aggregat_ls_plot, aes(fj, vwausgaben, color = gsrbetr)) +
+  geom_line() +
+  theme_addendum()+
+  theme(legend.position="none")+
+  geom_dl(aes(label = gsrbetr), method="angled.boxes")+
+  ylim(0, 400000000)
+
+print(plot100)
+
+```
+
+```{r}
+# Betrachtung der absoluten Veärnderung je Gemeinde der Verwaltungsausgaben
+verwaltungsausgaben_aggregat_ls_abs <-verwaltungsausgaben %>%
+  group_by(fj, gsrbetr, gkz_neu) %>%
+  summarise(vwausgaben = sum(soll)) %>%
+  ungroup() %>%
+  select(fj, vwausgaben, gsrbetr, gkz_neu) #%>%
+
+
+# Anhang der Mail an LH-Sprecher, Michael Feiertag
+print(verwaltungsausgaben_aggregat_sums_ls_abs <-verwaltungsausgaben_aggregat_ls_abs %>%
+  spread(fj, vwausgaben) %>%
+  mutate(vwausgabenvor = `2012`+`2013`+`2014`,
+         vwausgabendanach = `2016`+`2017`+`2015`, 
+         vwausgaben_vor_danach_diff = ((vwausgabendanach/vwausgabenvor)-1)*100) %>%
+  mutate(avg_diff_posneg = ifelse(vwausgaben_vor_danach_diff<=0, "sparen", "steigen")) %>%
+  group_by(gsrbetr, avg_diff_posneg) %>%
+  summarise(count = n()) %>%
+  spread(avg_diff_posneg, count) %>%
+  mutate(gesamt = sparen+steigen, 
+         steigen_pct = round((steigen/gesamt*100),0)))
+```
+
 
 ## Linting
 
