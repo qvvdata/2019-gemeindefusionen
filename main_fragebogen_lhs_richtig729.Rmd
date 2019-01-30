@@ -146,6 +146,20 @@ vwohne729_90_einwohnerrichtig_progemeinde_data %>%
         format = "html",
         format.args = list(decimal.mark = ',', big.mark = ".")) %>%
   kable_styling()
+
+
+
+vwohne729_90_einwohnerrichtig_progemeinde_data %>%
+  filter(gkz_neu!=60101) %>%
+  group_by(gsrbetr, mehrweniger) %>%
+  summarise(n=n()) %>%
+  spread(mehrweniger, n) %>%
+  mutate(pct=mehr/(mehr+weniger)*100) %>%
+  kable(caption="Verwaltungskostensteigerungen/EW ohne 729/90 mit echten Einwohnerzahlen ohne Graz",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
 ```
 
 
@@ -311,7 +325,7 @@ dw1 <- vwohne729_90_einwohnerrichtig_progemeinde %>%
   summarise(vwaprokopf=sum(vwausgaben)/sum(ew)) %>%
   spread(gsrbetr, vwaprokopf)
 
-dw1 %>% write_("output/ignore/vwohne729_90_fin_01_verwaltungsausgaben.csv")
+#dw1 %>% write_("output/ignore/vwohne729_90_fin_01_verwaltungsausgaben.csv")
 
 dw1
 ```
