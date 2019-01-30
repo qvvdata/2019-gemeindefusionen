@@ -302,13 +302,13 @@ vwohne729_90_ <- vwohne729_90 %>%
   mutate(sum12_14 = `2012`+`2013`+`2014`, 
          sum15_17 = `2015`+`2016`+`2017`, 
          diff = ((sum15_17/sum12_14)-1)*100)
-  
-vwohne729_90_ %>% spread(fj, soll) %>%
-  kable(caption="Verwaltungsausgaben absolut ohne 729/90*",
-        digits=1,
-        format = "html",
-        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
-  kable_styling()
+
+vwohne729_90_ %>%
+ kable(caption="Verwaltungsausgaben absolut ohne 729/90*",
+       digits=1,
+       format = "html",
+       format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+ kable_styling()
 
 ggplot(vwmit729_90 %>%
   mutate(analyse="mit729/90") %>%
@@ -545,3 +545,15 @@ vwohne729_90_og_ <- vwohne729_90_og %>%
          diff = ((sum15_17/sum12_14)-1)*100)
 ```
 
+
+
+```{r}
+# hier ist graz wohl in geralds auswertung entfernt, also hier auch.
+
+vwohne729_90_einwohnerrichtig_progemeinde %>%
+  filter(gkz_neu!=60101) %>%
+  group_by(fj,gsrbetr) %>%
+  summarise(vwaprokopf=sum(vwausgaben)/sum(ew)) %>%
+  spread(gsrbetr, vwaprokopf)
+```
+```
