@@ -271,15 +271,19 @@ write.xlsx(as.data.frame(personalkostenprokopf_temp_merged), "output/ignore/pers
 
 ```
 
-
+## Absolute Zahlen ohne Graz
 
 ```{r}
 vwohne729_90_og <- verwaltungsausgaben %>%
   filter(!(post3=='729' & ans2=='90')) %>%
-   filter(gkz_neu!=60101)
+  filter(gkz_neu!=60101)
 
-vwohne729_90_og <- verwaltungsausgaben %>% group_by(gsrbetr, fj) %>% summarise(soll=sum(soll))
-vwohne729_90_og %>% spread(fj, soll) %>%
+vwohne729_90_og_ <- vwohne729_90_og %>%
+  group_by(gsrbetr, fj) %>%
+  summarise(soll=sum(soll)) %>%
+  spread(fj, soll)
+
+vwohne729_90_og_ %>%
   kable(caption="Verwaltungsausgaben absolut ohne 729/90* und Graz",
         digits=1,
         format = "html",
@@ -287,13 +291,48 @@ vwohne729_90_og %>% spread(fj, soll) %>%
   kable_styling()
 
 
-vwohne729_90_og_ <- vwohne729_90_og %>%
+vwohne729_90_og_diff <- vwohne729_90_og_ %>%
  # group_by(gsrbetr, fj) %>%
 #  summarise(soll=sum(soll)) %>%
-  spread(fj, soll)%>%
+#  spread(fj, soll)%>%
   mutate(sum12_14 = `2012`+`2013`+`2014`, 
          sum15_17 = `2015`+`2016`+`2017`, 
          diff = ((sum15_17/sum12_14)-1)*100)
+
+
+vwohne729_90_og_diff
+```
+
+## Absolute Zahlen mit Graz
+
+
+```{r}
+vwohne729_90_mg <- verwaltungsausgaben %>%
+  filter(!(post3=='729' & ans2=='90'))
+
+vwohne729_90_mg_ <- vwohne729_90_mg %>%
+  group_by(gsrbetr, fj) %>%
+  summarise(soll=sum(soll)) %>%
+  spread(fj, soll)
+
+vwohne729_90_mg_ %>%
+  kable(caption="Verwaltungsausgaben absolut ohne 729/90* und Graz",
+        digits=1,
+        format = "html",
+        format.args = list(decimal.mark = ',', big.mark = ".")) %>%
+  kable_styling()
+
+
+vwohne729_90_mg_diff <- vwohne729_90_mg_ %>%
+ # group_by(gsrbetr, fj) %>%
+#  summarise(soll=sum(soll)) %>%
+#  spread(fj, soll)%>%
+  mutate(sum12_14 = `2012`+`2013`+`2014`, 
+         sum15_17 = `2015`+`2016`+`2017`, 
+         diff = ((sum15_17/sum12_14)-1)*100)
+
+
+vwohne729_90_mg_diff
 ```
 
 
